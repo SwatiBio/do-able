@@ -1,0 +1,7 @@
+# Folders to ignore (add your own)
+backend/
+backup-backened/
+backup-frontened/
+
+# Specific files
+todo-prompt.txt
