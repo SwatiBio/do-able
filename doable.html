@@ -189,6 +189,32 @@ textarea{resize:vertical;min-height:80px}
 .calendar-day.expanded .calendar-day-tasks{display:block}
 .calendar-day-task{font-size:12px;padding:2px 0;cursor:pointer;color:var(--text);font-family:var(--font-mono)} 
 .calendar-day-task:hover{color:var(--accent)}
+.calendar-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.calendar-controls select{padding:4px 8px;font-size:12px;width:auto}
+.calendar-controls input[type="date"]{padding:4px 8px;font-size:12px;width:auto}
+.calendar-desc{font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.5}
+.calendar-week-grid{display:grid;grid-template-columns:auto repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;font-size:12px}
+.calendar-time-label{padding:4px 8px;font-size:11px;color:var(--text-dim);background:var(--bg);text-align:right;font-family:var(--font-mono);border-top:1px solid var(--border);min-height:40px;white-space:nowrap}
+.calendar-hour-slot{padding:2px 4px;font-size:11px;background:var(--bg);border-top:1px solid var(--border);cursor:pointer;transition:background .15s;min-height:40px;position:relative}
+.calendar-hour-slot:hover{background:var(--bg-raised)}
+.calendar-hour-slot.today-col{background:var(--bg-hover)}
+.cal-heatmap-0{background:var(--bg)}
+.cal-heatmap-1{background:rgba(136,192,208,.12)}
+.cal-heatmap-2{background:rgba(136,192,208,.28)}
+.cal-heatmap-3{background:rgba(136,192,208,.48)}
+.cal-heatmap-4{background:rgba(136,192,208,.68)}
+.cal-heatmap-5{background:rgba(136,192,208,.88)}
+.calendar-day.today{border:2px solid var(--accent);animation:cal-today-pulse 2s ease-in-out infinite}
+.calendar-day.today .calendar-day-num{color:var(--accent);font-weight:700}
+.calendar-day.overdue{box-shadow:inset 0 0 0 1px var(--red)}
+.calendar-day.drag-over{background:rgba(136,192,208,.15)}
+.calendar-hour-slot.drag-over{background:rgba(136,192,208,.15)}
+.cal-multi-bar{position:absolute;top:2px;left:0;right:0;height:18px;border-radius:3px;font-size:9px;padding:0 4px;display:flex;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;z-index:2;opacity:.85}
+.cal-multi-bar:hover{opacity:1;z-index:3}
+.cal-preview-task{font-size:11px;padding:1px 4px;margin:1px 0;border-radius:2px;background:var(--bg-muted);color:var(--text-dim);cursor:pointer;opacity:.5;font-style:italic}
+.calendar-day-task .task-time{font-family:var(--font-mono);opacity:.7;margin-right:2px;font-size:10px}
+@keyframes cal-today-pulse{0%,100%{box-shadow:0 0 0 0 rgba(136,192,208,.4)}50%{box-shadow:0 0 0 4px rgba(136,192,208,0)}}
+.calendar-hour-slot .calendar-day-task{font-size:10px;padding:1px 3px;margin:1px 0}
 
 /* Task Detail */
 .detail-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
@@ -570,6 +596,15 @@ textarea{resize:vertical;min-height:80px}
             </div>
           </div>
         </div>
+        <div class="settings-section">
+          <h2 onclick="toggleAccordion(this)">Categories</h2>
+          <div class="settings-body">
+            <div class="settings-row">
+              <div><div class="settings-label">Manage categories</div><div class="settings-desc">Delete unused categories. Tasks using a deleted category become uncategorized.</div></div>
+            </div>
+            <div id="settingsCategoriesList"></div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -627,7 +662,7 @@ function getFocus(){return lsGet('focus',{})}
 function saveFocus(f){lsSet('focus',f)}
 
 function logActivity(taskId,action,details=''){
-  const a=getActivity();a.unshift({id:uid(),task_id:taskId,action,details,timestamp:nowISO()});
+  let a=getActivity();a.unshift({id:uid(),task_id:taskId,action,details,timestamp:nowISO()});
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-10);
   a=a.filter(e=>e.timestamp>=cutoff.toISOString());
   if(a.length>500)a.length=500;saveActivity(a)
@@ -842,9 +877,10 @@ function renderListView(){
       let cols='<th style="width:20px"></th><th style="width:36px"></th><th>Title</th><th style="width:80px">Priority</th><th style="width:100px">Status</th><th style="width:120px">Due</th>';
       if(showTags)cols+='<th style="width:120px">Tags</th>';
       if(showCat)cols+='<th style="width:100px">Category</th>';
-      if(showAnno)cols+='<th style="width:60px">Notes</th>';
-      if(showDeps)cols+='<th style="width:60px">Deps</th>';
-      if(showRecur)cols+='<th style="width:80px">Recur</th>';
+  if(taskColumns.includes('time'))cols+='<th style="width:80px">Time</th>';
+  if(showAnno)cols+='<th style="width:60px">Notes</th>';
+  if(showDeps)cols+='<th style="width:60px">Deps</th>';
+  if(showRecur)cols+='<th style="width:80px">Recur</th>';
       html=`<table class="task-table"><thead><tr>${cols}</tr></thead><tbody>${pageTasks.map(t=>renderTaskRow(t)).join('')}</tbody></table>`
     }
   document.getElementById('taskListView').innerHTML=html;
@@ -857,6 +893,7 @@ function renderTaskRow(t){
   const showDeps=taskColumns.includes('dependencies');
   const showRecur=taskColumns.includes('recur');
   let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone('${t.id}',this.checked)" title="Mark done"></td><td><span class="task-title" onclick="showTaskDetail('${t.id}')">${escHtml(t.title)}</span></td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
+  if(taskColumns.includes('time'))cells+=`<td class="text-sm text-dim">${t.time||'—'}</td>`;
   if(showTags)cells+=`<td>${(t.tags||[]).map(tag=>`<span class="tag-pill">${escHtml(tag)}</span>`).join('')}</td>`;
   if(showCat)cells+=`<td class="text-dim text-sm">${escHtml(t.category||'—')}</td>`;
   if(showAnno)cells+=`<td class="text-dim text-sm">${(t.notes||[]).length||'—'}</td>`;
@@ -941,6 +978,7 @@ document.addEventListener('click',function(e){
 
 // --- Column Filter UI ---
 const columnOptions=[
+  {key:'time',label:'Time'},
   {key:'tags',label:'Tags'},
   {key:'category',label:'Category'},
   {key:'annotations',label:'Annotations'},
@@ -1013,22 +1051,170 @@ function onDropKanban(e,key){
 }
 
 // --- Calendar ---
-let calMonth=null,calYear=null;
+let calViewDate=new Date();
+let calViewMode='month';
+let calHeatmap=false;
+
 function renderCalendar(){
-  const now=new Date();const m=calMonth===null?now.getMonth():calMonth;const y=calYear===null?now.getFullYear():calYear;
-  const tasks=getFilteredTasks().filter(t=>t.due_date);
-  const firstDay=new Date(y,m,1).getDay();const daysInMonth=new Date(y,m+1,0).getDate();
-  const prevDays=new Date(y,m,0).getDate();
+  const container=document.getElementById('taskCalendarView');
+  let tasks=getFilteredTasks().filter(t=>t.due_date||t.start_date);
+  const m=calViewDate.getMonth();const y=calViewDate.getFullYear();
   const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  let html=`<div class="calendar-header"><button class="btn btn-ghost btn-sm" onclick="calMonth=${m-1<0?11:m-1};calYear=${m-1<0?y-1:y};renderCalendar()">←</button><span style="font-weight:600">${monthNames[m]} ${y}</span><button class="btn btn-ghost btn-sm" onclick="calMonth=${m+1>11?0:m+1};calYear=${m+1>11?y+1:y};renderCalendar()">→</button><button class="btn btn-secondary btn-sm" onclick="calMonth=null;calYear=null;renderCalendar()">Today</button></div><div class="calendar-grid">`;
+  const today=todayStr();
+
+  const previewTasks=getCalPreviews(tasks);
+
+  let html='<div class="calendar-desc">View tasks on a timeline. <strong>Month</strong> for overview, <strong>Week</strong> for hourly time-blocking. Drag tasks between days to reschedule.</div>';
+  html+=`<div class="calendar-controls">
+    <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">←</button>`;
+  if(calViewMode==='month'){
+    html+=`<span style="font-weight:600;min-width:160px;text-align:center">${monthNames[m]} ${y}</span>`;
+  }else{
+    const mon=getMonday(calViewDate);
+    const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+    const fmt=d=>d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+    html+=`<span style="font-weight:600;min-width:200px;text-align:center">${fmt(mon)} – ${fmt(sun)}</span>`;
+  }
+  html+=`<button class="btn btn-ghost btn-sm" onclick="calNav(1)">→</button>
+    <button class="btn btn-secondary btn-sm" onclick="calGoToday()">Today</button>
+    <div style="flex:1"></div>
+    <button class="btn btn-sm ${calViewMode==='month'?'btn-primary':'btn-ghost'}" onclick="calViewMode='month';renderCalendar()">Month</button>
+    <button class="btn btn-sm ${calViewMode==='week'?'btn-primary':'btn-ghost'}" onclick="calViewMode='week';calViewDate=getMonday(calViewDate);renderCalendar()">Week</button>
+    <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-dim);cursor:pointer;user-select:none"><input type="checkbox" ${calHeatmap?'checked':''} onchange="calHeatmap=this.checked;renderCalendar()" style="width:14px;height:14px"> Heatmap</label>
+    <input type="date" id="calJumpDate" onchange="calJumpTo(this.value)" style="width:140px;font-size:12px;padding:4px 8px" title="Jump to date">
+  </div>`;
+
+  if(calViewMode==='week'){
+    html+=renderWeekView(tasks,previewTasks,today);
+  }else{
+    html+=renderMonthView(tasks,previewTasks,m,y,today);
+  }
+  container.innerHTML=html
+}
+
+function getMonday(d){
+  const date=new Date(d);const day=date.getDay();
+  const diff=date.getDate()-day+(day===0?-6:1);
+  date.setDate(diff);date.setHours(0,0,0,0);return date
+}
+
+function calNav(dir){
+  if(calViewMode==='month'){calViewDate.setMonth(calViewDate.getMonth()+dir)}
+  else{calViewDate.setDate(calViewDate.getDate()+dir*7)}
+  renderCalendar()
+}
+
+function calGoToday(){
+  calViewDate=new Date();
+  if(calViewMode==='week')calViewDate=getMonday(calViewDate);
+  renderCalendar()
+}
+
+function calJumpTo(dateStr){
+  if(!dateStr)return;
+  calViewDate=new Date(dateStr+'T00:00:00');
+  renderCalendar()
+}
+
+function getCalPreviews(tasks){
+  const result=[];const viewStart=new Date(calViewDate);
+  const viewEnd=new Date(calViewDate);
+  if(calViewMode==='month'){viewEnd.setMonth(viewEnd.getMonth()+1);viewEnd.setDate(0)}
+  else{viewEnd.setDate(viewEnd.getDate()+6)}
+  viewEnd.setHours(23,59,59,999);
+  const endStr=viewEnd.toISOString().slice(0,10);
+  const startStr=viewStart.toISOString().slice(0,10);
+  tasks.filter(t=>t.recur&&t.due_date).forEach(t=>{
+    const dueStr=t.due_date;
+    if(dueStr>=startStr&&dueStr<=endStr)return;
+    let next=new Date(dueStr+'T00:00:00');
+    for(let i=0;i<52;i++){
+      if(t.recur==='daily')next.setDate(next.getDate()+1);
+      else if(t.recur==='weekly')next.setDate(next.getDate()+7);
+      else if(t.recur==='monthly')next.setMonth(next.getMonth()+1);
+      const ns=next.toISOString().slice(0,10);
+      if(ns>endStr)break;
+      if(ns>=startStr){result.push({...t,id:t.id+'_p',due_date:ns,_preview:true});break}
+    }
+  });
+  return result
+}
+
+function renderMonthView(tasks,previewTasks,m,y,today){
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const prevDays=new Date(y,m,0).getDate();
+  const allTasks=[...tasks,...previewTasks];
+  let html='<div class="calendar-grid">';
   ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>html+=`<div class="calendar-day-header">${d}</div>`);
   for(let i=firstDay-1;i>=0;i--){const d=prevDays-i;html+=`<div class="calendar-day other-month"><div class="calendar-day-num">${d}</div></div>`}
-  for(let d=1;d<=daysInMonth;d++){const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');const dayTasks=tasks.filter(t=>t.due_date===ds);const isToday=ds===todayStr();
-    html+=`<div class="calendar-day${isToday?' today':''}${dayTasks.length?' has-tasks':''}" onclick="toggleCalDay(this)"><div class="calendar-day-num">${d}</div>${dayTasks.length?`<div class="calendar-day-dots">${['high','medium','low'].map(p=>dayTasks.filter(t=>(t.priority||'medium')===p).length?`<span class="calendar-day-dot" style="background:${p==='high'?'var(--red)':p==='medium'?'var(--orange)':'var(--green)'}"></span>`:'').join('')}</div>`:''}<div class="calendar-day-tasks">${dayTasks.map(t=>`<div class="calendar-day-task" onclick="event.stopPropagation();showTaskDetail('${t.id}')">${escHtml(t.title)}</div>`).join('')}</div></div>`
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const dayTasks=allTasks.filter(t=>t.due_date===ds);
+    const isToday=ds===today;
+    const isOverdue=!isToday&&ds<today&&dayTasks.some(t=>!t._preview&&t.status!=='done');
+    const hc=calHeatmap?' cal-heatmap-'+Math.min(dayTasks.length,5):'';
+    html+=`<div class="calendar-day${isToday?' today':''}${isOverdue?' overdue':''}${hc}" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')" onclick="toggleCalDay(this)"><div class="calendar-day-num">${d}</div>`;
+    const multiDay=allTasks.filter(t=>t.start_date&&t.start_date<ds&&t.due_date&&t.due_date>=ds&&t.due_date!==ds);
+    multiDay.forEach(t=>{
+      const st=new Date(t.start_date+'T00:00:00');
+      const en=new Date(t.due_date+'T00:00:00');
+      const td=Math.round((en-st)/86400000)+1;
+      const od=Math.round((new Date(ds+'T00:00:00')-st)/86400000);
+      html+=`<div class="cal-multi-bar" style="background:var(--accent);left:${od/td*100}%;width:${100/td}%" title="${escHtml(t.title)}" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`
+    });
+    const regTasks=dayTasks.filter(t=>!t.start_date||t.start_date===t.due_date||t.start_date>=ds);
+    if(regTasks.length<=4){
+      regTasks.forEach(t=>{const cls=t._preview?'cal-preview-task':'calendar-day-task';html+=`<div class="${cls}" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`})
+    }else{
+      html+=`<div class="calendar-day-dots">${['high','medium','low'].map(p=>regTasks.filter(t=>(t.priority||'medium')===p).length?`<span class="calendar-day-dot" style="background:${p==='high'?'var(--red)':p==='medium'?'var(--orange)':'var(--green)'}"></span>`:'').join('')}</div>`;
+      html+=`<div class="calendar-day-tasks">${regTasks.map(t=>`<div class="calendar-day-task" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`).join('')}</div>`
+    }
+    html+=`</div>`
   }
   const remaining=7-(firstDay+daysInMonth)%7;if(remaining<7)for(let d=1;d<=remaining;d++)html+=`<div class="calendar-day other-month"><div class="calendar-day-num">${d}</div></div>`;
-  html+=`</div>`;document.getElementById('taskCalendarView').innerHTML=html
+  html+='</div>';return html
 }
+
+function renderWeekView(tasks,previewTasks,today){
+  const mon=getMonday(calViewDate);
+  const days=[];for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);days.push(d)}
+  const allTasks=[...tasks,...previewTasks];
+  const hours=[];for(let h=7;h<=22;h++)hours.push(h);
+  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html='<div class="calendar-week-grid">';
+  html+=`<div class="calendar-time-label"></div>`;
+  days.forEach(d=>{
+    const ds=d.toISOString().slice(0,10);const isToday=ds===today;
+    html+=`<div style="padding:8px;text-align:center;font-size:11px;font-weight:600;color:${isToday?'var(--accent)':'var(--text-dim)'};background:${isToday?'var(--bg-hover)':'var(--bg-raised)'};font-family:var(--font-mono)">${dayNames[d.getDay()]} ${d.getDate()}</div>`
+  });
+  hours.forEach(h=>{
+    const timeStr=String(h).padStart(2,'0')+':00';
+    html+=`<div class="calendar-time-label">${timeStr}</div>`;
+    days.forEach(d=>{
+      const ds=d.toISOString().slice(0,10);const isToday=ds===today;
+      const slotTasks=allTasks.filter(t=>t.due_date===ds&&t.time&&t.time.startsWith(String(h).padStart(2,'0')));
+      const noTimeTasks=allTasks.filter(t=>t.due_date===ds&&(!t.time||!t.time.startsWith(String(h).padStart(2,'0')))&&h===12);
+      const hc=calHeatmap?' cal-heatmap-'+Math.min(slotTasks.length,5):'';
+      html+=`<div class="calendar-hour-slot${isToday?' today-col':''}${hc}" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')" onclick="toggleCalDay(this)">
+        ${slotTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${t.time?`<span class="task-time">${t.time}</span>`:''}${escHtml(t.title)}</div>`).join('')}
+        ${h===12?noTimeTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`).join(''):''}
+      </div>`
+    })
+  });
+  html+='</div>';return html
+}
+
+let calDragId=null;
+function calDrop(e,dateStr){
+  e.preventDefault();const t=e.target.closest('[class*="calendar"]');
+  if(t)t.classList.remove('drag-over');
+  if(!calDragId)return;
+  const tasks=getTasks();const ti=tasks.find(x=>x.id===calDragId);
+  if(ti&&ti.due_date!==dateStr){ti.due_date=dateStr;ti.updated_at=nowISO();saveTasks(tasks);logActivity(ti.id,'updated',ti.title);renderCalendar()}
+  calDragId=null
+}
+
 function toggleCalDay(el){el.classList.toggle('expanded')}
 
 function populateTaskFilters(){} // no-op: filter dropdowns removed
@@ -1043,7 +1229,7 @@ function renderCurrentView(){
 // --- Quick Add ---
 function quickAddTask(){
   const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
-  const tasks=getTasks();const t={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:document.getElementById('quickAddPriority').value,due_date:'',category:'',tags:[],recur:null,depends_on:[],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const tasks=getTasks();const t={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:document.getElementById('quickAddPriority').value,due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);inp.value='';renderCurrentView()
 }
 
@@ -1092,6 +1278,16 @@ function renderTaskDetailPage(){
         <div class="detail-field">
           <label>Due date</label>
           <input type="date" id="detailDue" value="${t.due_date||''}">
+        </div>
+        <div class="detail-field">
+          <label>Start date</label>
+          <input type="date" id="detailStartDate" value="${t.start_date||''}">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="detail-field">
+          <label>Time</label>
+          <input type="time" id="detailTime" value="${t.time||''}">
         </div>
         <div class="detail-field">
           <label>Category</label>
@@ -1172,6 +1368,8 @@ function saveDetailTask(id){
   t.priority=document.getElementById('detailPriority').value;
   t.status=document.getElementById('detailStatus').value;
   t.due_date=document.getElementById('detailDue').value||null;
+  t.start_date=document.getElementById('detailStartDate').value||null;
+  t.time=document.getElementById('detailTime').value||null;
   const newCat=document.getElementById('detailCategoryNew').value.trim();
   if(newCat&&newCat!==t.category)toast('Category added','success');
   t.category=newCat||document.getElementById('detailCategory').value;
@@ -1296,7 +1494,31 @@ function renderSettings(){
   const frogCb=document.getElementById('settingsFrog');
   if(frogCb)frogCb.checked=!!cfg.frog_enabled;
   document.getElementById('settingsDateMode').value=cfg.date_mode||'smart';
-  document.getElementById('settingsPerPage').value=cfg.per_page||25
+  document.getElementById('settingsPerPage').value=cfg.per_page||25;
+  renderSettingsCategories()
+}
+function renderSettingsCategories(){
+  const tasks=getTasks();
+  const cats=[...new Set(tasks.map(t=>t.category).filter(Boolean))].sort();
+  const el=document.getElementById('settingsCategoriesList');
+  if(!el)return;
+  if(!cats.length){
+    el.innerHTML='<div class="text-dim text-sm" style="padding:8px 0">No categories yet.</div>';return
+  }
+  el.innerHTML=cats.map(cat=>{
+    const count=tasks.filter(t=>t.category===cat&&!t.deleted_at).length;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(cat)}</strong> <span class="text-dim text-sm">(${count} task${count!==1?'s':''})</span></span><button class="btn btn-danger btn-sm" onclick="deleteCategory('${escHtml(cat)}')">Delete</button></div>`
+  }).join('')
+}
+function deleteCategory(cat){
+  if(!confirm(`Delete category "${cat}"? Tasks will become uncategorized.`))return;
+  const tasks=getTasks();
+  tasks.forEach(t=>{if(t.category===cat)t.category=''});
+  saveTasks(tasks);
+  logActivity(null,'updated',`Deleted category: ${cat}`);
+  toast('Category deleted','success');
+  renderSettingsCategories();
+  renderCurrentView()
 }
 function updateConfig(key,val){
   const cfg=getConfig();cfg[key]=val;saveConfig(cfg);
@@ -1389,7 +1611,7 @@ function fireConfetti(){
 // --- Sample data ---
 function getSampleTasks(){
   const sid=()=>uid();
-  const s={welcome:sid(),homepage:sid(),loginBug:sid(),weeklyReview:sid(),depReport:sid(),deploy:sid(),morningJog:sid(),deepRead:sid(),budget:sid(),apiDocs:sid(),errorHandling:sid(),authRefactor:sid(),teamMetrics:sid(),blogPost:sid(),grocery:sid(),meditate:sid(),garden:sid(),invoice:sid(),portfolio:sid(),podcast:sid()};
+  const s={welcome:sid(),homepage:sid(),loginBug:sid(),weeklyReview:sid(),depReport:sid(),deploy:sid(),morningJog:sid(),deepRead:sid(),budget:sid(),apiDocs:sid(),errorHandling:sid(),authRefactor:sid(),teamMetrics:sid(),blogPost:sid(),grocery:sid(),meditate:sid(),garden:sid(),invoice:sid(),portfolio:sid(),podcast:sid(),standup:sid()};
   const fut=new Date();fut.setDate(fut.getDate()+3);const futStr=fut.toISOString().slice(0,10);
   const nextWk=new Date();nextWk.setDate(nextWk.getDate()+9);const nextWkStr=nextWk.toISOString().slice(0,10);
   const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);const yestStr=yesterday.toISOString().slice(0,10);
@@ -1404,7 +1626,7 @@ function getSampleTasks(){
     {id:s.weeklyReview,title:'Weekly review notes',description:'Prepare agenda for Friday team sync. Discuss sprint progress and blockers.',status:'not_started',priority:'medium',due_date:futStr,category:'Meetings',tags:['recurring','team','sync'],_sample,recur:'weekly',notes:[],created_at:lastWkStr+'T14:00:00',updated_at:nowISO(),deleted_at:null},
     {id:s.depReport,title:'Deprecated draft report',description:'Q1 analysis draft — superseded by the final version.',status:'done',priority:'low',due_date:'',category:'Reports',tags:['old','archive'],_sample,notes:[],created_at:lastMthStr,updated_at:lastMthStr,deleted_at:d2agoStr},
     {id:s.deploy,title:'Deploy v2 to staging',description:'Push the current feature branch to staging for QA. Needs mockup sign-off first.',status:'not_started',priority:'high',due_date:futStr,category:'Development',tags:['deploy','devops'],_sample,depends_on:[s.homepage],notes:[{id:sid(),text:'Coordinated with DevOps — they are ready for Friday',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.morningJog,title:'Morning jog',description:'30 min run before breakfast. Loop around the park.',status:'done',priority:'medium',due_date:yestStr,category:'Health',tags:['exercise','routine'],_sample,recur:'daily',notes:[{id:sid(),text:'5.2 km in 28 min — new PR!',timestamp:nowISO()}],created_at:lastWkStr+'T06:30:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.morningJog,title:'Morning jog',description:'30 min run before breakfast. Loop around the park.',status:'done',priority:'medium',due_date:yestStr,start_date:yestStr,time:'06:30',category:'Health',tags:['exercise','routine'],_sample,recur:'daily',notes:[{id:sid(),text:'5.2 km in 28 min — new PR!',timestamp:nowISO()}],created_at:lastWkStr+'T06:30:00',updated_at:nowISO(),deleted_at:null},
     {id:s.deepRead,title:'Read "Deep Work"',description:'Finish chapters 5-7 this week. Take notes on the four deep work philosophies.',status:'started',priority:'low',due_date:nextWkStr,category:'Personal',tags:['reading','learning','focus'],_sample,notes:[{id:sid(),text:'Ch5: Monastic vs Bimodal — I lean bimodal',timestamp:nowISO()}],created_at:lastWkStr+'T20:00:00',updated_at:nowISO(),deleted_at:null},
     {id:s.budget,title:'Quarterly budget review',description:'Review Q2 spending against plan. Flag any line items over 10% of budget.',status:'not_started',priority:'high',due_date:nextWkStr,category:'Finance',tags:['budget','planning','review'],_sample,notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
     {id:s.apiDocs,title:'Write API docs',description:'Document the new REST endpoints for the team. Include request/response examples.',status:'done',priority:'medium',due_date:lastWkStr,category:'Development',tags:['docs','api','backend'],_sample,notes:[{id:sid(),text:'Published to internal wiki — link in #dev channel',timestamp:nowISO()}],created_at:lastMthStr,updated_at:lastWkStr+'T17:30:00',deleted_at:null},
@@ -1413,10 +1635,11 @@ function getSampleTasks(){
     {id:s.teamMetrics,title:'Compile team metrics',description:'Gather velocity, burndown, and cycle time data for the monthly stakeholder deck.',status:'not_started',priority:'medium',due_date:futStr,category:'Reports',tags:['metrics','team','analysis'],_sample,recur:'monthly',depends_on:[s.weeklyReview],notes:[{id:sid(),text:'Jira dashboard already configured — just need to export',timestamp:nowISO()}],created_at:lastWkStr+'T11:00:00',updated_at:nowISO(),deleted_at:null},
     {id:s.blogPost,title:'Write blog post on accessibility',description:'Draft a post about WCAG 2.2 compliance — what changed and how to audit.',status:'started',priority:'low',due_date:nextWkStr,category:'Content',tags:['writing','blog','a11y'],_sample,notes:[{id:sid(),text:'Outline approved by marketing. Target: 1500 words.',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
     {id:s.grocery,title:'Grocery shopping',description:'Weekly run: veggies, eggs, milk, bread, oats.',status:'not_started',priority:'low',due_date:todayStr(),category:'Personal',tags:['errand','routine'],_sample,recur:'weekly',notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.meditate,title:'Evening meditation',description:'10 min guided meditation using Headspace.',status:'done',priority:'medium',due_date:yestStr,category:'Health',tags:['routine','mindfulness'],_sample,recur:'daily',notes:[{id:sid(),text:'Session 45/90 on Headspace — focus pack',timestamp:nowISO()}],created_at:yestStr+'T21:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.meditate,title:'Evening meditation',description:'10 min guided meditation using Headspace.',status:'done',priority:'medium',due_date:yestStr,start_date:yestStr,time:'21:00',category:'Health',tags:['routine','mindfulness'],_sample,recur:'daily',notes:[{id:sid(),text:'Session 45/90 on Headspace — focus pack',timestamp:nowISO()}],created_at:yestStr+'T21:00:00',updated_at:nowISO(),deleted_at:null},
     {id:s.garden,title:'Plant spring vegetables',description:'Prepare raised beds and sow seeds for tomatoes, peppers, basil.',status:'not_started',priority:'low',due_date:futStr,category:'Personal',tags:['garden','outdoor'],_sample,notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
     {id:s.invoice,title:'Send Q2 invoices',description:'Generate and send invoices for Q2 consulting work. Follow up on overdue payments.',status:'not_started',priority:'high',due_date:futStr,category:'Finance',tags:['billing','client'],_sample,depends_on:[s.budget],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.portfolio,title:'Update portfolio site',description:'Add new projects and case studies. Update tech stack section with recent work.',status:'started',priority:'medium',due_date:nextWkStr,category:'Design',tags:['design','frontend','portfolio'],_sample,notes:[{id:sid(),text:'Decided on Astro + Tailwind stack',timestamp:nowISO()}],created_at:lastWkStr+'T15:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.portfolio,title:'Update portfolio site',description:'Add new projects and case studies. Update tech stack section with recent work.',status:'started',priority:'medium',due_date:nextWkStr,start_date:futStr,category:'Design',tags:['design','frontend','portfolio'],_sample,notes:[{id:sid(),text:'Decided on Astro + Tailwind stack',timestamp:nowISO()}],created_at:lastWkStr+'T15:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.standup,title:'Daily standup',description:'Team sync — updates, blockers, priorities.',status:'not_started',priority:'medium',due_date:todayStr(),start_date:todayStr(),time:'09:00',category:'Meetings',tags:['recurring','team'],_sample,recur:'daily',notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
     {id:s.podcast,title:'Record podcast episode',description:'Episode on "Building in public" — prep talking points and invite co-host.',status:'not_started',priority:'medium',due_date:nextWkStr,category:'Content',tags:['writing','podcast'],_sample,depends_on:[s.blogPost],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null}
   ]
 }
