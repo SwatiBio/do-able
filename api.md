@@ -28,16 +28,18 @@ Array of task objects.
     "due_date": "2026-06-25",
     "category": "personal",
     "tags": ["errands"],
-    "fields": {},
     "recur": null,
     "depends_on": [],
     "notes": [],
     "created_at": "2026-06-21T10:00:00.000Z",
     "updated_at": "2026-06-21T10:00:00.000Z",
-    "deleted_at": null
+    "deleted_at": null,
+    "_sample": true
   }
 ]
 ```
+
+- `_sample` — optional flag set on sample tasks; used by "Remove Samples" in Settings
 
 ### `doable_activity`
 
@@ -63,13 +65,15 @@ Actions: `created`, `completed`, `deleted`, `restored`, `updated`
 {
   "theme": "nord-dark",
   "date_mode": "smart",
-  "per_page": 25
+  "per_page": 25,
+  "frog_enabled": false
 }
 ```
 
-- `theme`: `"nord-dark"` | `"nord-light"`
+- `theme`: `"nord-dark"` | `"nord-light"` | `"system"`
 - `date_mode`: `"smart"` (relative) | `"iso"`
 - `per_page`: integer, pagination size
+- `frog_enabled`: boolean, show/hide frog companion
 
 ### `doable_notes`
 
@@ -89,12 +93,20 @@ Array of scratch pad notes.
 
 ### `doable_focus`
 
-Map of date → task ID array. Auto-clears old dates.
+Map of date → task ID array. Auto-clears old dates on init.
 
 ```json
 {
   "2026-06-21": ["k3x8a9b2c", "m7d4e5f6g"]
 }
+```
+
+### `doable_taskColumns`
+
+Array of visible column keys in task list view. Persisted across sessions.
+
+```json
+["priority", "status", "due", "tags", "category", "annotations", "dependencies", "recur"]
 ```
 
 ## Functions (JS API)
@@ -114,7 +126,11 @@ All functions are defined in `doable.html` and globally accessible.
 | `getFocus()` | Returns focus goals |
 | `saveFocus(focus)` | Saves focus goals |
 | `logActivity(taskId, action, details)` | Adds entry to activity log, auto-truncates to 500 |
-| `showTaskDetail(id)` | Opens task detail modal |
+| `showTaskDetail(id)` | Opens task detail page |
+| `handleRecurrence(task)` | Creates next instance of a recurring task on completion |
+| `createBackup()` | Downloads all data as JSON file |
+| `restoreBackup(event)` | Uploads and restores data from JSON backup file |
+| `exportData(format)` | Exports tasks as JSON, CSV, or Markdown |
 
 ## Data Flow
 
@@ -134,13 +150,18 @@ User Action → Event Handler → JS Function → localStorage (sync)
 |---------|---------------|
 | **Recurring** | On marking done, `handleRecurrence()` creates next instance |
 | **Soft-delete** | `deleted_at` timestamp set, hidden from main views |
-| **Annotations** | Notes array on task object, shown in detail modal |
-| **Dependencies** | `depends_on` array of task IDs, informational only |
-| **Search** | Client-side `String.includes()` across title + description |
+| **Annotations** | Notes array on task object, shown in task detail page |
+| **Dependencies** | `depends_on` array of task IDs, with incompletion warnings and "blocks" indicator |
+| **Search** | Client-side `String.includes()` across title + description, debounced |
 | **Relative dates** | `fmtDate()` converts ISO to "today", "in 3 days", etc. |
 | **Export** | `exportData()` generates JSON/CSV/MD and triggers download |
 | **Backup/restore** | JSON file download/upload of all localStorage data |
 | **Focus goals** | Per-date array in `doable_focus`, auto-clears daily |
 | **Overdue detection** | Client-side comparison of `due_date` against today |
 | **Activity log** | Array in localStorage, keeps 500 entries |
-| **Theme** | CSS custom properties, `data-theme` attribute toggle |
+| **Theme** | CSS custom properties, `data-theme` attribute toggle, dark/light/system |
+| **Frog companion** | SVG frog with idle/sleep/stretch/walk/happy animations |
+| **Sort popover** | Two-step popover: select field → select direction |
+| **Data filters** | Filter by status, priority, category, due date range |
+| **Column visibility** | Toggle columns via checkbox menu, persisted to `doable_taskColumns` |
+| **Sample data** | Tasks with `_sample` flag; loaded on first run, removable via Settings |

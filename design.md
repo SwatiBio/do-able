@@ -26,6 +26,7 @@ Open `doable.html` in any modern browser. All data stays in your browser's local
 │  doable_config             │
 │  doable_notes              │
 │  doable_focus              │
+│  doable_taskColumns        │
 └─────────────────────────────┘
 ```
 
@@ -38,70 +39,89 @@ Open `doable.html` in any modern browser. All data stays in your browser's local
 
 ### 1. Dashboard (`#dashboard`)
 - Scratch pad notes (create, pin, delete)
-- Focus goals for today (read-only, links to Focus page)
-- Motivational quote
+- Focus goals selector (add up to 3 tasks, cycle status by click, progress counter, confetti on all done)
+- Motivational quote (random from built-in list)
 - Overdue tasks list (max 5)
 - Due today list (max 5)
 - Counts row (total, not started, started, done)
 - Bar charts (by priority, by category)
 - Weekly/monthly recap text
 - 30-day activity sparkline
-- Recent activity feed
+- Recent activity feed (last 5 entries)
 
 ### 2. Tasks (`#tasks`)
 Three view modes toggled via icon buttons:
 
-**List View** — sortable table, status/priority/category/due filters, grouping toggle, pagination
+**List View** — sortable table with popover-based sort (field + direction), data filters (status/priority/category/due), column visibility toggle (tags, category, annotations, dependencies, recurrence), grouping toggle, pagination
 **Kanban View** — drag-and-drop columns (not started / started / done), status change on drop
-**Calendar View** — month grid, dot indicators for priority, click to expand day tasks
+**Calendar View** — month grid with navigation, dot indicators for priority, click to expand day tasks
 
 Features:
 - Quick-add inline (title + priority + Enter)
-- Global search (debounced, across all views)
+- Global search (debounced, across all views, in topbar)
 - Filters persist during session
 - Sort by clicking column headers
+- Column visibility saved to localStorage
 
-### 3. Task Detail (modal)
-Opens on clicking any task title:
+### 3. Task Detail (page `#task-detail`)
+Opens as a full page (not a modal) when clicking any task title:
 - Inline editing: title, description, priority, status, due date, category
 - Tag management with autocomplete from existing tags
 - Recurrence setting (none / daily / weekly / monthly)
-- Dependency links to other tasks
-- Annotations timeline
+- Dependency links to other tasks with status badges and incompletion warning
+- "Blocks N other tasks" indicator
+- Annotations timeline with timestamps
 - Created/updated timestamps
-- Delete (soft-delete to Bin)
+- Soft-delete to Bin
+- Unsaved changes warning on navigation away
 
-### 4. Focus (`#focus`)
-- Select up to 3 tasks as today's goals
-- Cycle status: not_started → started → done → not_started
-- Progress counter ("2 of 3 done")
-- Confetti animation when all complete
-- Goals auto-reset daily (only today's shown)
-
-### 5. Bin (`#bin`)
-- List of soft-deleted tasks with deleted date
+### 4. Bin (`#bin`)
+- List of soft-deleted tasks with deleted date and original status
 - Restore individual tasks
 - Empty bin with confirmation
 
-### 6. Activity Log (`#log`)
+### 5. Activity Log (`#log`)
 - Chronological feed of all mutations
-- Filter by action type
+- Filter by action type (created, completed, deleted, restored, updated)
+- Paginated (25 per page)
 - Keeps latest 500 entries
 
-### 7. Settings (`#settings`)
-- Theme: Nord Dark / Nord Light
-- Date mode: Smart (relative) / ISO
-- Tasks per page
-- Backup: download full data as JSON
-- Restore: upload JSON backup file
-- Export: JSON / CSV / Markdown
-- Clear all data (with double confirmation)
+### 6. Settings (`#settings`)
+Collapsible accordion sections:
+
+- **Appearance**: Theme (Nord Dark / Nord Light / System), Frog companion toggle (SVG frog with idle, sleep, stretch, walk, happy states)
+- **Display**: Date mode (Smart relative / ISO), Tasks per page
+- **Backups**: Download full data as JSON, Restore from JSON upload
+- **Export**: JSON / CSV / Markdown
+- **Data**: Clear all data (double confirmation), Load / Remove sample tasks
 
 ## Theme: Nord
 
 CSS custom properties switching via `data-theme` attribute on `<html>`.
 
-Auto-detection uses `prefers-color-scheme` (not implemented in single-file — default is Nord Dark, user can toggle in Settings).
+Three modes:
+- `nord-dark` (default) — dark slate background
+- `nord-light` — light grey background
+- `system` — follows `prefers-color-scheme` media query, re-evaluated on change
+
+## Frog Companion
+
+An interactive SVG frog that lives on the screen. Toggled in Settings.
+
+States:
+- **Idle** — sits and breathes gently (gentle scale animation)
+- **Sleep** — dozes off with animated "Zzz" bubbles (most of the time)
+- **Stretch** — lazy stretch animation once in a while
+- **Walk** — walks across the screen, alternating per click
+- **Happy** — bounces excitedly on confetti events or when clicked
+- **Peek** — peeks up from below
+- **Perch** — hops to a random new position on click
+
+Behaviors:
+- Random idle/sleep/stretch cycle (12-30s interval)
+- Click the frog → it gets happy, then hops to a new random position
+- Frogs gets happy when confetti fires (task completion)
+- Responsive: repositions if window is resized
 
 ## Tufte Principles
 
@@ -131,13 +151,13 @@ Each task:
   "due_date": "YYYY-MM-DD | null",
   "category": "string",
   "tags": ["string"],
-  "fields": {},
   "recur": "daily | weekly | monthly | null",
   "depends_on": ["task_id"],
   "notes": [{"id", "text", "timestamp"}],
   "created_at": "ISO datetime",
   "updated_at": "ISO datetime",
-  "deleted_at": "ISO datetime | null"
+  "deleted_at": "ISO datetime | null",
+  "_sample": true | undefined
 }
 ```
 
@@ -149,22 +169,19 @@ All under `localStorage` with `doable_` prefix key:
 |-----|----------|
 | `doable_tasks` | Array of task objects |
 | `doable_activity` | Array of activity log entries |
-| `doable_config` | { theme, date_mode, per_page } |
+| `doable_config` | { theme, date_mode, per_page, frog_enabled } |
 | `doable_notes` | Array of scratch note objects |
 | `doable_focus` | { "YYYY-MM-DD": ["task_id", ...] } |
+| `doable_taskColumns` | Array of visible column keys |
 
 ## Files
 
 ```
 todo-todo/
 ├── doable.html              # The entire app
-├── backup-backend/          # Archived FastAPI backend
-├── backup-frontend/         # Archived React frontend
-├── start.bat                # Opens doable.html on Windows
-├── start.sh                 # Opens doable.html on Linux/macOS
 ├── design.md                # This file
 ├── api.md                   # Data API reference
 ├── directory-structure.md   # File tree
 ├── TRACKER.md               # Build progress
-└── todo-prompt.txt          # Original build prompt
+└── .gitignore               # Ignored files
 ```
