@@ -1,14 +1,14 @@
-# Do-able — Build Tracker
+# Do-able - Build Tracker
 
 ## Layer 1: Single File Foundation
 
 | Step | Status |
 |------|--------|
-| `doable.html` — CSS (Nord theme + layout + responsive) | done |
-| `doable.html` — HTML structure (orbital ring, sidebar, topbar, all pages) | done |
-| `doable.html` — JS data layer (localStorage read/write, ID generation) | done |
-| `doable.html` — JS navigation (page switching, sidebar toggle, backdrop) | done |
-| `doable.html` — Theme toggle (Nord Dark/Light/System with `prefers-color-scheme`) | done |
+| `doable.html` - CSS (Nord theme + layout + responsive) | done |
+| `doable.html` - HTML structure (orbital ring, sidebar, topbar, all pages) | done |
+| `doable.html` - JS data layer (localStorage read/write, ID generation) | done |
+| `doable.html` - JS navigation (page switching, sidebar toggle, backdrop) | done |
+| `doable.html` - Theme toggle (Nord Dark/Light/System with `prefers-color-scheme`) | done |
 
 ## Layer 2: Features
 

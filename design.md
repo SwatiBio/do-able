@@ -1,4 +1,4 @@
-# Do-able — Design
+# Do-able - Design
 
 ## Overview
 
@@ -49,9 +49,9 @@ Open `doable.html` in any modern browser. All data stays in your browser's local
 └────────────┴──────────────────────────────────┘
 ```
 
-- **Orbital ring** — 44px circular button fixed at bottom-left; opens a 200px sidebar overlay with backdrop
-- **Topbar** — 52px header with global search (debounced) and theme-cycle icon button
-- **Main content** — scrollable area, max-width 1100px, centered
+- **Orbital ring** - 44px circular button fixed at bottom-left; opens a 200px sidebar overlay with backdrop
+- **Topbar** - 52px header with global search (debounced) and theme-cycle icon button
+- **Main content** - scrollable area, max-width 1100px, centered
 
 ## Views
 
@@ -62,32 +62,32 @@ Open `doable.html` in any modern browser. All data stays in your browser's local
 - "+ Add Task" button (navigates to Tasks page)
 - Overdue tasks list (due before today, not done, max 5)
 - Due today list (max 5)
-- Bar charts (by priority — high/medium/low — using semantic colors; by category — up to 8, using accent color)
+- Bar charts (by priority - high/medium/low - using semantic colors; by category - up to 8, using accent color)
 - Weekly/monthly recap table (created / done / completion rate)
 
 ### 2. Tasks
 Three view modes toggled via icon buttons:
 
-**List View** — sortable table with:
+**List View** - sortable table with:
 - Two-step popover sort (select field → select direction). Active sorts shown as removable chips in sort bar.
 - Data filters for status, priority, category, due range (all/today/overdue/week/month/none)
-- Column visibility toggle (tags, category, time, annotations, dependencies, recurrence) — persisted to `doable_taskColumns`
+- Column visibility toggle (tags, category, time, annotations, dependencies, recurrence) - persisted to `doable_taskColumns`
 - Pagination (configurable per-page via Settings)
 - Row shows checkbox, priority dot, title, priority text, status badge, due date, plus any visible extra columns
 
-**Kanban View** — grouped by category with:
+**Kanban View** - grouped by category with:
 - Drag-and-drop to reassign category
 - Task count per column header
 - Drop zone at bottom of each column
 - Responsive auto-fill columns (min 280px)
 
-**Calendar View** — two sub-modes:
-- **Month grid** — 7-column grid, day numbers, priority dot indicators (overflow shows expandable popover), today pulse animation, overdue glow (red inset shadow), multi-day bars for tasks spanning multiple dates, recurring task previews (shown in calendar but not yet created), click to expand inline task list, drag-and-drop to reschedule due date
-- **Week view** — 7-day columns with hourly time slots (07:00–22:00), today column highlight, time-labelled tasks, tasks without time shown at 12:00 slot, drag-and-drop reschedule
+**Calendar View** - two sub-modes:
+- **Month grid** - 7-column grid, day numbers, priority dot indicators (overflow shows expandable popover), today pulse animation, overdue glow (red inset shadow), multi-day bars for tasks spanning multiple dates, recurring task previews (shown in calendar but not yet created), click to expand inline task list, drag-and-drop to reschedule due date
+- **Week view** - 7-day columns with hourly time slots (07:00–22:00), today column highlight, time-labelled tasks, tasks without time shown at 12:00 slot, drag-and-drop reschedule
 - Calendar controls: ← → navigation, Today button, Month/Week toggle, jump-to-date date picker
 
 Features:
-- Quick-add input (title only, no priority — defaults to medium, not_started, no due date) at top of page
+- Quick-add input (title only, no priority - defaults to medium, not_started, no due date) at top of page
 - Rotating motivational quote (random from 28 built-in quotes, no repeat in a row)
 - Global search (debounced 300ms, across title + description)
 - Filter state persists during session
@@ -133,32 +133,32 @@ Collapsible accordion sections (each toggles open/closed via h2 click):
 CSS custom properties switching via `data-theme` attribute on `<html>`.
 
 Three modes:
-- `nord-dark` (default) — dark slate background (#2e3440)
-- `nord-light` — light grey background (#eceff4)
-- `system` — follows `prefers-color-scheme` media query, re-evaluated on change
+- `nord-dark` (default) - dark slate background (#2e3440)
+- `nord-light` - light grey background (#eceff4)
+- `system` - follows `prefers-color-scheme` media query, re-evaluated on change
 
 Color tokens:
-- `--accent` (#88c0d0 dark, #5e81ac light) — primary interactive elements, links
-- `--red` (#bf616a) — high priority, overdue, danger, delete
-- `--orange` (#d08770) — medium priority, due today, started status
-- `--yellow` (#ebcb8b) — low priority (status dot only)
-- `--green` (#a3be8c) — low priority, done status, success
-- `--purple` (#b48ead) — confetti accent
-- `--text` / `--text-dim` / `--text-faint` — three-tier text hierarchy
-- `--bg` / `--bg-raised` / `--bg-hover` / `--bg-muted` — surface hierarchy
+- `--accent` (#88c0d0 dark, #5e81ac light) - primary interactive elements, links
+- `--red` (#bf616a) - high priority, overdue, danger, delete
+- `--orange` (#d08770) - medium priority, due today, started status
+- `--yellow` (#ebcb8b) - low priority (status dot only)
+- `--green` (#a3be8c) - low priority, done status, success
+- `--purple` (#b48ead) - confetti accent
+- `--text` / `--text-dim` / `--text-faint` - three-tier text hierarchy
+- `--bg` / `--bg-raised` / `--bg-hover` / `--bg-muted` - surface hierarchy
 
 ## Frog Companion
 
 An interactive SVG frog that lives on the screen. Toggled in Settings (persisted in `config.frog_enabled`).
 
 States (7 total):
-- **Idle** — sits and breathes gently (gentle scaleY animation, most common state)
-- **Sleep** — dozes off with animated "💤" Zzz bubbles floating upward (long duration ~10s)
-- **Stretch** — lazy stretch animation (~1.8s) once in a while
-- **Walk** — walks across the screen (waddle animation), alternating left-right per trigger
-- **Happy** — bounces excitedly (4 cycles, ~2s) on confetti events or when clicked
-- **Peek** — peeks up from below (~2s, translateY keyframes)
-- **Perch** — hops to a random new position (~0.7s, scale+rotate hop animation)
+- **Idle** - sits and breathes gently (gentle scaleY animation, most common state)
+- **Sleep** - dozes off with animated "💤" Zzz bubbles floating upward (long duration ~10s)
+- **Stretch** - lazy stretch animation (~1.8s) once in a while
+- **Walk** - walks across the screen (waddle animation), alternating left-right per trigger
+- **Happy** - bounces excitedly (4 cycles, ~2s) on confetti events or when clicked
+- **Peek** - peeks up from below (~2s, translateY keyframes)
+- **Perch** - hops to a random new position (~0.7s, scale+rotate hop animation)
 
 Behaviors:
 - Random idle/sleep/stretch cycle (12–30s interval; sleep ~35%, idle ~35%, stretch ~10%)

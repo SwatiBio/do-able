@@ -1,4 +1,4 @@
-# Do-able — localStorage Data API Reference
+# Do-able - localStorage Data API Reference
 
 > There is no backend. All data is stored in the browser's `localStorage`.
 > This document describes the data structures and the JavaScript functions that
