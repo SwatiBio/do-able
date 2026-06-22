@@ -1095,8 +1095,8 @@ function renderTaskDetailPage(){
         </div>
         <div class="detail-field">
           <label>Category</label>
-          <input id="detailCategory" list="categorySuggestions" value="${escHtml(t.category||'')}" placeholder="Type or pick a category...">
-          <datalist id="categorySuggestions">${cats.map(c=>`<option value="${escHtml(c)}">`).join('')}</datalist>
+          <select id="detailCategory"><option value="">None</option>${cats.map(c=>`<option value="${escHtml(c)}" ${t.category===c?'selected':''}>${escHtml(c)}</option>`).join('')}</select>
+          <input id="detailCategoryNew" placeholder="Type new category, press Enter to add" style="margin-top:6px;font-size:12px;padding:6px 8px" onkeydown="if(event.key==='Enter'){event.preventDefault();addDetailCategory()}">
         </div>
       </div>
       <div class="detail-field">
@@ -1149,6 +1149,21 @@ function renderTaskDetailPage(){
   const form=document.querySelector('.detail-form');
   if(form)form.addEventListener('change',()=>{detailDirty=true})
 }
+function addDetailCategory(){
+  const inp=document.getElementById('detailCategoryNew');
+  const val=inp.value.trim();
+  if(!val)return;
+  const sel=document.getElementById('detailCategory');
+  if([...sel.options].some(o=>o.value.toLowerCase()===val.toLowerCase())){
+    inp.value='';return
+  }
+  const opt=document.createElement('option');
+  opt.value=val;opt.textContent=val;opt.selected=true;
+  sel.appendChild(opt);
+  inp.value='';
+  toast('Category added','success');
+}
+
 function saveDetailTask(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);if(!t)return;
   const oldStatus=t.status;
@@ -1157,14 +1172,17 @@ function saveDetailTask(id){
   t.priority=document.getElementById('detailPriority').value;
   t.status=document.getElementById('detailStatus').value;
   t.due_date=document.getElementById('detailDue').value||null;
-  t.category=document.getElementById('detailCategory').value.trim();
+  const newCat=document.getElementById('detailCategoryNew').value.trim();
+  if(newCat&&newCat!==t.category)toast('Category added','success');
+  t.category=newCat||document.getElementById('detailCategory').value;
   t.recur=document.getElementById('detailRecur').value||null;
   t.updated_at=nowISO();
   saveTasks(tasks);
   if(t.status!==oldStatus&&t.status==='done')handleRecurrence(t);
   logActivity(id,'updated',t.title);
   detailDirty=false;
-  navigateTo(previousPage)
+  toast('Task saved','success');
+  setTimeout(()=>navigateTo(previousPage),150)
 }
 function handleRecurrence(t){
   if(!t.recur)return;
