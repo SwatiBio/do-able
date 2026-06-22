@@ -464,7 +464,7 @@ textarea{resize:vertical;min-height:80px}
 
       <!-- Activity Log -->
       <div class="page" id="page-log">
-        <h1>Activity Log</h1>
+        <h1>Activity Log <span class="text-dim text-sm" style="font-weight:400">(Last 10 days)</span></h1>
         <div class="filter-bar">
           <select id="logFilterAction" onchange="logPage=1;renderActivityLog()">
             <option value="all">All actions</option>
@@ -628,6 +628,8 @@ function saveFocus(f){lsSet('focus',f)}
 
 function logActivity(taskId,action,details=''){
   const a=getActivity();a.unshift({id:uid(),task_id:taskId,action,details,timestamp:nowISO()});
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-10);
+  a=a.filter(e=>e.timestamp>=cutoff.toISOString());
   if(a.length>500)a.length=500;saveActivity(a)
 }
 
@@ -837,7 +839,7 @@ function renderListView(){
   let html='';
   if(!pageTasks.length)html='<div class="empty-state"><p class="text-dim">No tasks match your filters.</p></div>';
     else{
-      let cols='<th style="width:20px"></th><th>Title</th><th style="width:80px">Priority</th><th style="width:100px">Status</th><th style="width:120px">Due</th>';
+      let cols='<th style="width:20px"></th><th style="width:36px"></th><th>Title</th><th style="width:80px">Priority</th><th style="width:100px">Status</th><th style="width:120px">Due</th>';
       if(showTags)cols+='<th style="width:120px">Tags</th>';
       if(showCat)cols+='<th style="width:100px">Category</th>';
       if(showAnno)cols+='<th style="width:60px">Notes</th>';
@@ -854,7 +856,7 @@ function renderTaskRow(t){
   const showAnno=taskColumns.includes('annotations');
   const showDeps=taskColumns.includes('dependencies');
   const showRecur=taskColumns.includes('recur');
-  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td><span class="task-title" onclick="showTaskDetail('${t.id}')">${escHtml(t.title)}</span></td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
+  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone('${t.id}',this.checked)" title="Mark done"></td><td><span class="task-title" onclick="showTaskDetail('${t.id}')">${escHtml(t.title)}</span></td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
   if(showTags)cells+=`<td>${(t.tags||[]).map(tag=>`<span class="tag-pill">${escHtml(tag)}</span>`).join('')}</td>`;
   if(showCat)cells+=`<td class="text-dim text-sm">${escHtml(t.category||'—')}</td>`;
   if(showAnno)cells+=`<td class="text-dim text-sm">${(t.notes||[]).length||'—'}</td>`;
@@ -865,6 +867,16 @@ function renderTaskRow(t){
 function statusBadge(s){
   const m={not_started:'Not started',started:'Started',done:'Done'};const c={not_started:'var(--text-dim)',started:'var(--orange)',done:'var(--green)'};
   return `<span class="badge" style="color:${c[s]||'var(--text-dim)'}">${m[s]||s}</span>`
+}
+function toggleTaskDone(id,checked){
+  const tasks=getTasks();const t=tasks.find(x=>x.id===id);if(!t)return;
+  if(checked){
+    t.status='done';t.updated_at=nowISO();saveTasks(tasks);logActivity(id,'updated',t.title);
+    fireConfetti();handleRecurrence(t);
+  }else{
+    t.status='not_started';t.updated_at=nowISO();saveTasks(tasks);logActivity(id,'updated',t.title)
+  }
+  renderCurrentView()
 }
 // --- Sort UI ---
 const sortFieldMeta={
@@ -908,8 +920,7 @@ function removeSort(idx){
 }
 function renderSortBar(){
   const bar=document.getElementById('sortBar');if(!bar)return;
-  const fc=getFilterCount();
-  let html=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="sort-wrapper"><button class="btn btn-ghost sort-btn" onclick="toggleSortMenu(this)" style="padding:6px 16px;font-size:13px">+ Sort</button></div><div class="sort-wrapper"><button class="btn btn-ghost filter-btn" onclick="toggleDataFilterMenu(this)" style="padding:6px 16px;font-size:13px">${fc?'⚙ Filter ('+fc+')':'⚙ Filter'}</button></div><div class="sort-wrapper"><button class="btn btn-ghost filter-btn" onclick="toggleFilterMenu(this)" style="padding:6px 16px;font-size:13px">📋 Columns</button></div>`;
+  let html=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="sort-wrapper"><button class="btn btn-ghost sort-btn" onclick="toggleSortMenu(this)" style="padding:6px 16px;font-size:13px">+ Sort</button></div><div class="sort-wrapper"><button class="btn btn-ghost filter-btn" onclick="toggleFilterMenu(this)" style="padding:6px 16px;font-size:13px">Columns</button></div>`;
   taskSorts.forEach((s,i)=>{
     const m=sortFieldMeta[s.field];
     html+=`<span class="sort-chip">${m?m.label:s.field}: ${s.dir==='asc'?m?m.asc:'↑':m?m.desc:'↓'}<span class="chip-remove" onclick="removeSort(${i})">✕</span></span>`
@@ -926,9 +937,6 @@ document.addEventListener('click',function(e){
   if(filterMenuOpen&&!e.target.closest('.filter-popover')&&!e.target.closest('.filter-btn')){
     filterMenuOpen=false;const p=document.getElementById('filterPopover');if(p)p.remove()
   }
-  if(dataFilterMenuOpen&&!e.target.closest('.sort-popover')&&!e.target.closest('#dataFilterPopover')&&!e.target.closest('.sort-btn')){
-    dataFilterMenuOpen=false;const p=document.getElementById('dataFilterPopover');if(p)p.remove()
-  }
 });
 
 // --- Column Filter UI ---
@@ -941,42 +949,11 @@ const columnOptions=[
 ];
 let taskFilter={status:'all',priority:'all',category:'all',due:'all'};
 let filterMenuOpen=false;
-let dataFilterMenuOpen=false;
-function toggleDataFilterMenu(btn){
-  if(dataFilterMenuOpen){dataFilterMenuOpen=false;const p=document.getElementById('dataFilterPopover');if(p)p.remove();return}
-  dataFilterMenuOpen=true;
-  const tasks=getTasks().filter(t=>!t.deleted_at);
-  const cats=[...new Set(tasks.map(t=>t.category).filter(Boolean))].sort();
-  const today=todayStr();const endOfWeek=new Date();endOfWeek.setDate(endOfWeek.getDate()+(7-endOfWeek.getDay()));const sow=endOfWeek.toISOString().slice(0,10);
-  const endOfMonth=new Date();endOfMonth.setMonth(endOfMonth.getMonth()+1);endOfMonth.setDate(0);const eom=endOfMonth.toISOString().slice(0,10);
-  const pop=document.createElement('div');pop.id='dataFilterPopover';pop.className='sort-popover';
-  pop.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;margin-bottom:4px">Filter tasks</div>
-    <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13px;color:var(--text-dim);cursor:pointer">Status
-      <select onclick="event.stopPropagation()" onchange="setTaskFilter('status',this.value)" style="margin-left:auto;width:auto;padding:2px 6px">${['all','not_started','started','done'].map(v=>`<option value="${v}" ${taskFilter.status===v?'selected':''}>${v==='all'?'All':v.replace('_',' ')}</option>`).join('')}</select>
-    </label>
-    <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13px;color:var(--text-dim);cursor:pointer">Priority
-      <select onclick="event.stopPropagation()" onchange="setTaskFilter('priority',this.value)" style="margin-left:auto;width:auto;padding:2px 6px">${['all','high','medium','low'].map(v=>`<option value="${v}" ${taskFilter.priority===v?'selected':''}>${v==='all'?'All':v[0].toUpperCase()+v.slice(1)}</option>`).join('')}</select>
-    </label>
-    <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13px;color:var(--text-dim);cursor:pointer">Category
-      <select onclick="event.stopPropagation()" onchange="setTaskFilter('category',this.value)" style="margin-left:auto;width:auto;padding:2px 6px"><option value="all" ${taskFilter.category==='all'?'selected':''}>All</option>${cats.map(c=>`<option value="${escHtml(c)}" ${taskFilter.category===c?'selected':''}>${escHtml(c)}</option>`).join('')}</select>
-    </label>
-    <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13px;color:var(--text-dim);cursor:pointer">Due
-      <select onclick="event.stopPropagation()" onchange="setTaskFilter('due',this.value)" style="margin-left:auto;width:auto;padding:2px 6px">${['all','today','overdue','week','month','none'].map(v=>`<option value="${v}" ${taskFilter.due===v?'selected':''}>${v==='all'?'All':v==='today'?'Due today':v==='overdue'?'Overdue':v==='week'?'This week':v==='month'?'This month':'No date'}</option>`).join('')}</select>
-    </label>
-    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">
-      <button onclick="event.stopPropagation();clearTaskFilters()" style="width:100%;padding:6px 10px;font-size:13px;color:var(--red);background:none;border:none;cursor:pointer;text-align:left">Clear filters</button>
-    </div>`;
-  const rect=btn.getBoundingClientRect();pop.style.position='fixed';pop.style.top=rect.bottom+4+'px';pop.style.left=rect.left+'px';
-  document.body.appendChild(pop)
-}
 function setTaskFilter(field,value){
   taskFilter[field]=value;renderSortBar();renderCurrentView()
 }
 function clearTaskFilters(){
   taskFilter={status:'all',priority:'all',category:'all',due:'all'};renderSortBar();renderCurrentView()
-}
-function getFilterCount(){
-  return Object.values(taskFilter).filter(v=>v!=='all').length
 }
 function toggleFilterMenu(btn){
   filterMenuOpen=!filterMenuOpen;
@@ -1003,32 +980,35 @@ function toggleColumn(key){
 // --- Kanban ---
 function renderKanban(){
   const tasks=getFilteredTasks();
-  const statuses=['not_started','started','done'];
-  const labels={not_started:'Not Started',started:'Started',done:'Done'};
-  const colors={not_started:'var(--text-dim)',started:'var(--orange)',done:'var(--green)'};
-  const grouped=statuses.map(s=>({name:labels[s],status:s,tasks:tasks.filter(t=>t.status===s)}));
+  let cats=[...new Set(tasks.map(t=>t.category).filter(Boolean))].sort();
+  if(!cats.length){
+    document.getElementById('taskKanbanView').innerHTML='<div class="empty-state"><p class="text-dim">Add a category to view Kanban view.</p></div>';
+    return
+  }
+  const uncategorized=tasks.filter(t=>!t.category);
+  if(uncategorized.length)cats=['__none__',...cats];
   const showTags=taskColumns.includes('tags');
-  const showCat=taskColumns.includes('category');
   const showAnno=taskColumns.includes('annotations');
   const showDeps=taskColumns.includes('dependencies');
   const showRecur=taskColumns.includes('recur');
-  document.getElementById('taskKanbanView').innerHTML=`<div class="kanban-board">${grouped.map(g=>`<div class="kanban-column" data-status="${g.status}"><div class="kanban-col-header" style="color:${colors[g.status]}">${g.name} (${g.tasks.length})</div>${g.tasks.map(t=>{
+  const grouped=cats.map(cat=>({name:cat==='__none__'?'Uncategorized':cat,key:cat,tasks:cat==='__none__'?uncategorized:tasks.filter(t=>t.category===cat)}));
+  document.getElementById('taskKanbanView').innerHTML=`<div class="kanban-board">${grouped.map(g=>`<div class="kanban-column" data-category="${escHtml(g.key)}"><div class="kanban-col-header">${escHtml(g.name)} (${g.tasks.length})</div>${g.tasks.map(t=>{
     let meta=[];
     if(t.due_date)meta.push('<span>'+fmtDate(t.due_date)+'</span>');
     if(showTags&&(t.tags||[]).length)meta.push(t.tags.map(tag=>escHtml(tag)).join(', '));
-    if(showCat&&t.category)meta.push(escHtml(t.category));
     if(showAnno&&(t.notes||[]).length)meta.push((t.notes||[]).length+' note'+((t.notes||[]).length>1?'s':''));
     if(showDeps&&(t.depends_on||[]).length)meta.push((t.depends_on||[]).length+' dep'+((t.depends_on||[]).length>1?'s':''));
     if(showRecur&&t.recur)meta.push(escHtml(t.recur));
     return`<div class="kanban-card" draggable="true" ondragstart="onDragStart(event,'${t.id}')" onclick="showTaskDetail('${t.id}')"><div class="kanban-card-row"><span class="priority-dot ${t.priority||'medium'}"></span><span class="kanban-card-title">${escHtml(t.title)}</span></div>${meta.length?'<div class="kanban-card-row text-dim text-sm">'+meta.join(' · ')+'</div>':''}</div>`
-  }).join('')}<div class="kanban-drop-zone" ondrop="onDrop(event,'${g.status}')" ondragover="event.preventDefault();event.target.classList.add('drag-over')" ondragleave="event.target.classList.remove('drag-over')">Drop here</div></div>`).join('')}</div>`
+  }).join('')}<div class="kanban-drop-zone" ondrop="onDropKanban(event,'${g.key}')" ondragover="event.preventDefault();event.target.classList.add('drag-over')" ondragleave="event.target.classList.remove('drag-over')">Drop here</div></div>`).join('')}</div>`
 }
 let dragId=null;
 function onDragStart(e,id){dragId=id;e.dataTransfer.effectAllowed='move'}
-function onDrop(e,status){
+function onDropKanban(e,key){
   e.preventDefault();e.target.classList.remove('drag-over');
   if(!dragId)return;const tasks=getTasks();const t=tasks.find(x=>x.id===dragId);
-  if(t&&t.status!==status){const old=t.status;t.status=status;t.updated_at=nowISO();saveTasks(tasks);logActivity(t.id,'updated',t.title);renderKanban()}
+  const newCat=key==='__none__'?'':key;
+  if(t&&t.category!==newCat){t.category=newCat;t.updated_at=nowISO();saveTasks(tasks);logActivity(t.id,'updated',t.title);renderKanban()}
   dragId=null
 }
 
@@ -1115,7 +1095,8 @@ function renderTaskDetailPage(){
         </div>
         <div class="detail-field">
           <label>Category</label>
-          <select id="detailCategory"><option value="">None</option>${cats.map(c=>`<option value="${escHtml(c)}" ${t.category===c?'selected':''}>${escHtml(c)}</option>`).join('')}<option value="__new__">+ Add new</option></select>
+          <input id="detailCategory" list="categorySuggestions" value="${escHtml(t.category||'')}" placeholder="Type or pick a category...">
+          <datalist id="categorySuggestions">${cats.map(c=>`<option value="${escHtml(c)}">`).join('')}</datalist>
         </div>
       </div>
       <div class="detail-field">
@@ -1176,8 +1157,7 @@ function saveDetailTask(id){
   t.priority=document.getElementById('detailPriority').value;
   t.status=document.getElementById('detailStatus').value;
   t.due_date=document.getElementById('detailDue').value||null;
-  t.category=document.getElementById('detailCategory').value;
-  if(t.category==='__new__'){const c=prompt('New category:');if(c&&c.trim()){t.category=c.trim();const opts=document.getElementById('detailCategory');const opt=document.createElement('option');opt.value=c.trim();opt.textContent=c.trim();opts.insertBefore(opt,opts.lastElementChild)}else t.category=''}
+  t.category=document.getElementById('detailCategory').value.trim();
   t.recur=document.getElementById('detailRecur').value||null;
   t.updated_at=nowISO();
   saveTasks(tasks);
