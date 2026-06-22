@@ -98,40 +98,49 @@ input[type="file"]::file-selector-button:hover{background:var(--bg-hover)}
 textarea{resize:vertical;min-height:80px}
 
 /* Dashboard */
-.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dashboard-grid .full{grid-column:1/-1}
-.bento-grid{display:grid;grid-template-columns:2fr 1fr;gap:32px}
+.bento-grid{display:grid;grid-template-columns:2fr 1fr;gap:12px}
 .bento-grid .full{grid-column:1/-1}
-.stat-row{display:flex;gap:32px;flex-wrap:wrap}
+.stat-row{display:flex;gap:12px;flex-wrap:wrap}
 .stat-item{display:flex;flex-direction:column;gap:2px}
-.stat-value{font-size:28px;font-weight:700;line-height:1.1;font-family:var(--font-serif)}
-.stat-label{font-size:12px;color:var(--text-dim);font-family:var(--font-mono)}
+.stat-value{font-size:20px;font-weight:700;line-height:1.2;font-family:var(--font-serif)}
+.stat-label{font-size:11px;color:var(--text-dim);font-family:var(--font-mono)}
 
-.dash-card{padding:28px;border:1px solid var(--border);border-radius:10px;background:var(--bg)}
+.dash-card{padding:14px;border-radius:8px;background:var(--bg)}
 
-.overdue-item,.due-item{display:flex;align-items:center;gap:8px;padding:4px 0}
-.compact-list{max-height:200px;overflow-y:auto}
+.due-row{display:flex;align-items:center;gap:6px;padding:3px 0}
+.due-badge{font-size:9px;font-family:var(--font-mono);font-weight:600;flex-shrink:0}
+.due-badge.overdue{color:var(--red)}
+.due-badge.today{color:var(--orange)}
 
-.bar-chart{display:flex;flex-direction:column;gap:6px}
-.bar-row{display:flex;align-items:center;gap:8px}
-.bar-label{width:80px;font-size:12px;color:var(--text-dim);text-align:right;flex-shrink:0;font-family:var(--font-mono)}
-.bar-track{flex:1;height:16px;background:var(--bg-raised);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width .3s}
-.bar-count{width:30px;font-size:12px;text-align:right;flex-shrink:0;color:var(--text-dim)}
+.bar-chart{display:flex;flex-direction:column;gap:3px}
+.bar-row{display:flex;align-items:center;gap:6px}
+.bar-label{width:60px;font-size:11px;color:var(--text-dim);text-align:right;flex-shrink:0;font-family:var(--font-mono)}
+.bar-track{flex:1;height:8px;background:var(--bg-raised);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width .3s}
 
-.recap-text{font-size:13px;color:var(--text-dim);line-height:1.6}
-.recap-text strong{color:var(--text)}
+.recap-table{width:100%;border-collapse:collapse;font-size:12px}
+.recap-table th,.recap-table td{padding:3px 8px;text-align:right}
+.recap-table th{color:var(--text-dim);font-weight:600;font-family:var(--font-mono);font-size:10px}
+.recap-table td:first-child{text-align:left;color:var(--text-dim);font-weight:600}
+.recap-table tr td{border-top:1px solid var(--border)}
 
-.sparkline{display:inline-flex;align-items:flex-end;gap:1px;height:20px}
-.sparkline-bar{width:3px;border-radius:1px 1px 0 0;background:var(--accent);opacity:.5}
+.sparkline{display:inline-flex;align-items:flex-end;gap:1px;height:12px}
+.sparkline-bar{width:2px;border-radius:1px 1px 0 0;background:var(--accent);opacity:.4}
 .sparkline-bar.high{opacity:1}
 
-.activity-feed{display:flex;flex-direction:column;gap:8px}
-.activity-entry{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius);font-size:13px;color:var(--text-dim)}
-.activity-entry:hover{background:var(--bg-raised)}
-.activity-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.stat-sparkline{display:flex;align-items:flex-end;gap:1px;height:8px;margin-top:2px;opacity:.5}
+
+.comp-sparkline-wrap{display:flex;align-items:center;gap:8px}
+.comp-sparkline-label{font-size:10px;color:var(--text-dim);white-space:nowrap;font-family:var(--font-mono)}
+.comp-sparkline{display:flex;align-items:flex-end;gap:1px;height:10px}
+
+.activity-feed{display:flex;flex-direction:column;gap:4px}
+.activity-entry{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:var(--radius);font-size:12px;color:var(--text-dim)}
+.activity-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;background:var(--text-dim);opacity:.3}
 .activity-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.activity-time{font-size:11px;flex-shrink:0;font-family:var(--font-mono)}
+.activity-time{font-size:10px;flex-shrink:0;font-family:var(--font-mono)}
 
 .scratch-section{display:flex;flex-direction:column;gap:8px}
 .scratch-input-area{display:flex;flex-direction:column;gap:6px}
@@ -156,7 +165,7 @@ textarea{resize:vertical;min-height:80px}
 
 .quick-add{display:flex;gap:6px;margin-bottom:12px;align-items:center}
 .quick-add input{flex:1;padding:5px 10px;font-size:13px}
-.quick-add select{width:90px;padding:5px 8px;font-size:13px}
+
 
 
 .pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 0;font-size:13px;color:var(--text-dim);font-family:var(--font-mono)}
@@ -387,51 +396,42 @@ textarea{resize:vertical;min-height:80px}
       <!-- Dashboard -->
       <div class="page active" id="page-dashboard">
         <h1>Dashboard</h1>
-        <div class="section" id="dashMorning">
-          <div class="text-dim" style="font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">Morning</div>
-          <div class="bento-grid">
+        <div class="bento-grid" id="dashTop">
             <div class="dash-card">
-              <h2 style="margin-bottom:16px">Scratch Pad</h2>
               <div class="scratch-section" id="scratchSection">
-                <div class="scratch-input-area">
-                  <textarea id="scratchInput" placeholder="Write a quick note..." rows="2"></textarea>
-                  <button class="btn btn-primary btn-sm" onclick="addScratchNote()" style="align-self:flex-end">Add Note</button>
-                </div>
-                <div id="scratchList"></div>
+              <div class="scratch-input-area">
+                <textarea id="scratchInput" placeholder="Write a quick note..." rows="2"></textarea>
+                <button class="btn btn-primary btn-sm" onclick="addScratchNote()" style="align-self:flex-end">Add Note</button>
               </div>
+              <div id="scratchList"></div>
             </div>
-            <div class="dash-card">
-              <h2 style="margin-bottom:16px">Focus Goals</h2>
-              <div id="dashFocusGoals"></div>
-            </div>
+          </div>
+          <div class="dash-card">
+            <h2 style="margin-bottom:8px">Focus Goals</h2>
+            <div id="dashFocusGoals"></div>
           </div>
         </div>
         <div class="section" id="dashStatus">
           <div class="dashboard-grid">
             <div class="dash-card">
-              <h2 class="text-red" style="margin-bottom:16px">Overdue</h2>
-              <div id="dashOverdue"></div>
+              <div id="dashDueList"></div>
             </div>
-            <div class="dash-card">
-              <h2 class="text-orange" style="margin-bottom:16px">Due Today</h2>
-              <div id="dashDueToday"></div>
-            </div>
+            <div class="stat-row" id="dashCounts"></div>
           </div>
-          <div class="stat-row mt-16" id="dashCounts"></div>
         </div>
         <div class="section full" id="dashAnalytics">
-          <div class="text-dim" style="font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">Analytics</div>
-          <div class="dashboard-grid mt-8">
-            <div class="dash-card"><h2 style="margin-bottom:16px">By Priority</h2><div class="bar-chart" id="dashPriorityChart"></div></div>
-            <div class="dash-card"><h2 style="margin-bottom:16px">By Category</h2><div class="bar-chart" id="dashCategoryChart"></div></div>
+          <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Analytics</div>
+          <div class="dashboard-grid">
+            <div class="dash-card"><div class="text-dim" style="font-size:11px;margin-bottom:6px">Priority</div><div class="bar-chart" id="dashPriorityChart"></div></div>
+            <div class="dash-card"><div class="text-dim" style="font-size:11px;margin-bottom:6px">Category</div><div class="bar-chart" id="dashCategoryChart"></div></div>
             <div class="full dash-card" id="dashRecap"></div>
-            <div class="full dash-card" id="dashSparkline"></div>
-          </div>
-        </div>
-        <div class="section full">
-          <div class="text-dim" style="font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">Recent Activity</div>
-          <div class="dash-card">
-            <div class="activity-feed mt-8" id="dashActivity"></div>
+            <div class="full dash-card">
+              <div id="dashSparkline"></div>
+              <div id="dashCompRate" style="margin-top:12px"></div>
+            </div>
+            <div class="full dash-card">
+              <div class="activity-feed" id="dashActivity"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -453,8 +453,7 @@ textarea{resize:vertical;min-height:80px}
           </div>
         </div>
         <div class="quick-add">
-          <input type="text" id="quickAddInput" placeholder="Task title..." onkeydown="if(event.key==='Enter')quickAddTask()">
-          <select id="quickAddPriority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select>
+          <input type="text" id="quickAddInput" placeholder="Add a task.." onkeydown="if(event.key==='Enter')quickAddTask()">
           <button class="btn btn-primary btn-sm" onclick="quickAddTask()">Add</button>
         </div>
         <div class="sort-bar" id="sortBar"></div>
@@ -734,35 +733,42 @@ function renderDashboard(){
   const tasks=getTasks().filter(t=>!t.deleted_at);
   renderScratchNotes();
   renderDashFocusGoals();
-  renderDashOverdue(tasks);
-  renderDashDueToday(tasks);
+  renderDashDueList(tasks);
   renderDashCounts(tasks);
   renderDashCharts(tasks);
   renderDashRecap(tasks);
   renderDashSparkline(tasks);
+  renderDashCompRate(tasks);
   renderDashActivity()
 }
-function renderDashOverdue(tasks){
+function renderDashDueList(tasks){
   const today=todayStr();
   const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done').slice(0,5);
-  document.getElementById('dashOverdue').innerHTML=overdue.length?overdue.map(t=>`<div class="overdue-item"><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a><span class="text-dim text-sm">${fmtDate(t.due_date)}</span></div>`).join(''):'<span class="text-dim text-sm">None — nice work.</span>'
-}
-function renderDashDueToday(tasks){
-  const today=todayStr();
   const due=tasks.filter(t=>t.due_date===today&&t.status!=='done').slice(0,5);
-  document.getElementById('dashDueToday').innerHTML=due.length?due.map(t=>`<div class="due-item"><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a></div>`).join(''):'<span class="text-dim text-sm">No tasks due today.</span>'
+  const items=[...overdue.map(t=>({...t,_b:'Overdue'})),...due.map(t=>({...t,_b:'Due Today'}))];
+  document.getElementById('dashDueList').innerHTML=items.length?items.map(t=>`<div class="due-row"><span class="due-badge ${t._b==='Overdue'?'overdue':'today'}">${t._b}</span><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a><span class="text-dim text-sm">${fmtDate(t.due_date)}</span></div>`).join(''):'<span class="text-dim text-sm">No overdue or due tasks.</span>'
 }
 function renderDashCounts(tasks){
   const total=tasks.length,notStarted=tasks.filter(t=>t.status==='not_started').length,started=tasks.filter(t=>t.status==='started').length,done=tasks.filter(t=>t.status==='done').length;
-  document.getElementById('dashCounts').innerHTML=`<div class="stat-item"><span class="stat-value">${total}</span><span class="stat-label">Total</span></div><div class="stat-item"><span class="stat-value">${notStarted}</span><span class="stat-label">Not started</span></div><div class="stat-item"><span class="stat-value">${started}</span><span class="stat-label">Started</span></div><div class="stat-item"><span class="stat-value">${done}</span><span class="stat-label">Done</span></div>`
+  const log=getActivity();
+  const days=[];const today=new Date();
+  for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const s=d.toISOString().slice(0,10);days.push({created:tasks.filter(t=>t.created_at.slice(0,10)===s).length,done:log.filter(e=>e.action==='completed'&&e.timestamp.slice(0,10)===s).length})}
+  const mC=Math.max(...days.map(d=>d.created),1),mD=Math.max(...days.map(d=>d.done),1);
+  const sp=(arr,m)=>arr.map(d=>`<span style="display:inline-block;width:4px;height:${d/m*10}px;background:var(--accent);border-radius:1px${d===m?';opacity:1':';opacity:.4'}"></span>`).join('');
+  const s=(a,b)=>`<div class="stat-sparkline">${sp(a,b)}</div>`;
+  document.getElementById('dashCounts').innerHTML=
+    `<div class="stat-item"><span class="stat-value">${total}</span><span class="stat-label">Total</span>${s(days.map(d=>d.created),mC)}</div>`+
+    `<div class="stat-item"><span class="stat-value">${notStarted}</span><span class="stat-label">Not started</span></div>`+
+    `<div class="stat-item"><span class="stat-value">${started}</span><span class="stat-label">Started</span></div>`+
+    `<div class="stat-item"><span class="stat-value">${done}</span><span class="stat-label">Done</span>${s(days.map(d=>d.done),mD)}</div>`
 }
 function renderDashCharts(tasks){
   const priorityCounts={high:0,medium:0,low:0};const catCounts={};
   tasks.filter(t=>t.status!=='done').forEach(t=>{priorityCounts[t.priority||'medium']++;(catCounts[t.category||'uncategorized'])=(catCounts[t.category||'uncategorized']||0)+1});
   const pMax=Math.max(...Object.values(priorityCounts),1);
-  document.getElementById('dashPriorityChart').innerHTML=Object.entries(priorityCounts).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/pMax*100}%;background:${k==='high'?'var(--red)':k==='medium'?'var(--orange)':'var(--green)'}"></div></div><span class="bar-count">${v}</span></div>`).join('');
+  document.getElementById('dashPriorityChart').innerHTML=Object.entries(priorityCounts).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/pMax*100}%;background:${k==='high'?'var(--text)':k==='medium'?'var(--text-dim)':'var(--text-faint)'}"></div></div></div>`).join('');
   const cMax=Math.max(...Object.values(catCounts),1);
-  document.getElementById('dashCategoryChart').innerHTML=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${escHtml(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${v/cMax*100}%;background:var(--accent)"></div></div><span class="bar-count">${v}</span></div>`).join('')
+  document.getElementById('dashCategoryChart').innerHTML=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${escHtml(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${v/cMax*100}%;background:var(--accent)"></div></div></div>`).join('')
 }
 function renderDashRecap(tasks){
   const today=new Date();const dow=today.getDay();
@@ -772,18 +778,28 @@ function renderDashRecap(tasks){
   const monthStart=new Date(today.getFullYear(),today.getMonth(),1);
   const monthTasks=tasks.filter(t=>{const d=new Date(t.created_at);return d>=monthStart});
   const doneMonth=monthTasks.filter(t=>t.status==='done');
-  const rate=monthTasks.length?Math.round(doneMonth.length/monthTasks.length*100):0;
-  document.getElementById('dashRecap').innerHTML=`<div class="recap-text"><strong>This week:</strong> ${doneWeek.length} completed, ${weekTasks.length} created. — <strong>This month:</strong> ${doneMonth.length} completed, ${rate}% rate.</div>`
+  const wRate=weekTasks.length?Math.round(doneWeek.length/weekTasks.length*100):0;
+  const mRate=monthTasks.length?Math.round(doneMonth.length/monthTasks.length*100):0;
+  document.getElementById('dashRecap').innerHTML=`<table class="recap-table"><tr><th></th><th>Created</th><th>Done</th><th>Rate</th></tr><tr><td>Week</td><td>${weekTasks.length}</td><td>${doneWeek.length}</td><td>${wRate}%</td></tr><tr><td>Month</td><td>${monthTasks.length}</td><td>${doneMonth.length}</td><td>${mRate}%</td></tr></table>`
 }
 function renderDashSparkline(tasks){
   const days=[];const today=new Date();
   for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const s=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');days.push({date:s,count:tasks.filter(t=>{const c=t.created_at.slice(0,10);return c===s}).length})}
   const max=Math.max(...days.map(d=>d.count),1);
-  document.getElementById('dashSparkline').innerHTML=`<h2>Activity (30 days)</h2><div class="sparkline mt-8">${days.map(d=>`<div class="sparkline-bar${d.count===max?' high':''}" style="height:${d.count/max*20}px" title="${d.date}: ${d.count}"></div>`).join('')}</div>`
+  document.getElementById('dashSparkline').innerHTML=`<div style="font-size:11px;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:4px">30-day task activity</div><div class="sparkline">${days.map(d=>`<div class="sparkline-bar${d.count===max?' high':''}" style="height:${d.count/max*12}px" title="${d.date}: ${d.count}"></div>`).join('')}</div>`
+}
+function renderDashCompRate(tasks){
+  const today=new Date();const log=getActivity();const rates=[];
+  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const s=d.toISOString().slice(0,10);
+    const created=tasks.filter(t=>t.created_at.slice(0,10)===s).length;
+    const done=log.filter(e=>e.action==='completed'&&e.timestamp.slice(0,10)===s).length;
+    rates.push(created?Math.round(done/created*100):0)}
+  const max=Math.max(...rates,1);
+  document.getElementById('dashCompRate').innerHTML=`<div class="comp-sparkline-wrap"><span class="comp-sparkline-label">Completion rate (30d)</span><div class="comp-sparkline">${rates.map(r=>`<span style="display:inline-block;width:3px;height:${r/max*10}px;background:var(--green);border-radius:1px"></span>`).join('')}</div></div>`
 }
 function renderDashActivity(){
   const a=getActivity().slice(0,5);
-  document.getElementById('dashActivity').innerHTML=a.length?a.map(e=>`<div class="activity-entry"><span class="activity-dot" style="background:${e.action==='created'?'var(--green)':e.action==='completed'?'var(--accent)':e.action==='deleted'?'var(--red)':'var(--orange)'}"></span><span class="activity-text">${escHtml(e.action)}${e.details?': '+escHtml(e.details):''}</span><span class="activity-time">${fmtDateTime(e.timestamp)}</span></div>`).join(''):'<span class="text-dim">No activity yet.</span>'
+  document.getElementById('dashActivity').innerHTML=a.length?a.map(e=>`<div class="activity-entry"><span class="activity-dot"></span><span class="activity-text">${escHtml(e.action)}${e.details?': '+escHtml(e.details):''}</span><span class="activity-time">${fmtDateTime(e.timestamp)}</span></div>`).join(''):'<span class="text-dim">No activity yet.</span>'
 }
 
 // --- Scratch Notes ---
@@ -808,13 +824,11 @@ function renderDashFocusGoals(){
   const focus=getFocus();const today=todayStr();
   const ids=focus[today]||[];const goals=ids.map(id=>getTasks().find(t=>t.id===id)).filter(Boolean);
   const doneCount=goals.filter(t=>t.status==='done').length;
-  const quotes=["The only way to do great work is to love what you do.","Start where you are. Use what you have. Do what you can.","Done is better than perfect.","The secret of getting ahead is getting started.","Small steps lead to big changes.","Focus on being productive instead of busy.","You don't have to be extreme, just consistent.","Every task completed is a step forward."];
   const selHtml=`<div class="goal-selector" style="margin-bottom:8px"><select id="dashFocusSelect" style="flex:1">${tasks.map(t=>`<option value="${t.id}">${escHtml(t.title)}</option>`).join('')}</select><button class="btn btn-primary btn-sm" onclick="addDashFocusGoal()">Add</button></div>`;
-  const cntHtml=`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount} of ${goals.length} done</div>`;
+  const cntHtml=`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount}/${goals.length}</div>`;
   const cardsHtml=goals.length?goals.map(t=>`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`).join(''):'<div class="text-dim text-sm">Add tasks above to set today\'s goals.</div>';
   if(goals.length&&doneCount===goals.length)fireConfetti();
-  const q='"'+quotes[Math.floor(Math.random()*quotes.length)]+'"';
-  document.getElementById('dashFocusGoals').innerHTML=selHtml+cntHtml+cardsHtml+`<div class="mt-16 text-dim text-sm" style="line-height:1.5">${q}</div>`
+  document.getElementById('dashFocusGoals').innerHTML=selHtml+cntHtml+cardsHtml
 }
 
 // --- Task List ---
@@ -1229,7 +1243,7 @@ function renderCurrentView(){
 // --- Quick Add ---
 function quickAddTask(){
   const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
-  const tasks=getTasks();const t={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:document.getElementById('quickAddPriority').value,due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const tasks=getTasks();const t={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);inp.value='';renderCurrentView()
 }
 
