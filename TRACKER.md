@@ -24,9 +24,11 @@
 | Due today list (max 5) | done |
 | Bar charts by priority (high/medium/low) | done |
 | Bar charts by category (top 8) | done |
-| Weekly/monthly recap table (created / done / rate) | done |
+| Weekly/monthly recap table → Heatmap grid (53wk × 7day contribution grid) | done |
+| Task roulette (pick random incomplete task) | done |
 | "+ Add Task" button → navigates to Tasks page | done |
 | Bento grid layout (2fr+1fr top, full-width analytics below) | done |
+| Frog reading book (empty state when no tasks) | done |
 | **Tasks (List View)** | |
 | Sortable table with configurable columns | done |
 | Two-step sort popover (field → direction) with removable chips | done |
@@ -53,6 +55,12 @@
 | Today indicator with pulse animation | done |
 | Overdue glow (red inset shadow) on past-due days | done |
 | Time-labelled tasks in week view | done |
+| **Tasks (Eisenhower Matrix)** | |
+| 2×2 grid (Do First / Schedule / Delegate / Eliminate) | done |
+| Quadrant assignment by urgency (due_date) × importance (priority) | done |
+| Task count per quadrant | done |
+| Click task title to open detail | done |
+| Hint text explaining quadrant logic | done |
 | **Task Detail (Full-Page Editor)** | |
 | Inline editing: title, description, priority, status | done |
 | Due date, start date, time inputs | done |
@@ -121,7 +129,26 @@
 | Peek | Peeks up from below (~2.2s) | done |
 | Perch | Hops to random new position on click (~1.2s) | done |
 | Auto-cycle | Random idle/sleep/stretch cycle (12–30s interval) | done |
-| Click behavior | Happy → teleport to new random position | done |
+| Click behavior | Happy → hop to new position with CSS transition | done |
 | Confetti trigger | Gets happy when confetti fires | done |
+| Modal peek | Peeks behind modal overlay when open | done |
+| Toast rider | Appears inside toast notifications | done |
 | Window resize | Repositions to stay within viewport | done |
 | Toggle on/off | Via Settings → Appearance → Frog companion checkbox | done |
+
+## Layer 4: Backend
+
+| Step | Status |
+|------|--------|
+| FastAPI backend with async SQLAlchemy + SQLite | done |
+| Task CRUD endpoints (`/api/tasks`) | done |
+| Config, Focus, Notes endpoints | done |
+| Sync endpoint (`/api/sync/full`) with id_map + depends_on resolution | done |
+| Dashboard, Search, Backup, Bin, Activity, Export endpoints | done |
+| Frontend API client with background sync (`_initApi`, `_syncFull`, `_syncCfg`, `syncFocus`) | done |
+| Frontend reads from localStorage cache, writes fire background API calls | done |
+| `doable.html` served at `GET /` via FileResponse | done |
+| `start.bat` / `stop.bat` convenience scripts | done |
+| Updated README.md with new architecture | done |
+| Updated design.md, api.md, directory-structure.md, TRACKER.md | done |
+| Backend pushed to repo (removed from .gitignore) | done |

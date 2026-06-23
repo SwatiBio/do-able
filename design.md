@@ -2,8 +2,7 @@
 
 ## Overview
 
-A local-first task manager in a single HTML file. No server, no build step, no dependencies.
-Open `doable.html` in any modern browser. All data stays in your browser's localStorage.
+A task manager with a FastAPI backend and a single-file HTML frontend. The backend persists data in SQLite; the frontend caches everything in `localStorage` for instant reads and syncs writes to the server in the background.
 
 ## Architecture
 
@@ -16,24 +15,33 @@ Open `doable.html` in any modern browser. All data stays in your browser's local
 │  │  CSS (Nord theme, layout)     │  │
 │  ├───────────────────────────────┤  │
 │  │  JavaScript (app logic)       │  │
+│  │  + API client (background     │  │
+│  │    sync to FastAPI backend)   │  │
 │  └───────────────────────────────┘  │
 └─────────────────────────────────────┘
-           ↕ localStorage API
-┌─────────────────────────────┐
-│     Browser localStorage    │
-│  doable_tasks              │
-│  doable_activity           │
-│  doable_config             │
-│  doable_notes              │
-│  doable_focus              │
-│  doable_taskColumns        │
-└─────────────────────────────┘
+       ↕ localStorage (cache)        ↕ HTTP (background sync)
+┌─────────────────────┐    ┌──────────────────────────┐
+│  Browser localStorage│    │   FastAPI Backend         │
+│  doable_tasks        │    │   /api/tasks              │
+│  doable_activity     │    │   /api/config             │
+│  doable_config       │    │   /api/notes              │
+│  doable_notes        │    │   /api/focus              │
+│  doable_focus        │    │   /api/sync/full          │
+│  doable_taskColumns  │    │   + 20 more endpoints     │
+└─────────────────────┘    └──────────────────────────┘
+                                    ↕
+                           ┌──────────────────┐
+                           │   SQLite Database │
+                           │   backend/.todo/  │
+                           │   todo.db          │
+                           └──────────────────┘
 ```
 
-- All data persists in `localStorage` with the `doable_` prefix
-- No network calls, no server, no database files
-- Export/backup via JSON file download/upload
-- Hashless client-side routing via JS state
+- Frontend reads from `localStorage` (instant, synchronous)
+- Every write updates `localStorage` immediately AND fires a background API call to persist to the server
+- On startup, `_initApi()` loads fresh data from the API and merges into `localStorage`
+- `_syncFull()` debounces bulk sync (800ms) posting all tasks/notes/config to `/api/sync/full`
+- If the server is offline, `localStorage` still works — data syncs when connectivity returns
 
 ## Layout
 
@@ -63,10 +71,12 @@ Open `doable.html` in any modern browser. All data stays in your browser's local
 - Overdue tasks list (due before today, not done, max 5)
 - Due today list (max 5)
 - Bar charts (by priority - high/medium/low - using semantic colors; by category - up to 8, using accent color)
-- Weekly/monthly recap table (created / done / completion rate)
+- **Heatmap grid** — GitHub-style contribution heatmap (53 weeks × 7 days) showing task completion density. Replaces the old recap table. Month labels along the top, today highlighted with an outline, Nord color scale from muted to accent.
+- **Task roulette** — "Pick random" button that selects a random incomplete task and displays it with a clickable link.
+- Frog reading a tiny book in the analytics area when no tasks exist (empty state).
 
 ### 2. Tasks
-Three view modes toggled via icon buttons:
+Four view modes toggled via icon buttons:
 
 **List View** - sortable table with:
 - Two-step popover sort (select field → select direction). Active sorts shown as removable chips in sort bar.
@@ -85,6 +95,15 @@ Three view modes toggled via icon buttons:
 - **Month grid** - 7-column grid, day numbers, priority dot indicators (overflow shows expandable popover), today pulse animation, overdue glow (red inset shadow), multi-day bars for tasks spanning multiple dates, recurring task previews (shown in calendar but not yet created), click to expand inline task list, drag-and-drop to reschedule due date
 - **Week view** - 7-day columns with hourly time slots (07:00–22:00), today column highlight, time-labelled tasks, tasks without time shown at 12:00 slot, drag-and-drop reschedule
 - Calendar controls: ← → navigation, Today button, Month/Week toggle, jump-to-date date picker
+
+**Eisenhower Matrix** - 2×2 grid (Do First / Schedule / Delegate / Eliminate):
+- Quadrant assignment based on urgency (due_date proximity) × importance (priority level)
+- Do First: high importance + urgent (high/medium priority + due within 3 days or overdue)
+- Schedule: high importance + not urgent (high/medium priority + due later or no due)
+- Delegate: low importance + urgent (low priority + due within 3 days or overdue)
+- Eliminate: low importance + not urgent (low priority + no due or due later)
+- Each quadrant shows task count, list of tasks with priority dots and due dates, click task title to open detail
+- Hint text above the matrix explaining the quadrant logic
 
 Features:
 - Quick-add input (title only, no priority - defaults to medium, not_started, no due date) at top of page
@@ -128,6 +147,53 @@ Collapsible accordion sections (each toggles open/closed via h2 click):
 - **Data**: Clear All Data (double confirmation), Load Samples / Remove Samples buttons
 - **Categories**: List of all categories with task count + Delete button (confirms, sets tasks to uncategorized)
 
+## Backend
+
+FastAPI async server with SQLAlchemy 2.0 + SQLite (via `aiosqlite`).
+
+### Starting the server
+
+```bash
+cd backend
+py -m pip install -r requirements.txt
+py -B -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Or from the project root: double-click `start.bat` (Windows) which starts the server and opens the browser.
+
+### Key endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | Serves `doable.html` |
+| `GET/POST` | `/api/tasks` | List or create tasks |
+| `GET/PUT/DELETE` | `/api/tasks/{id}` | Read, update, or delete a task |
+| `POST` | `/api/tasks/{id}/done` | Mark task done (triggers recurrence) |
+| `POST` | `/api/tasks/{id}/undone` | Reopen a done task |
+| `POST` | `/api/tasks/{id}/note` | Add annotation to task |
+| `GET/PUT` | `/api/config` | Read or update config |
+| `GET/PUT` | `/api/focus` | Read or update focus goals |
+| `GET/POST/PUT/DELETE` | `/api/notes` | CRUD for scratch notes |
+| `POST` | `/api/sync/full` | Bulk import tasks/notes/config (returns `id_map` for frontend ID reconciliation) |
+| `GET` | `/api/dashboard` | Dashboard analytics |
+| `GET` | `/api/search?q=` | Full-text search across tasks |
+| `GET/POST` | `/api/backups` | List or create backups |
+| `POST` | `/api/backups/{file}/restore` | Restore from backup |
+| `GET` | `/api/bin` | List deleted tasks |
+| `POST` | `/api/bin/{id}/restore` | Restore a deleted task |
+| `DELETE` | `/api/bin` | Empty bin |
+| `GET` | `/api/activity` | Activity log |
+| `GET` | `/api/export/{fmt}` | Export tasks (json/csv/markdown) |
+
+### Data model
+
+SQLAlchemy models in `backend/app/models.py`:
+- `Task` — mirrors the frontend task object (id, title, description, status, priority, due_date, start_date, time, category, tags, recur, depends_on, notes, created_at, updated_at, deleted_at, _sample)
+- `Config` — JSON-serialized config blob
+- `Focus` — JSON-serialized focus goals map
+- `Note` — scratch pad notes
+- `Activity` — activity log entries
+
 ## Theme: Nord
 
 CSS custom properties switching via `data-theme` attribute on `<html>`.
@@ -162,8 +228,10 @@ States (7 total):
 
 Behaviors:
 - Random idle/sleep/stretch cycle (12–30s interval; sleep ~35%, idle ~35%, stretch ~10%)
-- Click the frog → happy animation, then teleport to random position after 3s
+- Click the frog → happy animation, then hops to a new position with a CSS transition (no teleport)
 - Frog gets happy automatically when confetti fires (task completion)
+- Frog peeks behind modal overlay when a modal is open
+- Frog rides inside toast notifications
 - Responsive: repositions to stay within viewport on window resize
 - SVG is ~60×52px, green frog with eyes, smile, legs, cheek blush
 
@@ -207,29 +275,29 @@ Each task:
 }
 ```
 
-## Storage
-
-All under `localStorage` with `doable_` prefix key:
-
-| Key | Contents |
-|-----|----------|
-| `doable_tasks` | Array of task objects |
-| `doable_activity` | Array of activity log entries |
-| `doable_config` | { theme, date_mode, per_page, frog_enabled } |
-| `doable_notes` | Array of scratch note objects |
-| `doable_focus` | { "YYYY-MM-DD": ["task_id", ...] } |
-| `doable_taskColumns` | Array of visible column keys |
-
 ## Files
 
 ```
 todo-todo/
-├── doable.html              # The entire app (1765 lines)
+├── doable.html              # The entire frontend (~1900 lines)
+├── start.bat                # Starts uvicorn + opens browser (Windows)
+├── stop.bat                 # Kills the server process (Windows)
 ├── README.md                # Getting started guide
 ├── design.md                # This file
-├── api.md                   # Data API reference
+├── api.md                   # Data API reference (localStorage + REST)
 ├── directory-structure.md   # File tree
 ├── TRACKER.md               # Build progress
 ├── LICENSE                  # MIT license
-└── .gitignore               # Ignored files
+├── .gitignore               # Ignored files
+└── backend/                 # FastAPI backend
+    ├── pyproject.toml
+    ├── requirements.txt
+    └── app/
+        ├── __init__.py
+        ├── main.py           # FastAPI app entry point
+        ├── database.py       # SQLAlchemy async setup
+        ├── models.py         # ORM models
+        ├── schemas.py        # Pydantic schemas
+        ├── routes/           # 12 route modules
+        └── services/         # 9 service modules
 ```

@@ -1,7 +1,14 @@
-# Folders to ignore (add your own)
-backend/
+# Folders to ignore
 backup-backend/
 backup-frontend/
+
+# Python cache
+__pycache__/
+*.pyc
+*.egg-info/
+
+# SQLite database
+.todo/
 
 # Specific files
 todo-prompt.txt
