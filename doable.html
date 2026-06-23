@@ -121,12 +121,6 @@ textarea{resize:vertical;min-height:80px}
 .due-badge.overdue{color:var(--red)}
 .due-badge.today{color:var(--orange)}
 
-.bar-chart{display:flex;flex-direction:column;gap:3px}
-.bar-row{display:flex;align-items:center;gap:6px}
-.bar-label{width:60px;font-size:11px;color:var(--text-dim);text-align:right;flex-shrink:0;font-family:var(--font-mono)}
-.bar-track{flex:1;height:8px;background:var(--bg-raised);border-radius:2px;overflow:hidden}
-.bar-fill{height:100%;border-radius:2px;transition:width .3s}
-
 /* Heatmap grid */
 .heatmap-wrapper{overflow-x:auto;overflow-y:hidden;padding-top:4px}
 .heatmap-table{border-collapse:collapse;font-size:9px;font-family:var(--font-mono)}
@@ -154,10 +148,6 @@ textarea{resize:vertical;min-height:80px}
 #page-dashboard .scratch-note-text{font-size:12px}
 #page-dashboard #scratchList{max-height:100px;overflow-y:auto}
 #page-dashboard h2{font-size:13px;margin-bottom:4px}
-#page-dashboard .bar-chart{gap:2px}
-#page-dashboard .bar-row{font-size:10px;gap:4px}
-#page-dashboard .bar-label{font-size:10px;width:44px}
-#page-dashboard .bar-track{height:6px}
 #page-dashboard .due-row{padding:2px 0;font-size:12px}
 #page-dashboard .focus-card{padding:4px 6px;font-size:12px}
 #page-dashboard .focus-card-title{font-size:12px}
@@ -485,12 +475,8 @@ textarea{resize:vertical;min-height:80px}
             </div>
           </div>
         <div class="section full" id="dashAnalytics">
-          <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Analytics</div>
           <div class="dashboard-grid">
-            <div class="dash-card"><div class="text-dim" style="font-size:11px;margin-bottom:6px">Priority</div><div class="bar-chart" id="dashPriorityChart"></div></div>
-            <div class="dash-card"><div class="text-dim" style="font-size:11px;margin-bottom:6px">Category</div><div class="bar-chart" id="dashCategoryChart"></div></div>
             <div class="full dash-card" id="dashRecap"></div>
-
           </div>
         </div>
       </div>
@@ -936,7 +922,6 @@ function renderDashboard(){
   renderScratchNotes();
   renderDashFocusGoals();
   renderDashMyDay(tasks);
-  renderDashCharts(tasks);
   renderDashHeatmap(tasks);
   const area=document.getElementById('dashAnalytics');
   const existing=area.querySelector('.dash-empty-frog');
@@ -946,14 +931,6 @@ function renderDashboard(){
     d.innerHTML='<svg viewBox="0 0 64 56"><path d="M17,44 L12,49 M17,44 L16,50 M17,44 L22,49" stroke="#3a7a3c" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M47,44 L42,49 M47,44 L46,50 M47,44 L52,49" stroke="#3a7a3c" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="32" cy="30" r="22" fill="#3a7a3c"/><circle cx="32" cy="30" r="20" fill="#7bc67e"/><ellipse cx="32" cy="37" rx="10" ry="8" fill="#d4f5c4"/><circle cx="20" cy="12" r="9" fill="#3a7a3c"/><circle cx="20" cy="12" r="7.5" fill="#7bc67e"/><circle cx="20" cy="12" r="4" fill="#1a1a1a"/><circle cx="18.5" cy="10.5" r="1.3" fill="white"/><circle cx="44" cy="12" r="9" fill="#3a7a3c"/><circle cx="44" cy="12" r="7.5" fill="#7bc67e"/><circle cx="44" cy="12" r="4" fill="#1a1a1a"/><circle cx="42.5" cy="10.5" r="1.3" fill="white"/><ellipse cx="14" cy="29" rx="4" ry="3" fill="#f5b8a0" opacity=".45"/><ellipse cx="50" cy="29" rx="4" ry="3" fill="#f5b8a0" opacity=".45"/><path d="M26,33 Q29,36 32,33 Q35,36 38,33" fill="none" stroke="#3a7a3c" stroke-width="1.2" stroke-linecap="round"/><rect x="24" y="26" width="16" height="14" rx="1" fill="#d4f5c4" stroke="#3a7a3c" stroke-width=".8"/><line x1="26" y1="29" x2="38" y2="29" stroke="#3a7a3c" stroke-width=".6"/><line x1="26" y1="32" x2="35" y2="32" stroke="#3a7a3c" stroke-width=".6"/><line x1="26" y1="35" x2="32" y2="35" stroke="#3a7a3c" stroke-width=".6"/></svg><span>Frog is reading... waiting for your first task!</span>';
     area.appendChild(d)
   }
-}
-function renderDashCharts(tasks){
-  const priorityCounts={high:0,medium:0,low:0};const catCounts={};
-  tasks.filter(t=>t.status!=='done').forEach(t=>{priorityCounts[t.priority||'medium']++;(catCounts[t.category||'uncategorized'])=(catCounts[t.category||'uncategorized']||0)+1});
-  const pMax=Math.max(...Object.values(priorityCounts),1);
-  document.getElementById('dashPriorityChart').innerHTML=Object.entries(priorityCounts).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/pMax*100}%;background:${k==='high'?'var(--text)':k==='medium'?'var(--text-dim)':'var(--text-faint)'}"></div></div></div>`).join('');
-  const cMax=Math.max(...Object.values(catCounts),1);
-  document.getElementById('dashCategoryChart').innerHTML=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${escHtml(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${v/cMax*100}%;background:var(--accent)"></div></div></div>`).join('')
 }
 function pickRandomTask(){
   const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done');
