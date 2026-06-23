@@ -16,6 +16,12 @@ doable.html  ←──→  FastAPI (Python)  ←──→  SQLite (aiosqlite)
 
 ## Getting Started
 
+### Prerequisites
+
+- **Python 3.10+** (3.12 recommended) — check with `python --version` or `py --version`
+- **Git** — to clone the repo
+- A modern browser (Chrome, Firefox, Edge, Safari)
+
 ### 1. Clone the repo
 
 ```bash
@@ -23,37 +29,88 @@ git clone https://github.com/SwatiBio/do-able.git
 cd do-able
 ```
 
-### 2. Install Python dependencies
+### 2. Set up a virtual environment (recommended)
 
 ```bash
 cd backend
+
+# Create venv
+python -m venv .venv
+
+# Activate it
+# Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+# Windows (Git Bash):
+source .venv/Scripts/activate
+# macOS / Linux:
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Start the server
+This installs: `fastapi`, `uvicorn[standard]`, `sqlalchemy[asyncio]`, `aiosqlite`, `pydantic`, and `httpx` (for tests).
 
-**Option A — Double-click shortcut:**
+### 4. Start the server
 
-Go back to the project root and double-click `start.bat`. It starts the server and opens your browser automatically.
+**Option A — Windows shortcut:**
+
+Go back to the project root and double-click **`start.bat`**. It starts the server and opens your browser automatically.
 
 **Option B — Manual:**
 
 ```bash
-cd backend
+# From the backend/ directory (with venv active):
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 4. Open the app
+Or from the project root:
 
-Navigate to **http://localhost:8000** in any modern browser.
+```bash
+uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+You should see:
+
+```
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process
+INFO:     Application startup complete.
+```
+
+### 5. Open the app
+
+Navigate to **http://localhost:8000** in your browser. The app loads instantly — all UI is a single HTML file served by the backend.
+
+### First run
+
+On your first visit, the app loads **20 sample tasks** and **4 scratch notes** so you can explore immediately. The samples have `_sample` flags and can be removed via **Settings → Data → Remove Samples**.
+
+A SQLite database is auto-created at `backend/.todo/todo.db` — no manual setup needed.
 
 ### Stopping the server
 
 Double-click `stop.bat`, or press `Ctrl+C` in the terminal.
 
+### Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `python` / `pip` not found | Try `py --version` / `py -m pip install ...` (Windows launcher). Or install Python from [python.org](https://python.org) |
+| `ModuleNotFoundError` | Make sure your venv is activated before running `pip install` and `uvicorn` |
+| Port 8000 already in use | Use a different port: `uvicorn app.main:app --port 8001` |
+| Database errors on startup | Delete the old database: `rm -f backend/.todo/todo.db` and restart |
+| `start.bat` doesn't open browser | Open http://localhost:8000 manually — the server may still be starting |
+| Blank page at localhost | Check the terminal for errors. Make sure you're in the `backend/` directory when starting uvicorn |
+
 ## Quick Start (no server)
 
-You can still open `doable.html` directly in a browser without the server. The app runs fully offline using localStorage. The backend is optional — it adds persistence beyond the browser and enables future multi-device sync.
+You can open `doable.html` directly in a browser without the server. The app runs fully offline using localStorage. The backend is optional — it adds persistence beyond the browser and enables future multi-device sync.
+
+**Note:** Without the server, data stays in your browser only. Clearing browser data will lose everything. Back up regularly via **Settings → Backups → Download Backup**.
 
 ## Things to Keep in Mind
 
