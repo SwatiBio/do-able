@@ -1,154 +1,161 @@
 # Do-able - Build Tracker
 
-## Layer 1: Single File Foundation
+## Layer 1: Foundation
 
 | Step | Status |
 |------|--------|
-| `doable.html` - CSS (Nord theme + layout + responsive) | done |
-| `doable.html` - HTML structure (orbital ring, sidebar, topbar, all pages) | done |
-| `doable.html` - JS data layer (localStorage read/write, ID generation) | done |
-| `doable.html` - JS navigation (page switching, sidebar toggle, backdrop) | done |
-| `doable.html` - Theme toggle (Nord Dark/Light/System with `prefers-color-scheme`) | done |
+| CSS (Nord theme, layout, responsive) | done |
+| HTML structure (orbital ring, sidebar, topbar, pages) | done |
+| JS data layer (localStorage read/write, ID generation) | done |
+| JS navigation (page switching, sidebar toggle, backdrop) | done |
+| Theme toggle (Nord Dark/Light/System) | done |
 
-## Layer 2: Features
+## Layer 2: Core Features
 
+### Dashboard
 | Feature | Status |
 |---------|--------|
-| **Dashboard** | |
-| Scratch notes CRUD + pin/unpin | done |
-| Focus goals selector (max 3, dropdown from active tasks) | done |
-| Focus goal status cycling (not_started → started → done → not_started) | done |
-| Focus goal progress counter + confetti on all done | done |
+| Scratch notes (create, pin/unpin, delete) | done |
+| Focus goals (max 3, dropdown, status cycling, progress counter, confetti) | done |
 | Focus goals auto-reset daily | done |
 | Overdue tasks list (max 5) | done |
-| Due today list (max 5) | done |
-| Bar charts by priority (high/medium/low) | done |
+| Bar charts by priority | done |
 | Bar charts by category (top 8) | done |
-| Weekly/monthly recap table → Heatmap grid (53wk × 7day contribution grid) | done |
-| Task roulette (pick random incomplete task) | done |
-| "+ Add Task" button → navigates to Tasks page | done |
-| Bento grid layout (2fr+1fr top, full-width analytics below) | done |
-| Frog reading book (empty state when no tasks) | done |
-| **Tasks (List View)** | |
+| Heatmap grid (53 weeks x 7 days) | done |
+| My Day section (overdue + due today + focus) | done |
+| Task roulette (random incomplete picker) | done |
+| Frog reading book (empty state) | done |
+
+### Tasks: List View
+| Feature | Status |
+|---------|--------|
 | Sortable table with configurable columns | done |
-| Two-step sort popover (field → direction) with removable chips | done |
+| Two-step sort popover (field then direction) | done |
 | Data filters (status, priority, category, due range) | done |
-| Column visibility toggle (tags, category, time, annotations, dependencies, recurrence) | done |
-| Column visibility persisted to `doable_taskColumns` | done |
-| Pagination (configurable per-page) | done |
-| Quick-add input (title only, no priority dropdown) | done |
-| Rotating motivational quote (28 quotes, no consecutive repeat) | done |
-| **Tasks (Kanban View)** | |
-| Grouped by category with task count per column | done |
+| Column visibility toggle (persisted) | done |
+| Pagination | done |
+| Quick-add input with natural language parsing | done |
+| Rotating motivational quote | done |
+| Template selector dropdown | done |
+
+### Tasks: Kanban
+| Feature | Status |
+|---------|--------|
+| Grouped by category with task count | done |
 | Drag-and-drop to reassign category | done |
 | Drop zone at column bottom | done |
-| Column visibility (tags, annotations, dependencies, recurrence) shown on cards | done |
-| **Tasks (Calendar View)** | |
-| Month grid with day numbers and navigation | done |
-| Week view with hourly time slots (07:00–22:00) | done |
-| Priority dot indicators on overflow days | done |
-| Expandable day task popover on click | done |
-| Multi-day bar rendering for spanning tasks | done |
-| Recurring task previews (auto-calculated next occurrence) | done |
-| Drag-and-drop reschedule between days | done |
-| Jump-to-date date picker | done |
-| Today indicator with pulse animation | done |
-| Overdue glow (red inset shadow) on past-due days | done |
-| Time-labelled tasks in week view | done |
-| **Tasks (Eisenhower Matrix)** | |
-| 2×2 grid (Do First / Schedule / Delegate / Eliminate) | done |
-| Quadrant assignment by urgency (due_date) × importance (priority) | done |
+
+### Tasks: Calendar
+| Feature | Status |
+|---------|--------|
+| Month grid with navigation | done |
+| Week view with hourly time slots (07:00 to 22:00) | done |
+| Priority dot indicators | done |
+| Expandable day task popover | done |
+| Multi-day bars | done |
+| Recurring task previews | done |
+| Drag-and-drop reschedule | done |
+| Jump-to-date picker | done |
+| Today pulse animation | done |
+| Overdue glow | done |
+| Time blocking (click hour slot to assign task time) | done |
+
+### Tasks: Eisenhower Matrix
+| Feature | Status |
+|---------|--------|
+| 2x2 grid (Do First / Schedule / Delegate / Eliminate) | done |
+| Quadrant assignment by priority and due date | done |
 | Task count per quadrant | done |
-| Click task title to open detail | done |
-| Hint text explaining quadrant logic | done |
-| **Task Detail (Full-Page Editor)** | |
-| Inline editing: title, description, priority, status | done |
+| Click task to open detail | done |
+
+### Task Detail
+| Feature | Status |
+|---------|--------|
+| Inline editing (title, description, priority, status) | done |
 | Due date, start date, time inputs | done |
-| Category: hybrid select dropdown + type-new input (Enter to add) | done |
-| Tags: pill display + input with autocomplete datalist | done |
-| Recurrence setting (none / daily / weekly / monthly) | done |
-| Dependencies: searchable by title, status badges, priority dots | done |
-| Incomplete dependency warning banner | done |
-| "Blocks N other tasks" indicator | done |
-| Annotations/notes timeline with relative timestamps | done |
-| Created/updated timestamps | done |
-| Soft-delete to Bin with confirmation-less delete button | done |
-| Save button → navigates back | done |
-| Unsaved changes warning on navigation | done |
-| **Bin** | |
-| Table of deleted tasks with deletion date + original status | done |
+| Category (hybrid select + type-new) | done |
+| Tags (pill display + autocomplete) | done |
+| Recurrence (daily/weekly/monthly) | done |
+| Dependencies (search, status badges, warnings) | done |
+| Subtasks (add, toggle, delete, indent) | done |
+| Attachments (file upload, max 5 x 2MB) | done |
+| Annotations timeline | done |
+| Save as Template button | done |
+| Soft-delete to Bin | done |
+| Unsaved changes warning | done |
+
+### Bin
+| Feature | Status |
+|---------|--------|
+| Deleted tasks table | done |
 | Restore individual tasks | done |
-| Empty bin with single confirmation | done |
-| Empty state display | done |
-| **Activity Log** | |
-| Chronological feed (newest first) | done |
-| Filter by action type (all/created/completed/deleted/restored/updated) | done |
-| Colored dots by action type | done |
+| Empty bin with confirmation | done |
+
+### Activity Log
+| Feature | Status |
+|---------|--------|
+| Chronological feed | done |
+| Filter by action type | done |
 | Paginated (25 per page) | done |
-| Keeps last 500 entries / last 10 days | done |
-| **Settings** | |
-| Collapsible accordion sections (Appearance, Display, Backups, Export, Data, Categories) | done |
-| Theme: Nord Dark / Nord Light / System | done |
-| Frog companion toggle (checkbox) | done |
-| Date mode: Smart (relative) / ISO | done |
-| Tasks per page number input | done |
-| Backup: download full data as JSON | done |
-| Restore: upload JSON file to restore all data | done |
-| Export: JSON / CSV / Markdown | done |
-| Clear all data with double confirmation | done |
-| Load sample tasks | done |
-| Remove sample tasks | done |
-| Category management: list with task counts + delete button | done |
-| **Global** | |
-| Global search (debounced 300ms, across title + description) | done |
-| Recurring tasks auto-create next instance on completion | done |
-| Sample data on first run (20 tasks + 4 scratch notes) | done |
-| Empty states for all lists/tables | done |
-| Toast notifications (success/error/info, 3s auto-dismiss) | done |
-| Confetti animation on task completion / focus goals done | done |
-| Modal overlay system | done |
+| Keeps last 500 entries / 10 days | done |
+
+### Settings
+| Feature | Status |
+|---------|--------|
+| Theme (Nord Dark / Light / System) | done |
+| Frog companion toggle | done |
+| Notification enable button | done |
+| Date mode (smart relative / ISO) | done |
+| Tasks per page | done |
+| Backup download/restore | done |
+| Export (JSON / CSV / Markdown) | done |
+| Clear all data | done |
+| Load/remove samples | done |
+| Category management | done |
+| Template management | done |
 
 ## Layer 3: Polish
 
 | Step | Status |
 |------|--------|
-| Orbital ring sidebar (fixed overlay, opens from left with backdrop) | done |
-| Responsive layout (mobile: single-column grids, smaller ring/padding) | done |
-| System theme support (`prefers-color-scheme` listener) | done |
-| Custom scrollbar styling | done |
+| Orbital ring sidebar with backdrop | done |
+| Responsive layout (mobile) | done |
+| System theme support | done |
+| Custom scrollbar | done |
 
-## Frog Companion (7 States)
+## Frog Companion
 
-| State | Description | Status |
-|-------|-------------|--------|
-| Idle | Gentle breathing animation (most of the time) | done |
-| Sleep | Dozes off with floating 💤 Zzz bubbles (~10s) | done |
-| Stretch | Lazy stretch animation (~1.8s) | done |
-| Walk | Alternating waddle walk across screen (~4.2s) | done |
-| Happy | Bounces excitedly on completion/click (~2.5s) | done |
-| Peek | Peeks up from below (~2.2s) | done |
-| Perch | Hops to random new position on click (~1.2s) | done |
-| Auto-cycle | Random idle/sleep/stretch cycle (12–30s interval) | done |
-| Click behavior | Happy → hop to new position with CSS transition | done |
-| Confetti trigger | Gets happy when confetti fires | done |
-| Modal peek | Peeks behind modal overlay when open | done |
-| Toast rider | Appears inside toast notifications | done |
-| Window resize | Repositions to stay within viewport | done |
-| Toggle on/off | Via Settings → Appearance → Frog companion checkbox | done |
+| State | Status |
+|-------|--------|
+| Idle (breathing animation) | done |
+| Sleep (Zzz bubbles) | done |
+| Stretch | done |
+| Walk (waddle across screen) | done |
+| Happy (bounce on completion/click) | done |
+| Peek (behind modal overlay) | done |
+| Perch (hop to new position) | done |
+| Auto-cycle (12-30s interval) | done |
+| Toast rider | done |
+| Modal peek | done |
 
 ## Layer 4: Backend
 
 | Step | Status |
 |------|--------|
-| FastAPI backend with async SQLAlchemy + SQLite | done |
-| Task CRUD endpoints (`/api/tasks`) | done |
+| FastAPI async server with SQLAlchemy + SQLite | done |
+| Task CRUD endpoints | done |
 | Config, Focus, Notes endpoints | done |
-| Sync endpoint (`/api/sync/full`) with id_map + depends_on resolution | done |
+| Sync endpoint with ID remapping | done |
 | Dashboard, Search, Backup, Bin, Activity, Export endpoints | done |
-| Frontend API client with background sync (`_initApi`, `_syncFull`, `_syncCfg`, `syncFocus`) | done |
-| Frontend reads from localStorage cache, writes fire background API calls | done |
-| `doable.html` served at `GET /` via FileResponse | done |
-| `start.bat` / `stop.bat` convenience scripts | done |
-| Updated README.md with new architecture | done |
-| Updated design.md, api.md, directory-structure.md, TRACKER.md | done |
-| Backend pushed to repo (removed from .gitignore) | done |
+| Frontend API client with background sync | done |
+| doable.html served at GET / | done |
+| PWA (sw.js, manifest, service worker) | done |
+| Natural language quick-add | done |
+| Subtasks (parent_id, fold, indent) | done |
+| Task templates (save/apply) | done |
+| Attachments (file upload) | done |
+| Time blocking (week view hour slots) | done |
+| My Day (daily planner widget) | done |
+| Smart reminders (browser notifications) | done |
+| start.bat / stop.bat scripts | done |
+| Updated README, design, api, directory-structure, TRACKER | done |

@@ -1,303 +1,170 @@
 # Do-able - Design
 
-## Overview
-
-A task manager with a FastAPI backend and a single-file HTML frontend. The backend persists data in SQLite; the frontend caches everything in `localStorage` for instant reads and syncs writes to the server in the background.
-
 ## Architecture
 
 ```
-┌─────────────────────────────────────┐
-│          doable.html                │
-│  ┌───────────────────────────────┐  │
-│  │  HTML (semantic structure)    │  │
-│  ├───────────────────────────────┤  │
-│  │  CSS (Nord theme, layout)     │  │
-│  ├───────────────────────────────┤  │
-│  │  JavaScript (app logic)       │  │
-│  │  + API client (background     │  │
-│  │    sync to FastAPI backend)   │  │
-│  └───────────────────────────────┘  │
-└─────────────────────────────────────┘
-       ↕ localStorage (cache)        ↕ HTTP (background sync)
-┌─────────────────────┐    ┌──────────────────────────┐
-│  Browser localStorage│    │   FastAPI Backend         │
-│  doable_tasks        │    │   /api/tasks              │
-│  doable_activity     │    │   /api/config             │
-│  doable_config       │    │   /api/notes              │
-│  doable_notes        │    │   /api/focus              │
-│  doable_focus        │    │   /api/sync/full          │
-│  doable_taskColumns  │    │   + 20 more endpoints     │
-└─────────────────────┘    └──────────────────────────┘
-                                    ↕
-                           ┌──────────────────┐
-                           │   SQLite Database │
-                           │   backend/.todo/  │
-                           │   todo.db          │
-                           └──────────────────┘
+doable.html  <--->  FastAPI (Python)  <--->  SQLite
+  (UI)                (REST API)           (database)
 ```
 
-- Frontend reads from `localStorage` (instant, synchronous)
-- Every write updates `localStorage` immediately AND fires a background API call to persist to the server
-- On startup, `_initApi()` loads fresh data from the API and merges into `localStorage`
-- `_syncFull()` debounces bulk sync (800ms) posting all tasks/notes/config to `/api/sync/full`
-- If the server is offline, `localStorage` still works — data syncs when connectivity returns
+The frontend caches everything in the browser's localStorage for instant reads. Every write goes to localStorage first (so the UI responds immediately) and then to the backend server in the background. The backend persists data to a SQLite database.
+
+If the server is offline, the frontend keeps working from localStorage. When connectivity returns, the next write syncs to the server.
 
 ## Layout
 
 ```
-┌────────────┬──────────────────────────────────┐
-│            │  Topbar (search + theme toggle)   │
-│  Orbital   ├──────────────────────────────────┤
-│  Ring      │  Main Content Area               │
-│  Sidebar   │  (max-width: 1100px, centered)    │
-│  (fixed    │                                   │
-│   overlay) │  One page visible at a time       │
-│            │                                   │
-└────────────┴──────────────────────────────────┘
++----------+----------------------------------+
+|          |  Topbar (search + theme toggle)   |
+| Sidebar  +----------------------------------+
+| (orbital |  Main Content Area               |
+|  ring)   |  max-width 1100px, centered      |
+|          |                                  |
++----------+----------------------------------+
 ```
 
-- **Orbital ring** - 44px circular button fixed at bottom-left; opens a 200px sidebar overlay with backdrop
-- **Topbar** - 52px header with global search (debounced) and theme-cycle icon button
-- **Main content** - scrollable area, max-width 1100px, centered
+The sidebar uses an "orbital ring" design: a 44px circular button fixed at the bottom-left corner of the screen. Clicking it slides open a 200px navigation panel from the left with a backdrop overlay. On mobile the ring shrinks and the sidebar takes the full width.
 
-## Views
+The topbar is 52px tall with a global search input on the left and a theme-cycle button on the right.
 
-### 1. Dashboard
-- Bento grid layout (2fr + 1fr top row, full-width analytics section below)
-- Scratch pad notes (create, pin/unpin, delete; sorted pinned-first, then by updated_at)
-- Focus goals selector (dropdown picks from all active tasks, max 3 per day; click goal to cycle status: not_started → started → done → not_started; progress counter; confetti when all done)
-- "+ Add Task" button (navigates to Tasks page)
-- Overdue tasks list (due before today, not done, max 5)
-- Due today list (max 5)
-- Bar charts (by priority - high/medium/low - using semantic colors; by category - up to 8, using accent color)
-- **Heatmap grid** — GitHub-style contribution heatmap (53 weeks × 7 days) showing task completion density. Replaces the old recap table. Month labels along the top, today highlighted with an outline, Nord color scale from muted to accent.
-- **Task roulette** — "Pick random" button that selects a random incomplete task and displays it with a clickable link.
-- Frog reading a tiny book in the analytics area when no tasks exist (empty state).
+## Pages
 
-### 2. Tasks
-Four view modes toggled via icon buttons:
+### Dashboard
 
-**List View** - sortable table with:
-- Two-step popover sort (select field → select direction). Active sorts shown as removable chips in sort bar.
-- Data filters for status, priority, category, due range (all/today/overdue/week/month/none)
-- Column visibility toggle (tags, category, time, annotations, dependencies, recurrence) - persisted to `doable_taskColumns`
-- Pagination (configurable per-page via Settings)
-- Row shows checkbox, priority dot, title, priority text, status badge, due date, plus any visible extra columns
+A bento grid layout with two columns on top (scratch notes + focus goals) and a full-width analytics section below.
 
-**Kanban View** - grouped by category with:
-- Drag-and-drop to reassign category
-- Task count per column header
-- Drop zone at bottom of each column
-- Responsive auto-fill columns (min 280px)
+- Scratch notes with create, pin/unpin, delete
+- Focus goals: pick up to 3 tasks per day, click to cycle their status, progress counter with confetti when all done
+- Overdue tasks list (max 5)
+- My Day section showing overdue, due-today, and focus goals together
+- Task roulette button that picks a random incomplete task
+- Priority bar chart and category bar chart (top 8 categories)
+- Heatmap grid: 53 weeks by 7 days, color-coded by completion density, month labels, today highlighted
+- Frog reading a book when there are no tasks (empty state)
 
-**Calendar View** - two sub-modes:
-- **Month grid** - 7-column grid, day numbers, priority dot indicators (overflow shows expandable popover), today pulse animation, overdue glow (red inset shadow), multi-day bars for tasks spanning multiple dates, recurring task previews (shown in calendar but not yet created), click to expand inline task list, drag-and-drop to reschedule due date
-- **Week view** - 7-day columns with hourly time slots (07:00–22:00), today column highlight, time-labelled tasks, tasks without time shown at 12:00 slot, drag-and-drop reschedule
-- Calendar controls: ← → navigation, Today button, Month/Week toggle, jump-to-date date picker
+### Tasks
 
-**Eisenhower Matrix** - 2×2 grid (Do First / Schedule / Delegate / Eliminate):
-- Quadrant assignment based on urgency (due_date proximity) × importance (priority level)
-- Do First: high importance + urgent (high/medium priority + due within 3 days or overdue)
-- Schedule: high importance + not urgent (high/medium priority + due later or no due)
-- Delegate: low importance + urgent (low priority + due within 3 days or overdue)
-- Eliminate: low importance + not urgent (low priority + no due or due later)
-- Each quadrant shows task count, list of tasks with priority dots and due dates, click task title to open detail
-- Hint text above the matrix explaining the quadrant logic
+Four view modes:
 
-Features:
-- Quick-add input (title only, no priority - defaults to medium, not_started, no due date) at top of page
-- Rotating motivational quote (random from 28 built-in quotes, no repeat in a row)
-- Global search (debounced 300ms, across title + description)
-- Filter state persists during session
+**List**: Sortable table with configurable columns (tags, category, time, annotations, dependencies, recurrence). Two-step sort popover (pick field, then direction). Data filters for status, priority, category, due range. Pagination.
 
-### 3. Task Detail
-Opens as a full page (not a modal) when clicking any task title:
-- Inline editing: title (large serif font), description (textarea), priority, status, due date, start date, time
-- Category: hybrid select dropdown + type-new input (press Enter to add new category to dropdown)
-- Tags: pill display with remove, input with autocomplete datalist from all existing tags
-- Recurrence setting (none / daily / weekly / monthly)
-- Dependency links: searchable by title, shows status badge + priority dot, incompletion warning banner, "blocks N other tasks" indicator
-- Annotations timeline with relative timestamps
-- Created/updated timestamps
-- Delete button (soft-delete to Bin)
-- Save button
-- Unsaved changes warning via `confirm()` dialog on navigation away
+**Kanban**: Columns grouped by category. Drag-and-drop to reassign. Task count per column header.
 
-### 4. Bin
-- Table of soft-deleted tasks (title link opens detail, deletion date, original status)
-- Restore individual tasks
-- Empty bin with single confirmation
-- Empty state when no deleted tasks
+**Calendar**: Month grid with day numbers and priority dot indicators. Week view with hourly time slots (07:00 to 22:00). Multi-day bars for spanning tasks. Recurring task previews. Drag-and-drop reschedule. Jump-to-date picker. Today pulse animation. Overdue glow on past-due days. Clicking an hour slot in week view opens a time-blocking popover to assign a task to that time.
 
-### 5. Activity Log
-- Chronological feed of all mutations (newest first)
-- Filter by action type dropdown (all/created/completed/deleted/restored/updated)
-- Each entry: colored dot by action type, action label + details, relative timestamp
-- Paginated (25 per page)
-- Keeps latest 500 entries, truncated to last 10 days
+**Eisenhower Matrix**: 2x2 grid. Quadrants assigned by urgency (due date proximity) and importance (priority level). Do First = high importance + urgent. Schedule = high importance + not urgent. Delegate = low importance + urgent. Eliminate = low importance + not urgent.
 
-### 6. Settings
-Collapsible accordion sections (each toggles open/closed via h2 click):
+### Task Detail
 
-- **Appearance**: Theme select (Nord Dark / Nord Light / System), Frog companion checkbox with description of all 7 behaviors
-- **Display**: Date mode select (Smart relative / ISO), Tasks per page number input
-- **Backups**: Download Backup button (JSON), Restore from backup file input
-- **Export**: JSON / CSV / Markdown buttons
-- **Data**: Clear All Data (double confirmation), Load Samples / Remove Samples buttons
-- **Categories**: List of all categories with task count + Delete button (confirms, sets tasks to uncategorized)
+Full-page editor (not a modal). Inline editing for title, description, priority, status, due date, start date, time, category, tags, recurrence, and dependencies. Subtask section with add/toggle/delete. Attachments section with file upload (5 files, 2 MB each). Annotations timeline. Save as Template button. Soft-delete to Bin.
 
-## Backend
+### Bin
 
-FastAPI async server with SQLAlchemy 2.0 + SQLite (via `aiosqlite`).
+Table of soft-deleted tasks. Restore individual tasks or empty the whole bin.
 
-### Starting the server
+### Activity Log
 
-```bash
-cd backend
-py -m pip install -r requirements.txt
-py -B -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+Chronological feed of all mutations. Filter by action type. Paginated (25 per page). Keeps the last 500 entries.
 
-Or from the project root: double-click `start.bat` (Windows) which starts the server and opens the browser.
+### Settings
 
-### Key endpoints
+Collapsible accordion sections:
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/` | Serves `doable.html` |
-| `GET/POST` | `/api/tasks` | List or create tasks |
-| `GET/PUT/DELETE` | `/api/tasks/{id}` | Read, update, or delete a task |
-| `POST` | `/api/tasks/{id}/done` | Mark task done (triggers recurrence) |
-| `POST` | `/api/tasks/{id}/undone` | Reopen a done task |
-| `POST` | `/api/tasks/{id}/note` | Add annotation to task |
-| `GET/PUT` | `/api/config` | Read or update config |
-| `GET/PUT` | `/api/focus` | Read or update focus goals |
-| `GET/POST/PUT/DELETE` | `/api/notes` | CRUD for scratch notes |
-| `POST` | `/api/sync/full` | Bulk import tasks/notes/config (returns `id_map` for frontend ID reconciliation) |
-| `GET` | `/api/dashboard` | Dashboard analytics |
-| `GET` | `/api/search?q=` | Full-text search across tasks |
-| `GET/POST` | `/api/backups` | List or create backups |
-| `POST` | `/api/backups/{file}/restore` | Restore from backup |
-| `GET` | `/api/bin` | List deleted tasks |
-| `POST` | `/api/bin/{id}/restore` | Restore a deleted task |
-| `DELETE` | `/api/bin` | Empty bin |
-| `GET` | `/api/activity` | Activity log |
-| `GET` | `/api/export/{fmt}` | Export tasks (json/csv/markdown) |
+- Appearance: theme (Nord Dark / Nord Light / System), frog companion toggle, notification enable button
+- Display: date mode (smart relative or ISO), tasks per page
+- Backups: download/restore JSON
+- Export: JSON, CSV, Markdown
+- Data: clear all, load/remove samples
+- Categories: list with task counts, delete button
+- Templates: list of saved templates, delete button
 
-### Data model
+## Theme
 
-SQLAlchemy models in `backend/app/models.py`:
-- `Task` — mirrors the frontend task object (id, title, description, status, priority, due_date, start_date, time, category, tags, recur, depends_on, notes, created_at, updated_at, deleted_at, _sample)
-- `Config` — JSON-serialized config blob
-- `Focus` — JSON-serialized focus goals map
-- `Note` — scratch pad notes
-- `Activity` — activity log entries
+Nord palette via CSS custom properties, toggled by a `data-theme` attribute on the HTML element.
 
-## Theme: Nord
+- `nord-dark`: dark slate background (#2e3440)
+- `nord-light`: light grey background (#eceff4)
+- `system`: follows the OS preference via `prefers-color-scheme`
 
-CSS custom properties switching via `data-theme` attribute on `<html>`.
+Colors:
+- Accent (#88c0d0 dark, #5e81ac light) for interactive elements
+- Red (#bf616a) for high priority, overdue, danger
+- Orange (#d08770) for medium priority, due today, started status
+- Green (#a3be8c) for low priority, done status, success
+- Purple (#b48ead) for confetti accent
 
-Three modes:
-- `nord-dark` (default) - dark slate background (#2e3440)
-- `nord-light` - light grey background (#eceff4)
-- `system` - follows `prefers-color-scheme` media query, re-evaluated on change
-
-Color tokens:
-- `--accent` (#88c0d0 dark, #5e81ac light) - primary interactive elements, links
-- `--red` (#bf616a) - high priority, overdue, danger, delete
-- `--orange` (#d08770) - medium priority, due today, started status
-- `--yellow` (#ebcb8b) - low priority (status dot only)
-- `--green` (#a3be8c) - low priority, done status, success
-- `--purple` (#b48ead) - confetti accent
-- `--text` / `--text-dim` / `--text-faint` - three-tier text hierarchy
-- `--bg` / `--bg-raised` / `--bg-hover` / `--bg-muted` - surface hierarchy
+Typography: system sans-serif for UI, Georgia/serif for headings, monospace for data elements.
 
 ## Frog Companion
 
-An interactive SVG frog that lives on the screen. Toggled in Settings (persisted in `config.frog_enabled`).
+An interactive SVG frog that sits on the screen. Seven states:
 
-States (7 total):
-- **Idle** - sits and breathes gently (gentle scaleY animation, most common state)
-- **Sleep** - dozes off with animated "💤" Zzz bubbles floating upward (long duration ~10s)
-- **Stretch** - lazy stretch animation (~1.8s) once in a while
-- **Walk** - walks across the screen (waddle animation), alternating left-right per trigger
-- **Happy** - bounces excitedly (4 cycles, ~2s) on confetti events or when clicked
-- **Peek** - peeks up from below (~2s, translateY keyframes)
-- **Perch** - hops to a random new position (~0.7s, scale+rotate hop animation)
+- Idle: gentle breathing animation (most common)
+- Sleep: dozes with floating Zzz bubbles
+- Stretch: lazy stretch animation
+- Walk: waddle walk across the screen
+- Happy: bounces on task completion or click
+- Peek: peeks behind the modal overlay
+- Perch: hops to a new position
 
-Behaviors:
-- Random idle/sleep/stretch cycle (12–30s interval; sleep ~35%, idle ~35%, stretch ~10%)
-- Click the frog → happy animation, then hops to a new position with a CSS transition (no teleport)
-- Frog gets happy automatically when confetti fires (task completion)
-- Frog peeks behind modal overlay when a modal is open
-- Frog rides inside toast notifications
-- Responsive: repositions to stay within viewport on window resize
-- SVG is ~60×52px, green frog with eyes, smile, legs, cheek blush
+Auto-cycles between idle/sleep/stretch every 12 to 30 seconds. Clicking the frog triggers a happy animation and a hop to a new spot. Gets happy automatically when confetti fires. Rides inside toast notifications. Toggled in Settings.
 
-## Tufte Principles
+## PWA
 
-| # | Principle | Implementation |
-|---|-----------|----------------|
-| 1 | Show the data | No splash screens, no onboarding modals |
-| 2 | Maximize data-ink ratio | No decorative illustrations, no shadows, no gradients |
-| 3 | Erase non-data-ink | No box borders on cards, space-only separation |
-| 4 | Erase redundant data-ink | Priority encoded via color dot only (text label also present in list view) |
-| 5 | Graphical integrity | Bar chart bars start at zero, no truncated axes |
-| 6 | Small multiples | CSS bar charts running vertically |
-| 7 | Layering & separation | Sidebar dimmer than content, three-tier text hierarchy |
-| 8 | Micro/macro readings | Task list scannable at a glance, detail page has full info |
-| 9 | Smallest effective difference | Priority dots, status badges with distinct colors |
-| 10 | Word-data integration | Labels on data, no separate legends |
+The app is a Progressive Web App. It has a service worker (`sw.js`) that caches the shell files (HTML, manifest, icon) for offline use. API routes are not cached. The manifest (`site.webmanifest`) defines the app name, display mode (standalone), theme colors, and icon. Users can install it on desktop and mobile.
 
-## Data Model
+## Data model
 
-Each task:
-```json
-{
-  "id": "string (unique)",
-  "title": "string",
-  "description": "string",
-  "status": "not_started | started | done",
-  "priority": "low | medium | high",
-  "due_date": "YYYY-MM-DD | null",
-  "start_date": "YYYY-MM-DD | null",
-  "time": "HH:mm | null",
-  "category": "string",
-  "tags": ["string"],
-  "recur": "daily | weekly | monthly | null",
-  "depends_on": ["task_id"],
-  "notes": [{"id", "text", "timestamp"}],
-  "created_at": "ISO datetime",
-  "updated_at": "ISO datetime",
-  "deleted_at": "ISO datetime | null",
-  "_sample": true | undefined
-}
-```
-
-## Files
+Each task has these fields:
 
 ```
-todo-todo/
-├── doable.html              # The entire frontend (~1900 lines)
-├── start.bat                # Starts uvicorn + opens browser (Windows)
-├── stop.bat                 # Kills the server process (Windows)
-├── README.md                # Getting started guide
-├── design.md                # This file
-├── api.md                   # Data API reference (localStorage + REST)
-├── directory-structure.md   # File tree
-├── TRACKER.md               # Build progress
-├── LICENSE                  # MIT license
-├── .gitignore               # Ignored files
-└── backend/                 # FastAPI backend
-    ├── pyproject.toml
-    ├── requirements.txt
-    └── app/
-        ├── __init__.py
-        ├── main.py           # FastAPI app entry point
-        ├── database.py       # SQLAlchemy async setup
-        ├── models.py         # ORM models
-        ├── schemas.py        # Pydantic schemas
-        ├── routes/           # 12 route modules
-        └── services/         # 9 service modules
+id            string (unique)
+title         string
+description   string
+status        not_started | started | done
+priority      high | medium | low
+due_date      YYYY-MM-DD or null
+start_date    YYYY-MM-DD or null
+time          HH:mm or null
+category      string
+tags          array of strings
+recur         daily | weekly | monthly or null
+depends_on    array of task IDs
+parent_id     task ID or null (for subtasks)
+files         array of {name, data, size, type}
+notes         array of {id, text, timestamp}
+created_at    ISO datetime
+updated_at    ISO datetime
+deleted_at    ISO datetime or null
+_sample       boolean (for sample data)
 ```
+
+## Backend
+
+FastAPI async server with SQLAlchemy 2.0 and SQLite (via aiosqlite).
+
+28 REST endpoints under `/api/`:
+
+- Tasks: CRUD, done/undone, add note
+- Config: get/update
+- Focus: get/update
+- Notes: CRUD for scratch notes
+- Sync: bulk import with ID remapping for dependencies
+- Dashboard: analytics data
+- Search: full-text across tasks
+- Backups: list, create, restore
+- Bin: list deleted, restore, empty
+- Activity: log entries
+- Export: JSON, CSV, Markdown
+
+The root route (`GET /`) serves `doable.html` as a static file.
+
+## Tufte principles
+
+1. Show the data. No splash screens or onboarding modals.
+2. Maximize the data-ink ratio. No decorative illustrations, no shadows, no gradients.
+3. Erase non-data-ink. No box borders on cards, space-only separation.
+4. Graphical integrity. Bar charts start at zero, no truncated axes.
+5. Small multiples. CSS bar charts running vertically.
+6. Layering and separation. Three-tier text hierarchy (text, dim, faint).
+7. Word-data integration. Labels on data, no separate legends.

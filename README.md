@@ -1,203 +1,153 @@
 # Do-able
 
-A local-first task manager with a FastAPI backend and a single-file HTML frontend.
+A task manager that runs in your browser with an optional Python backend for persistence.
 
-## Architecture
+## How it works
 
-```
-doable.html  ←──→  FastAPI (Python)  ←──→  SQLite (aiosqlite)
-  (UI)               (REST API)            (persistent DB)
-```
+Do-able has two parts:
 
-- **Frontend**: Single HTML file (`doable.html`) — all CSS and JS embedded, zero build step
-- **Backend**: FastAPI async server with SQLAlchemy 2.0 + SQLite
-- **Storage**: SQLite database at `~/.todo/todo.db`
-- **Sync**: Frontend uses localStorage for instant reads, background-syncs to the backend via REST API
+1. **Frontend** (`doable.html`): A single HTML file with all CSS and JavaScript inside it. No build step, no dependencies. Just open it in a browser.
+2. **Backend** (`backend/`): A FastAPI server that saves your data to a SQLite database. This means your tasks survive even if you clear your browser data.
 
-## Getting Started
+By default the app reads from your browser's localStorage (instant) and writes to both localStorage and the backend server (in the background). If the server is down, the app still works fine from localStorage alone.
 
-### Prerequisites
+## Clone and run
 
-- **Python 3.10+** (3.12 recommended) — check with `python --version` or `py --version`
-- **Git** — to clone the repo
-- A modern browser (Chrome, Firefox, Edge, Safari)
+### What you need
 
-### 1. Clone the repo
+- Python 3.10 or newer
+- Git
+- A web browser (Chrome, Firefox, Edge, Safari all work)
+
+### Steps
 
 ```bash
+# Clone the repo
 git clone https://github.com/SwatiBio/do-able.git
 cd do-able
-```
 
-### 2. Set up a virtual environment (recommended)
-
-```bash
+# Go into the backend folder
 cd backend
 
-# Create venv
+# Create a virtual environment
 python -m venv .venv
 
 # Activate it
-# Windows (PowerShell):
+# Windows PowerShell:
 .venv\Scripts\Activate.ps1
-# Windows (Git Bash):
+# Windows Git Bash:
 source .venv/Scripts/activate
-# macOS / Linux:
+# Mac/Linux:
 source .venv/bin/activate
-```
 
-### 3. Install dependencies
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-This installs: `fastapi`, `uvicorn[standard]`, `sqlalchemy[asyncio]`, `aiosqlite`, `pydantic`, and `httpx` (for tests).
-
-### 4. Start the server
-
-**Option A — Windows shortcut:**
-
-Go back to the project root and double-click **`start.bat`**. It starts the server and opens your browser automatically.
-
-**Option B — Manual:**
-
-```bash
-# From the backend/ directory (with venv active):
+# Start the server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Or from the project root:
+Open `http://localhost:8000` in your browser.
 
-```bash
-uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-You should see:
-
-```
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process
-INFO:     Application startup complete.
-```
-
-### 5. Open the app
-
-Navigate to **http://localhost:8000** in your browser. The app loads instantly — all UI is a single HTML file served by the backend.
+On Windows you can also double-click `start.bat` from the project root. It starts the server and opens the browser for you. Use `stop.bat` to kill it.
 
 ### First run
 
-On your first visit, the app loads **20 sample tasks** and **4 scratch notes** so you can explore immediately. The samples have `_sample` flags and can be removed via **Settings → Data → Remove Samples**.
+The first time you open the app, it loads 20 sample tasks and 4 scratch notes so you can see how things work. You can remove them from Settings > Data > Remove Samples.
 
-A SQLite database is auto-created at `backend/.todo/todo.db` — no manual setup needed.
+A SQLite database gets created automatically at `backend/.todo/todo.db`. No setup needed.
 
-### Stopping the server
+### Without the backend
 
-Double-click `stop.bat`, or press `Ctrl+C` in the terminal.
+You can open `doable.html` directly in a browser without running any server. Everything works offline using localStorage. The only downside is your data lives and dies with the browser.
 
-### Troubleshooting
+### On your phone
 
-| Problem | Fix |
-|---------|-----|
-| `python` / `pip` not found | Try `py --version` / `py -m pip install ...` (Windows launcher). Or install Python from [python.org](https://python.org) |
-| `ModuleNotFoundError` | Make sure your venv is activated before running `pip install` and `uvicorn` |
-| Port 8000 already in use | Use a different port: `uvicorn app.main:app --port 8001` |
-| Database errors on startup | Delete the old database: `rm -f backend/.todo/todo.db` and restart |
-| `start.bat` doesn't open browser | Open http://localhost:8000 manually — the server may still be starting |
-| Blank page at localhost | Check the terminal for errors. Make sure you're in the `backend/` directory when starting uvicorn |
+1. Make sure your phone and laptop are on the same WiFi
+2. Find your laptop's IP address (run `ipconfig` in terminal, look for IPv4 under Wi-Fi)
+3. Open `http://YOUR_IP:8000` on your phone's browser
+4. On Android (Chrome): tap the three dots menu > "Add to Home screen"
+5. On iPhone (Safari): tap the Share button > "Add to Home Screen"
 
-## Quick Start (no server)
-
-You can open `doable.html` directly in a browser without the server. The app runs fully offline using localStorage. The backend is optional — it adds persistence beyond the browser and enables future multi-device sync.
-
-**Note:** Without the server, data stays in your browser only. Clearing browser data will lose everything. Back up regularly via **Settings → Backups → Download Backup**.
-
-## Things to Keep in Mind
-
-- **Data lives in two places.** The frontend caches data in `localStorage` for instant access, and background-syncs to the SQLite database. If you clear your browser cache, the backend data remains and will re-sync on next load.
-- **Works offline.** Once loaded, the frontend runs entirely in the browser. API calls happen in the background and queue if the server is unreachable.
-- **No account needed.** No sign-up, no login, no tracking.
-- **Single HTML file.** All CSS and JavaScript are embedded inside `doable.html`. You can edit it directly or open it standalone without the backend.
-- **Backup regularly.** Use **Settings → Backups → Download Backup** to export all data as JSON.
+The app is a PWA, so once added to your home screen it runs in its own window without a browser address bar.
 
 ## Features
 
-**5 pages** in a collapsible orbital-ring sidebar (opens from left with backdrop overlay):
+### Views
 
-- **Dashboard** - scratch notes with pin/unpin, daily focus goals (max 3, status cycling by click, progress counter with confetti on all done), overdue and due-today task lists, priority and category bar charts, weekly/monthly completion recap table. "+ Add Task" button navigates to the Tasks page.
-- **Tasks** - three view modes toggled via icon buttons:
-  - **List** - sortable table with two-step popover sort (field → direction), data filters (status/priority/category/due range), column visibility toggle (tags/category/time/annotations/dependencies/recurrence) persisted to `doable_taskColumns`, pagination
-  - **Kanban** - grouped by category with drag-and-drop to reassign, task count per column, drop zone
-  - **Calendar** - month grid + week view with hourly time-blocking; multi-day bars, recurring task previews, drag-and-drop reschedule, jump-to-date picker, today indicator with pulse animation, overdue glow on past-due days
-  - Quick-add input (title only, no priority dropdown) at the top
-  - Rotating motivational quote displayed above tasks
-  - Global search (debounced, across title + description, in topbar)
-- **Task Detail** - full-page editor (not a modal) with inline editing for title, description, priority, status, due date, start date, time, category (hybrid select + type-new input), tags (with autocomplete datalist), recurrence (daily/weekly/monthly), dependencies (with incompletion warning and "blocks N tasks" indicator), annotations/notes timeline, created/updated timestamps. Unsaved changes warning on navigation away. Soft-delete to Bin.
-- **Bin** - view soft-deleted tasks with deletion date and original status, restore individual tasks, empty bin completely with confirmation
-- **Activity Log** - chronological feed of all mutations, filterable by action type (created/completed/deleted/restored/updated), paginated (25 per page), retains latest 500 entries
-- **Settings** - collapsible accordion sections for:
-  - **Appearance**: Nord Dark / Nord Light / System theme, frog companion toggle (SVG with 7 states)
-  - **Display**: date mode (smart relative or ISO), tasks per page
-  - **Backups**: download full backup as JSON, restore from JSON upload
-  - **Export**: tasks as JSON, CSV, or Markdown
-  - **Data**: clear all data (double confirmation), load or remove sample tasks
-  - **Categories**: manage and delete unused categories (tasks become uncategorized)
+- **Dashboard** with scratch notes, daily focus goals, overdue and due-today lists, priority and category bar charts, a heatmap grid showing task completion over 53 weeks, a My Day section, and a task roulette that picks a random incomplete task
+- **Task List** with sortable columns, two-step sort (pick field then direction), filters (status, priority, category, due date range), column visibility toggle, and pagination
+- **Kanban** grouped by category with drag-and-drop to reassign
+- **Calendar** with month and week views, multi-day bars, recurring task previews, drag-and-drop reschedule, jump-to-date picker, today pulse animation, and overdue glow on past-due days. Week view supports time blocking where you click an hour slot to assign a task to that time
+- **Eisenhower Matrix** with four quadrants (Do First, Schedule, Delegate, Eliminate) based on priority and due date urgency
+- **Task Detail** as a full-page editor with inline editing for every field
 
-**Extra touches:**
-- Frog companion - an interactive SVG frog with 7 states (idle, sleep, stretch, walk, happy, peek, perch); random auto-cycling (12-30s), click-to-happy with hop animation, happy on confetti events, dashboard empty-state reading pose, modal peek, toast rider
-- Confetti animation on task completion and when all daily focus goals are done
-- Toast notifications for all actions (success/error/info)
-- Recurring tasks auto-create next instance on completion (daily/weekly/monthly)
-- Soft-delete (tasks go to Bin instead of permanent deletion)
-- Unsaved changes warning when leaving the task detail page
-- System theme detection via `prefers-color-scheme`
-- Sample data on first run: 20 tasks with varied statuses/priorities/categories/tags/dependencies/recurrence/notes, 4 scratch notes (2 pinned)
-- Eisenhower Matrix view for prioritization
-- Heatmap grid on dashboard (GitHub-style contribution grid)
-- Task roulette widget (random incomplete task picker)
+### Task management
 
-**Task object fields:** `id`, `title`, `description`, `status` (not_started/started/done), `priority` (high/medium/low), `due_date`, `start_date`, `time`, `category`, `tags[]`, `recur` (daily/weekly/monthly/null), `depends_on[]`, `notes[]` (each with id/text/timestamp), `created_at`, `updated_at`, `deleted_at`, `_sample` (flag for sample data).
+- Natural language quick-add: type "Buy milk tomorrow high" and it parses the due date and priority automatically
+- Subtasks with parent/child relationships and fold/unfold toggle in the list view
+- Task templates: save any task as a template, apply it from the quick-add area or the detail page
+- Attachments: upload up to 5 files (2 MB each) per task, stored as base64
+- Dependencies between tasks with incompletion warnings
+- Recurring tasks (daily, weekly, monthly) that auto-create the next instance on completion
+- Annotations/notes timeline on each task
+- Soft-delete with a Bin for restoring deleted tasks
 
-**Design:** Nord palette (dark and light), Tufte-inspired (no decorative illustrations, no shadows, no gradients — color only for semantic encoding, bar charts instead of sparklines, data labels instead of legends, space-only separation).
+### Smart features
 
-## Project Structure
+- My Day: a daily planner on the dashboard showing overdue, due-today, and focus goals
+- Heatmap grid: GitHub-style contribution calendar showing your completion density
+- Task roulette: press a button to pick a random incomplete task
+- Smart reminders: browser notifications for due and overdue tasks (opt-in via Settings)
+- Global search across task titles and descriptions
+
+### Extras
+
+- Frog companion: an interactive SVG frog with 7 states (idle, sleep, stretch, walk, happy, peek, perch) that auto-cycles and reacts to your actions
+- Confetti on task completion
+- Nord color theme (dark, light, and system-aware modes)
+- Tufte-inspired design: no decorative illustrations, no shadows, no gradients
+- PWA support: installable on desktop and mobile, works offline
+- Export tasks as JSON, CSV, or Markdown
+- Backup and restore via JSON files
+- Activity log tracking all changes
+
+## Project structure
 
 ```
-todo-todo/
-├── doable.html              # Frontend — entire app (single file)
-├── backend/                 # FastAPI REST API server
-│   ├── app/
-│   │   ├── main.py          # App entry point, lifespan, CORS, root route
-│   │   ├── database.py      # SQLAlchemy async engine + session
-│   │   ├── models.py        # ORM models (Task, Tag, TaskDep, Note, etc.)
-│   │   ├── schemas.py       # Pydantic v2 schemas
-│   │   ├── routes/          # API route modules
-│   │   │   ├── tasks.py     # CRUD for tasks
-│   │   │   ├── sync.py      # Bulk sync endpoint (frontend → backend)
-│   │   │   ├── config.py    # App config
-│   │   │   ├── focus.py     # Focus goals
-│   │   │   ├── scratch.py   # Scratch notes
-│   │   │   ├── bin.py       # Soft-delete bin
-│   │   │   ├── activity.py  # Activity log
-│   │   │   ├── search.py    # Full-text search
-│   │   │   ├── dashboard.py # Dashboard stats
-│   │   │   ├── backups.py   # Backup/restore
-│   │   │   └── export.py    # JSON/CSV/MD export
-│   │   └── services/        # Business logic
-│   ├── requirements.txt     # Python deps (fastapi, uvicorn, sqlalchemy, aiosqlite)
-│   ├── tests/               # Backend tests
-│   └── alembic/             # DB migrations (optional)
-├── start.bat                # Double-click to start server + open browser
-├── stop.bat                 # Double-click to stop server
-├── README.md                # This file
-├── design.md                # Design specification
-├── api.md                   # API reference (localStorage + REST)
-├── directory-structure.md   # Detailed file tree
-├── TRACKER.md               # Build progress
-├── LICENSE                  # MIT license
-└── .gitignore
+do-able/
+  doable.html           The entire frontend (2200+ lines)
+  start.bat             Starts the server and opens the browser (Windows)
+  stop.bat              Kills the server (Windows)
+  sw.js                 Service worker for PWA offline caching
+  site.webmanifest      PWA manifest (app name, icons, colors)
+  icon.svg              App icon for PWA and notifications
+  backend/
+    requirements.txt    Python dependencies
+    app/
+      main.py           FastAPI entry point and route registration
+      database.py       SQLAlchemy async engine setup
+      models.py         Database models (Task, Tag, Note, Config, etc.)
+      schemas.py        Pydantic validation schemas
+      routes/           API endpoint handlers (12 modules)
+      services/         Business logic (10 modules)
+    tests/              Backend tests
 ```
+
+## API
+
+The backend exposes 28 REST endpoints under `/api/`. See `api.md` for the full reference.
+
+Main endpoints:
+
+- `GET /` serves the frontend HTML
+- `/api/tasks` for CRUD operations on tasks
+- `/api/sync/full` for bulk importing data from the frontend
+- `/api/config`, `/api/focus`, `/api/notes` for settings and scratch data
+- `/api/dashboard` for analytics
+- `/api/search` for full-text search
+- `/api/backups`, `/api/bin`, `/api/activity`, `/api/export` for everything else
 
 ## License
 
-[MIT](LICENSE) © SwatiBio
+MIT
