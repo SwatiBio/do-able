@@ -87,6 +87,18 @@ app.include_router(export.router)
 async def serve_frontend():
     return FileResponse(PROJECT_DIR / "doable.html")
 
+@app.get("/sw.js")
+async def serve_sw():
+    return FileResponse(PROJECT_DIR / "sw.js", media_type="application/javascript")
+
+@app.get("/site.webmanifest")
+async def serve_manifest():
+    return FileResponse(PROJECT_DIR / "site.webmanifest", media_type="application/manifest+json")
+
+@app.get("/icon.svg")
+async def serve_icon():
+    return FileResponse(PROJECT_DIR / "icon.svg", media_type="image/svg+xml")
+
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
