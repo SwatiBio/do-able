@@ -39,15 +39,15 @@ a:hover{text-decoration:underline}
 .icon-btn:hover{color:var(--text);background:var(--bg-hover)}
 
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.main-content{flex:1;overflow-y:auto;padding:32px;max-width:var(--content-max);margin:0 auto;width:100%}
+.main-content{flex:1;overflow-y:auto;padding:24px 32px;max-width:var(--content-max);margin:0 auto;width:100%}
 
 .page{display:none}
 .page.active{display:block}
 
-h1{font-size:26px;font-weight:700;margin-bottom:24px;color:var(--text);font-family:var(--font-serif);letter-spacing:-.3px}
+h1{font-size:24px;font-weight:700;margin-bottom:16px;color:var(--text);font-family:var(--font-serif);letter-spacing:-.3px}
 h2{font-size:16px;font-weight:600;margin-bottom:16px;color:var(--text);font-family:var(--font-serif)}
 h3{font-family:var(--font-serif)}
-.section{margin-bottom:40px}
+.section{margin-bottom:20px}
 .text-dim{color:var(--text-dim)}
 .text-accent{color:var(--accent)}
 .text-red{color:var(--red)}
@@ -122,11 +122,63 @@ textarea{resize:vertical;min-height:80px}
 .bar-track{flex:1;height:8px;background:var(--bg-raised);border-radius:2px;overflow:hidden}
 .bar-fill{height:100%;border-radius:2px;transition:width .3s}
 
-.recap-table{width:100%;border-collapse:collapse;font-size:12px}
-.recap-table th,.recap-table td{padding:3px 8px;text-align:right}
-.recap-table th{color:var(--text-dim);font-weight:600;font-family:var(--font-mono);font-size:10px}
-.recap-table td:first-child{text-align:left;color:var(--text-dim);font-weight:600}
-.recap-table tr td{border-top:1px solid var(--border)}
+/* Heatmap grid */
+.heatmap-wrapper{overflow-x:auto;overflow-y:hidden;padding-top:4px}
+.heatmap-table{border-collapse:collapse;font-size:9px;font-family:var(--font-mono)}
+.heatmap-table th{color:var(--text-dim);font-weight:400;padding:0 2px 2px;text-align:left;font-size:8px}
+.heatmap-table td{width:11px;height:11px;padding:1px}
+.heatmap-cell{width:11px;height:11px;border-radius:2px;background:var(--bg-muted)}
+.heatmap-cell.l1{background:var(--accent);opacity:.3}
+.heatmap-cell.l2{background:var(--accent);opacity:.55}
+.heatmap-cell.l3{background:var(--accent);opacity:.75}
+.heatmap-cell.l4{background:var(--accent);opacity:1}
+.heatmap-today{outline:2px solid var(--text);outline-offset:-1px}
+.heatmap-legend{display:flex;align-items:center;gap:4px;margin-top:4px;justify-content:flex-end;font-size:9px;color:var(--text-dim);font-family:var(--font-mono);padding-right:4px}
+.heatmap-legend .cell{width:10px;height:10px;border-radius:2px;background:var(--bg-muted)}
+.heatmap-legend .cell.l1{background:var(--accent);opacity:.3}
+.heatmap-legend .cell.l2{background:var(--accent);opacity:.55}
+.heatmap-legend .cell.l3{background:var(--accent);opacity:.75}
+.heatmap-legend .cell.l4{background:var(--accent);opacity:1}
+/* Compact dashboard (single-page fit) */
+#page-dashboard .section{margin-bottom:12px}
+#page-dashboard .bento-grid{gap:8px}
+#page-dashboard .dashboard-grid{gap:6px}
+#page-dashboard .dash-card{padding:8px 10px}
+#page-dashboard .scratch-input-area textarea{min-height:28px;font-size:12px;padding:4px 8px;resize:none}
+#page-dashboard .scratch-note{padding:6px 8px;font-size:12px}
+#page-dashboard .scratch-note-text{font-size:12px}
+#page-dashboard #scratchList{max-height:100px;overflow-y:auto}
+#page-dashboard h2{font-size:13px;margin-bottom:4px}
+#page-dashboard .bar-chart{gap:2px}
+#page-dashboard .bar-row{font-size:10px;gap:4px}
+#page-dashboard .bar-label{font-size:10px;width:44px}
+#page-dashboard .bar-track{height:6px}
+#page-dashboard .due-row{padding:2px 0;font-size:12px}
+#page-dashboard .focus-card{padding:4px 6px;font-size:12px}
+#page-dashboard .focus-card-title{font-size:12px}
+#page-dashboard .focus-card-meta{font-size:10px}
+#page-dashboard .heatmap-table td{width:9px;height:9px;padding:.5px}
+#page-dashboard .heatmap-cell{width:9px;height:9px}
+#page-dashboard .heatmap-legend{margin-top:2px}
+#page-dashboard .goal-selector select{font-size:12px;padding:3px 6px}
+#page-dashboard .roulette-btn{padding:4px 10px;font-size:12px}
+#page-dashboard .roulette-result{font-size:12px}
+/* Eisenhower Matrix */
+.eisenhower-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:300px}
+.eisenhower-card{background:var(--bg-raised);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:6px}
+.eisenhower-matrix{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0}
+.eisenhower-col{border:1px solid var(--border);display:flex;flex-direction:column}
+.eisenhower-label{height:24px;line-height:24px}
+.eisenhower-quad{flex:1;padding:12px}
+.eisenhower-quad-header{font-size:13px;font-weight:600;margin-bottom:8px;font-family:var(--font-serif)}
+.eisenhower-task{display:flex;align-items:center;gap:6px;padding:6px 6px;font-size:13px;cursor:pointer;border-radius:4px;transition:background .15s;border-bottom:1px solid var(--border)}
+.eisenhower-task:last-child{border-bottom:none}
+.eisenhower-task:hover{background:var(--bg-hover)}
+/* Task roulette */
+.roulette-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.roulette-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-raised);color:var(--text);cursor:pointer;font-size:13px;transition:all .2s}
+.roulette-btn:hover{border-color:var(--accent);background:var(--bg-hover);color:var(--accent)}
+.roulette-result{font-size:13px;color:var(--accent);font-family:var(--font-serif);padding:4px 0}
 
 
 
@@ -387,15 +439,15 @@ textarea{resize:vertical;min-height:80px}
 
       <!-- Dashboard -->
       <div class="page active" id="page-dashboard">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <h1 style="margin:0">Dashboard</h1>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h1 style="margin:0;font-size:22px">Dashboard</h1>
           <button class="btn btn-primary btn-sm" onclick="navigateTo('tasks')">+ Add Task</button>
         </div>
         <div class="bento-grid" id="dashTop">
             <div class="dash-card">
               <div class="scratch-section" id="scratchSection">
               <div class="scratch-input-area">
-                <textarea id="scratchInput" placeholder="Write a quick note..." rows="2"></textarea>
+                <textarea id="scratchInput" placeholder="Write a quick note..." rows="1"></textarea>
                 <button class="btn btn-primary btn-sm" onclick="addScratchNote()" style="align-self:flex-end">Add Note</button>
               </div>
               <div id="scratchList"></div>
@@ -406,14 +458,25 @@ textarea{resize:vertical;min-height:80px}
             <div id="dashFocusGoals"></div>
           </div>
         </div>
-        <div class="section" id="dashStatus">
-          <div class="dashboard-grid">
-            <div class="dash-card">
-              <div id="dashDueList"></div>
+          <div class="section" id="dashStatus">
+            <div class="dashboard-grid">
+              <div class="dash-card">
+                <div id="dashDueList"></div>
+              </div>
+              <div class="dash-card">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div class="text-dim" style="font-size:11px;margin-bottom:2px">Task Roulette</div>
+                  <div class="roulette-wrap">
+                    <button class="roulette-btn" onclick="pickRandomTask()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8L8 16M8 8l8 8"/></svg>
+                      Pick a random task
+                    </button>
+                    <span class="roulette-result" id="dashRouletteResult"></span>
+                  </div>
+                </div>
+              </div>
             </div>
-
           </div>
-        </div>
         <div class="section full" id="dashAnalytics">
           <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Analytics</div>
           <div class="dashboard-grid">
@@ -439,6 +502,9 @@ textarea{resize:vertical;min-height:80px}
             <button class="icon-btn" data-view="calendar" onclick="switchTaskView('calendar')" title="Calendar">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </button>
+            <button class="icon-btn" data-view="eisenhower" onclick="switchTaskView('eisenhower')" title="Eisenhower Matrix">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+            </button>
           </div>
         </div>
         <div id="taskQuote" class="text-dim" style="font-size:12px;font-style:italic;margin-bottom:10px;font-family:var(--font-serif);line-height:1.5"></div>
@@ -450,6 +516,7 @@ textarea{resize:vertical;min-height:80px}
         <div id="taskListView"></div>
         <div id="taskKanbanView" style="display:none"></div>
         <div id="taskCalendarView" style="display:none"></div>
+        <div id="taskEisenhowerView" style="display:none"></div>
         <div class="pagination" id="taskPagination"></div>
       </div>
 
@@ -691,6 +758,9 @@ function navigateTo(page){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const nav=document.querySelector(`.nav-item[data-page="${page}"]`);
   if(nav)nav.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarRing').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
   renderCurrentPage()
 }
 function renderCurrentPage(){
@@ -727,7 +797,7 @@ function renderDashboard(){
   renderDashFocusGoals();
   renderDashDueList(tasks);
   renderDashCharts(tasks);
-  renderDashRecap(tasks);
+  renderDashHeatmap(tasks);
   const area=document.getElementById('dashAnalytics');
   const existing=area.querySelector('.dash-empty-frog');
   if(existing)existing.remove();
@@ -752,17 +822,33 @@ function renderDashCharts(tasks){
   const cMax=Math.max(...Object.values(catCounts),1);
   document.getElementById('dashCategoryChart').innerHTML=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<div class="bar-row"><span class="bar-label">${escHtml(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${v/cMax*100}%;background:var(--accent)"></div></div></div>`).join('')
 }
-function renderDashRecap(tasks){
-  const today=new Date();const dow=today.getDay();
-  const mon=new Date(today);mon.setDate(today.getDate()-((dow+6)%7));
-  const weekTasks=tasks.filter(t=>{const d=new Date(t.created_at);return d>=mon});
-  const doneWeek=weekTasks.filter(t=>t.status==='done');
-  const monthStart=new Date(today.getFullYear(),today.getMonth(),1);
-  const monthTasks=tasks.filter(t=>{const d=new Date(t.created_at);return d>=monthStart});
-  const doneMonth=monthTasks.filter(t=>t.status==='done');
-  const wRate=weekTasks.length?Math.round(doneWeek.length/weekTasks.length*100):0;
-  const mRate=monthTasks.length?Math.round(doneMonth.length/monthTasks.length*100):0;
-  document.getElementById('dashRecap').innerHTML=`<table class="recap-table"><tr><th></th><th>Created</th><th>Done</th><th>Rate</th></tr><tr><td>Week</td><td>${weekTasks.length}</td><td>${doneWeek.length}</td><td>${wRate}%</td></tr><tr><td>Month</td><td>${monthTasks.length}</td><td>${doneMonth.length}</td><td>${mRate}%</td></tr></table>`
+function pickRandomTask(){
+  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done');
+  if(!tasks.length){document.getElementById('dashRouletteResult').textContent='No tasks to pick!';return}
+  const p=tasks[Math.floor(Math.random()*tasks.length)];
+  const el=document.getElementById('dashRouletteResult');
+  el.innerHTML=`<a href="#" onclick="showTaskDetail('${p.id}');return false" style="color:var(--accent);text-decoration:none">→ ${escHtml(p.title)}</a>`;
+  setTimeout(()=>el.innerHTML='',6000)
+}
+function renderDashHeatmap(tasks){
+  const today=new Date();const ds=today.toISOString().slice(0,10);
+  const start=new Date(today);start.setDate(start.getDate()-370);start.setDate(start.getDate()-start.getDay());
+  const doneMap={};tasks.filter(t=>t.status==='done').forEach(t=>{const d=t.updated_at?t.updated_at.slice(0,10):null;if(d)doneMap[d]=(doneMap[d]||0)+1});
+  const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const dl=['','Mon','','Wed','','Fri',''];
+  let html='<div class="heatmap-wrapper"><table class="heatmap-table"><tr><th></th>';
+  for(let w=0;w<53;w++){const d=new Date(start);d.setDate(d.getDate()+w*7);html+=`<th>${d.getDate()<=7?ms[d.getMonth()]:''}</th>`}
+  html+='</tr>';
+  for(let d=0;d<7;d++){
+    html+=`<tr><td style="padding-right:3px">${dl[d]}</td>`;
+    for(let w=0;w<53;w++){
+      const cd=new Date(start);cd.setDate(cd.getDate()+w*7+d);const key=cd.toISOString().slice(0,10);
+      const count=doneMap[key]||0;const lvl=count===0?'':count===1?'l1':count<=3?'l2':count<=6?'l3':'l4';
+      html+=`<td><div class="heatmap-cell${lvl?' '+lvl:''}${key===ds?' heatmap-today':''}"></div></td>`
+    }
+    html+='</tr>'
+  }
+  html+=`</table><div class="heatmap-legend"><span>Less</span><div class="cell"></div><div class="cell l1"></div><div class="cell l2"></div><div class="cell l3"></div><div class="cell l4"></div><span>More</span></div></div>`;
+  document.getElementById('dashRecap').innerHTML=html
 }
 
 
@@ -800,7 +886,7 @@ let taskView='list',taskSorts=[],taskColumns=JSON.parse(localStorage.getItem('do
 
 function switchTaskView(v){
   taskView=v;document.querySelectorAll('.view-toggle .icon-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
-  ['taskListView','taskKanbanView','taskCalendarView'].forEach(id=>document.getElementById(id).style.display='none');
+  ['taskListView','taskKanbanView','taskCalendarView','taskEisenhowerView'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('task'+v.charAt(0).toUpperCase()+v.slice(1)+'View').style.display='';
   taskPage=1;renderCurrentView()
 }
@@ -1196,6 +1282,22 @@ function calDrop(e,dateStr){
 
 function toggleCalDay(el){el.classList.toggle('expanded')}
 
+function renderEisenhower(){
+  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done');
+  const today=new Date();
+  const isUrgent=t=>{if(!t.due_date)return false;const d=new Date(t.due_date);const diff=Math.ceil((d-today)/864e5);return diff<=3||t.due_date<todayStr()};
+  const isImportant=t=>t.priority==='high'||t.priority==='medium';
+  const quads={doFirst:[],schedule:[],delegate:[],eliminate:[]};
+  tasks.forEach(t=>{
+    if(isImportant(t)&&isUrgent(t))quads.doFirst.push(t);
+    else if(isImportant(t)&&!isUrgent(t))quads.schedule.push(t);
+    else if(!isImportant(t)&&isUrgent(t))quads.delegate.push(t);
+    else quads.eliminate.push(t)
+  });
+  const card=(ts,label,color)=>`<div class="eisenhower-quad" style="border-top:3px solid ${color}"><div class="eisenhower-quad-header" style="color:${color}">${label} <span class="text-dim" style="font-weight:400">(${ts.length})</span></div>${ts.length?ts.map(t=>`<div class="eisenhower-task" onclick="showTaskDetail('${t.id}')"><span class="priority-dot ${t.priority}"></span><span>${escHtml(t.title)}</span>${t.due_date?`<span class="text-dim" style="font-size:10px;margin-left:auto">${fmtDate(t.due_date)}</span>`:''}</div>`).join(''):'<div class="text-dim text-sm" style="padding:8px 0">No tasks</div>'}</div>`;
+  document.getElementById('taskEisenhowerView').innerHTML=`<div class="text-dim text-sm" style="margin-bottom:12px;font-style:italic">Tasks sorted by urgency (due ≤3 days) and importance (high/medium priority).</div><div class="eisenhower-matrix"><div class="eisenhower-col"><div class="eisenhower-label" style="text-align:right;padding-right:8px;color:var(--text-dim);font-size:11px">Urgent</div>${card(quads.doFirst,'Do First','var(--red)')}</div><div class="eisenhower-col"><div class="eisenhower-label" style="padding-left:8px;color:var(--text-dim);font-size:11px">Not Urgent</div>${card(quads.schedule,'Schedule','var(--accent)')}</div><div class="eisenhower-col"><div class="eisenhower-label" style="text-align:right;padding-right:8px;color:var(--text-dim);font-size:11px">Not Important</div>${card(quads.delegate,'Delegate','var(--orange)')}</div><div class="eisenhower-col"><div class="eisenhower-label" style="padding-left:8px;color:var(--text-dim);font-size:11px">Not Important</div>${card(quads.eliminate,'Eliminate','var(--green)')}</div></div>`
+}
+
 function populateTaskFilters(){} // no-op: filter dropdowns removed
 const taskQuotes=[
   "The secret of getting ahead is getting started. — Mark Twain",
@@ -1240,7 +1342,8 @@ function renderCurrentView(){
   renderSortBar();
   if(taskView==='list')renderListView();
   else if(taskView==='kanban')renderKanban();
-  else renderCalendar();
+  else if(taskView==='calendar')renderCalendar();
+  else renderEisenhower();
   renderTaskQuote()
 }
 
