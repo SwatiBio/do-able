@@ -7,14 +7,21 @@ from pydantic import BaseModel, Field
 class TaskCreate(BaseModel):
     title: str
     description: str = ""
+    status: str = "not_started"
     priority: str = "medium"
     due_date: Optional[str] = None
+    start_date: Optional[str] = None
+    time: Optional[str] = None
     category: str = ""
     tags: list[str] = []
     fields: dict[str, str] = {}
     recur: Optional[str] = None
     depends_on: list[int] = []
+    depends_on_str: list[str] = []
+    notes: list[dict] = []
+    files: list[dict] = []
     note: Optional[str] = None
+    parent_id: Optional[int] = None
 
 
 class TaskUpdate(BaseModel):
@@ -23,12 +30,15 @@ class TaskUpdate(BaseModel):
     priority: Optional[str] = None
     status: Optional[str] = None
     due_date: Optional[str] = None
+    start_date: Optional[str] = None
+    time: Optional[str] = None
     category: Optional[str] = None
     tags: Optional[list[str]] = None
     fields: Optional[dict[str, str]] = None
     recur: Optional[str] = None
     depends_on: Optional[list[int]] = None
     note: Optional[str] = None
+    parent_id: Optional[int] = None
 
 
 class NoteOut(BaseModel):
@@ -43,20 +53,28 @@ class DepOut(BaseModel):
 
 
 class TaskOut(BaseModel):
+    model_config = {"populate_by_name": True}
+
     id: int
     title: str
     description: str
     status: str
     priority: str
     due_date: Optional[str] = None
+    start_date: Optional[str] = None
+    time: Optional[str] = None
     category: str
     tags: list[str] = []
     fields: dict[str, str] = {}
     recur: Optional[str] = None
     depends_on: list[DepOut] = []
     notes: list[NoteOut] = []
+    parent_id: Optional[int] = None
+    files: list[dict] = []
+    sample: bool = Field(False, alias="_sample")
     created_at: str
     updated_at: str
+    deleted_at: Optional[str] = None
 
 
 class TaskListResponse(BaseModel):

@@ -82,6 +82,9 @@ def task_to_dict(task: Task) -> dict:
         "created_at": task.created_at,
         "updated_at": task.updated_at,
         "deleted_at": task.deleted_at,
+        "parent_id": task.parent_id,
+        "files": json.loads(fields_dict.get("files", "[]")),
+        "sample": fields_dict.get("_sample") == "true",
     }
 
 
@@ -98,6 +101,7 @@ async def create_task(db: AsyncSession, data: dict) -> Task:
         time=data.get("time"),
         category=data.get("category", ""),
         recur=data.get("recur"),
+        parent_id=data.get("parent_id"),
         created_at=now,
         updated_at=now,
     )
@@ -112,6 +116,12 @@ async def create_task(db: AsyncSession, data: dict) -> Task:
 
     for dep_id in data.get("depends_on", []):
         db.add(TaskDep(task_id=task.id, depends_on=dep_id))
+
+    if data.get("files"):
+        db.add(TaskField(task_id=task.id, key="files", value=json.dumps(data["files"])))
+
+    if data.get("_sample"):
+        db.add(TaskField(task_id=task.id, key="_sample", value="true"))
 
     if data.get("note"):
         db.add(Note(task_id=task.id, text=data["note"], timestamp=now))
@@ -143,7 +153,7 @@ async def update_task(db: AsyncSession, task_id: int, data: dict) -> Optional[Ta
         return None
 
     now = datetime.now(timezone.utc).isoformat()
-    simple_fields = {"title", "description", "priority", "status", "category", "recur", "start_date", "time"}
+    simple_fields = {"title", "description", "priority", "status", "category", "recur", "start_date", "time", "parent_id"}
 
     for key, val in data.items():
         if key in simple_fields and val is not None:

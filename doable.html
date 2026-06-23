@@ -212,6 +212,8 @@ textarea{resize:vertical;min-height:80px}
 
 .quick-add{display:flex;gap:6px;margin-bottom:12px;align-items:center}
 .quick-add input{flex:1;padding:5px 10px;font-size:13px}
+.quick-add .nl-info{cursor:help;font-size:15px;color:var(--text-dim);flex-shrink:0;line-height:1}
+.quick-add .nl-info:hover{color:var(--accent)}
 
 
 
@@ -465,8 +467,8 @@ textarea{resize:vertical;min-height:80px}
         </div>
           <div class="section" id="dashStatus">
             <div class="dashboard-grid">
-              <div class="dash-card">
-                <div id="dashDueList"></div>
+              <div class="dash-card" id="dashMyDayList">
+                <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">My Day</div>
               </div>
               <div class="dash-card">
                 <div style="display:flex;flex-direction:column;gap:8px">
@@ -514,8 +516,17 @@ textarea{resize:vertical;min-height:80px}
         </div>
         <div id="taskQuote" class="text-dim" style="font-size:12px;font-style:italic;margin-bottom:10px;font-family:var(--font-serif);line-height:1.5"></div>
         <div class="quick-add">
-          <input type="text" id="quickAddInput" placeholder="Add a task.." onkeydown="if(event.key==='Enter')quickAddTask()">
+          <input type="text" id="quickAddInput" placeholder='e.g. "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')quickAddTask()">
           <button class="btn btn-primary btn-sm" onclick="quickAddTask()">Add</button>
+          <span class="nl-info" title='Natural language tips:
+  "Buy milk tomorrow high" → due tomorrow, high priority
+  "Meeting next monday medium" → due next Mon, medium priority
+  "Read article" → no due, medium priority
+  "Submit report today low" → due today, low priority
+  Keywords: high/medium/low, today/tomorrow/next week/next mon/tue/wed/thu/fri/sat/sun, MM/DD or MM-DD dates'>ⓘ</span>
+          <select id="templateSelect" onchange="if(this.value)applyTemplate(this.value);this.value=''" style="width:auto;font-size:12px;padding:4px 6px">
+            <option value="">Apply template...</option>
+          </select>
         </div>
         <div class="sort-bar" id="sortBar"></div>
         <div id="taskListView"></div>
@@ -586,6 +597,10 @@ textarea{resize:vertical;min-height:80px}
                 <input type="checkbox" id="settingsFrog" onchange="toggleFrog(this.checked)" style="width:16px;height:16px">
                 <span style="font-size:13px">Show frog</span>
               </label>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-label">Notifications</div><div class="settings-desc">Get notified about due and overdue tasks</div></div>
+              <button class="btn btn-sm btn-primary" onclick="requestNotifPermission();toast('Notification permission requested','info')">Enable Notifications</button>
             </div>
             <div style="background:var(--bg-raised);border-radius:8px;padding:12px 14px;margin-top:4px;margin-bottom:12px;font-size:12px;line-height:1.6;color:var(--text-dim)">
               <strong style="color:var(--text)">Frog companion — what it does:</strong>
@@ -666,6 +681,12 @@ textarea{resize:vertical;min-height:80px}
             <div id="settingsCategoriesList"></div>
           </div>
         </div>
+        <div class="settings-section">
+          <h2 onclick="toggleAccordion(this)">Templates</h2>
+          <div class="settings-body">
+            <div id="settingsTemplatesList"></div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -727,14 +748,14 @@ async function _initApi() {
   try {
     const [configRes, taskRes, noteRes, focusRes] = await Promise.all([
       _api.get('/config'),
-      _api.get('/tasks?flat=true&per_page=500'),
+      _api.get('/tasks?flat=true&per_page=100'),
       _api.get('/notes'),
       _api.get('/focus'),
     ]);
 
     if (taskRes && taskRes.tasks) {
       const tasks = taskRes.tasks.map(t => ({
-        id: t.id,
+        id: String(t.id),
         title: t.title,
         description: t.description || '',
         status: t.status || 'not_started',
@@ -745,12 +766,14 @@ async function _initApi() {
         category: t.category || '',
         tags: t.tags || [],
         recur: t.recur || null,
-        depends_on: (t.depends_on || []).map(d => typeof d === 'object' ? d.id : d),
-        notes: (t.notes || []).map(n => ({ id: n.id, text: n.text, timestamp: n.timestamp })),
+        depends_on: (t.depends_on || []).map(d => String(typeof d === 'object' ? d.id : d)),
+        notes: (t.notes || []).map(n => ({ id: String(n.id), text: n.text, timestamp: n.timestamp })),
         created_at: t.created_at,
         updated_at: t.updated_at,
         deleted_at: t.deleted_at || null,
-        _sample: t._sample || undefined,
+        parent_id: t.parent_id ? String(t.parent_id) : null,
+        files: t.files || [],
+        _sample: t.sample || t._sample || undefined,
       }));
       lsSet('tasks', tasks);
     }
@@ -802,11 +825,11 @@ async function saveTasks(t){
       const cur=getTasks();
       for(const[oldId,newId]of Object.entries(resp.id_map)){
         const task=cur.find(x=>String(x.id)===oldId);
-        if(task)task.id=newId;
+        if(task)task.id=String(newId);
       }
       for(const task of cur){
         if(task.depends_on&&task.depends_on.length)
-          task.depends_on=task.depends_on.map(d=>resp.id_map[String(d)]||d);
+          task.depends_on=task.depends_on.map(d=>{const m=resp.id_map[String(d)];return m?String(m):d});
       }
       lsSet('tasks',cur);
     }
@@ -912,7 +935,7 @@ function renderDashboard(){
   const tasks=getTasks().filter(t=>!t.deleted_at);
   renderScratchNotes();
   renderDashFocusGoals();
-  renderDashDueList(tasks);
+  renderDashMyDay(tasks);
   renderDashCharts(tasks);
   renderDashHeatmap(tasks);
   const area=document.getElementById('dashAnalytics');
@@ -923,13 +946,6 @@ function renderDashboard(){
     d.innerHTML='<svg viewBox="0 0 64 56"><path d="M17,44 L12,49 M17,44 L16,50 M17,44 L22,49" stroke="#3a7a3c" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M47,44 L42,49 M47,44 L46,50 M47,44 L52,49" stroke="#3a7a3c" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="32" cy="30" r="22" fill="#3a7a3c"/><circle cx="32" cy="30" r="20" fill="#7bc67e"/><ellipse cx="32" cy="37" rx="10" ry="8" fill="#d4f5c4"/><circle cx="20" cy="12" r="9" fill="#3a7a3c"/><circle cx="20" cy="12" r="7.5" fill="#7bc67e"/><circle cx="20" cy="12" r="4" fill="#1a1a1a"/><circle cx="18.5" cy="10.5" r="1.3" fill="white"/><circle cx="44" cy="12" r="9" fill="#3a7a3c"/><circle cx="44" cy="12" r="7.5" fill="#7bc67e"/><circle cx="44" cy="12" r="4" fill="#1a1a1a"/><circle cx="42.5" cy="10.5" r="1.3" fill="white"/><ellipse cx="14" cy="29" rx="4" ry="3" fill="#f5b8a0" opacity=".45"/><ellipse cx="50" cy="29" rx="4" ry="3" fill="#f5b8a0" opacity=".45"/><path d="M26,33 Q29,36 32,33 Q35,36 38,33" fill="none" stroke="#3a7a3c" stroke-width="1.2" stroke-linecap="round"/><rect x="24" y="26" width="16" height="14" rx="1" fill="#d4f5c4" stroke="#3a7a3c" stroke-width=".8"/><line x1="26" y1="29" x2="38" y2="29" stroke="#3a7a3c" stroke-width=".6"/><line x1="26" y1="32" x2="35" y2="32" stroke="#3a7a3c" stroke-width=".6"/><line x1="26" y1="35" x2="32" y2="35" stroke="#3a7a3c" stroke-width=".6"/></svg><span>Frog is reading... waiting for your first task!</span>';
     area.appendChild(d)
   }
-}
-function renderDashDueList(tasks){
-  const today=todayStr();
-  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done').slice(0,5);
-  const due=tasks.filter(t=>t.due_date===today&&t.status!=='done').slice(0,5);
-  const items=[...overdue.map(t=>({...t,_b:'Overdue'})),...due.map(t=>({...t,_b:'Due Today'}))];
-  document.getElementById('dashDueList').innerHTML=items.length?items.map(t=>`<div class="due-row"><span class="due-badge ${t._b==='Overdue'?'overdue':'today'}">${t._b}</span><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a><span class="text-dim text-sm">${fmtDate(t.due_date)}</span></div>`).join(''):'<span class="text-dim text-sm">No overdue or due tasks.</span>'
 }
 function renderDashCharts(tasks){
   const priorityCounts={high:0,medium:0,low:0};const catCounts={};
@@ -969,6 +985,34 @@ function renderDashHeatmap(tasks){
 }
 
 
+function renderDashMyDay(tasks){
+  const today=todayStr();
+  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done');
+  const dueToday=tasks.filter(t=>t.due_date===today&&t.status!=='done');
+  const focus=getFocus();const focusIds=focus[today]||[];
+  const focusGoals=focusIds.map(id=>tasks.find(t=>t.id===id)).filter(Boolean);
+  let html='';
+  if(overdue.length){
+    html+=`<div style="color:var(--red);font-size:12px;font-weight:600;margin-bottom:4px">Overdue (${overdue.length})</div>`;
+    overdue.slice(0,5).forEach(t=>{html+=`<div class="due-row"><span class="priority-dot ${t.priority||'medium'}"></span><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a><span class="text-dim text-sm">${fmtDate(t.due_date)}</span></div>`})
+  }
+  if(dueToday.length){
+    html+=`<div style="color:var(--accent);font-size:12px;font-weight:600;margin-bottom:4px;margin-top:${overdue.length?'8px':'0'}">Due Today (${dueToday.length})</div>`;
+    dueToday.forEach(t=>{html+=`<div class="due-row"><span class="priority-dot ${t.priority||'medium'}"></span><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a></div>`})
+  }
+  if(focusGoals.length){
+    html+=`<div style="color:var(--green);font-size:12px;font-weight:600;margin-bottom:4px;margin-top:${(overdue.length||dueToday.length)?'8px':'0'}">Focus Goals (${focusGoals.filter(g=>g.status==='done').length}/${focusGoals.length})</div>`;
+    focusGoals.forEach(t=>{html+=`<div class="due-row" style="${t.status==='done'?'opacity:.5':''}"><span class="priority-dot ${t.priority||'medium'}"></span><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title" style="${t.status==='done'?'text-decoration:line-through':''}">${escHtml(t.title)}</a></div>`})
+  }
+  if(!overdue.length&&!dueToday.length&&!focusGoals.length)html='<span class="text-dim text-sm">All clear for today! 🎯</span>';
+  const card=document.getElementById('dashMyDayList');
+  const header=card.querySelector('.text-dim');
+  card.innerHTML='';
+  if(header)card.appendChild(header);
+  const content=document.createElement('div');
+  content.innerHTML=html;
+  card.appendChild(content);
+}
 // --- Scratch Notes ---
 function renderScratchNotes(){
   const notes=getNotes().sort((a,b)=>b.pinned-a.pinned||new Date(b.updated_at)-new Date(a.updated_at));
@@ -1009,6 +1053,7 @@ function switchTaskView(v){
 }
 function getFilteredTasks(){
   let tasks=getTasks().filter(t=>!t.deleted_at);
+  tasks=tasks.filter(t=>!t.parent_id||!foldedParents.has(t.parent_id));
   const cfg=getConfig();taskSearch=document.getElementById('globalSearch')?.value||'';
   const today=todayStr();
   if(taskSearch){const q=taskSearch.toLowerCase();tasks=tasks.filter(t=>t.title.toLowerCase().includes(q)||(t.description||'').toLowerCase().includes(q))}
@@ -1067,20 +1112,29 @@ function renderListView(){
   document.getElementById('taskListView').innerHTML=html;
   document.getElementById('taskPagination').innerHTML=totalPages>1?`<button class="btn btn-ghost btn-sm" onclick="taskPage=Math.max(1,taskPage-1);renderListView()" ${taskPage<=1?'disabled':''}>Prev</button><span>Page ${taskPage} of ${totalPages}</span><button class="btn btn-ghost btn-sm" onclick="taskPage=Math.min(${totalPages},taskPage+1);renderListView()" ${taskPage>=totalPages?'disabled':''}>Next</button>`:''
 }
+var foldedParents=new Set();
 function renderTaskRow(t){
   const showTags=taskColumns.includes('tags');
   const showCat=taskColumns.includes('category');
   const showAnno=taskColumns.includes('annotations');
   const showDeps=taskColumns.includes('dependencies');
   const showRecur=taskColumns.includes('recur');
-  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone(this,'${t.id}')" title="Mark done"></td><td><span class="task-title" onclick="showTaskDetail('${t.id}')">${escHtml(t.title)}</span></td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
+  const tasks=getTasks();
+  const hasChildren=tasks.some(x=>x.parent_id===t.id&&!x.deleted_at);
+  const isFolded=foldedParents.has(t.id);
+  let titleHtml='';
+  if(hasChildren)titleHtml+=`<span style="cursor:pointer;font-size:11px;margin-right:4px;user-select:none" onclick="event.stopPropagation();${isFolded?'foldedParents.delete':'foldedParents.add'}('${t.id}');renderCurrentView()">${isFolded?'▸':'▾'}</span>`;
+  if(t.parent_id)titleHtml+='<span style="margin-right:4px;font-size:12px">↳</span>';
+  titleHtml+=`<span class="task-title" onclick="showTaskDetail('${t.id}')">${escHtml(t.title)}</span>`;
+  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone(this,'${t.id}')" title="Mark done"></td><td>${titleHtml}</td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
   if(taskColumns.includes('time'))cells+=`<td class="text-sm text-dim">${t.time||'—'}</td>`;
   if(showTags)cells+=`<td>${(t.tags||[]).map(tag=>`<span class="tag-pill">${escHtml(tag)}</span>`).join('')}</td>`;
   if(showCat)cells+=`<td class="text-dim text-sm">${escHtml(t.category||'—')}</td>`;
   if(showAnno)cells+=`<td class="text-dim text-sm">${(t.notes||[]).length||'—'}</td>`;
   if(showDeps)cells+=`<td class="text-dim text-sm">${(t.depends_on||[]).length||'—'}</td>`;
   if(showRecur)cells+=`<td class="text-dim text-sm">${t.recur?escHtml(t.recur):'—'}</td>`;
-  return `<tr class="${t.status==='done'?'task-row-done':''}">${cells}</tr>`
+  const style=t.parent_id?' style="padding-left:32px"':'';
+  return `<tr class="${t.status==='done'?'task-row-done':''}"${style}>${cells}</tr>`
 }
 function statusBadge(s){
   const m={not_started:'Not started',started:'Started',done:'Done'};const c={not_started:'var(--text-dim)',started:'var(--orange)',done:'var(--green)'};
@@ -1373,7 +1427,7 @@ function renderWeekView(tasks,previewTasks,today){
       const ds=d.toISOString().slice(0,10);const isToday=ds===today;
       const slotTasks=allTasks.filter(t=>t.due_date===ds&&t.time&&t.time.startsWith(String(h).padStart(2,'0')));
       const noTimeTasks=allTasks.filter(t=>t.due_date===ds&&(!t.time||!t.time.startsWith(String(h).padStart(2,'0')))&&h===12);
-      html+=`<div class="calendar-hour-slot${isToday?' today-col':''}" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')" onclick="toggleCalDay(this)">
+      html+=`<div class="calendar-hour-slot${isToday?' today-col':''}" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')" onclick="showTimeSlotPopover(${h},'${ds}',this)">
         ${slotTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${t.time?`<span class="task-time">${t.time}</span>`:''}${escHtml(t.title)}</div>`).join('')}
         ${h===12?noTimeTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`).join(''):''}
       </div>`
@@ -1398,6 +1452,20 @@ function calDrop(e,dateStr){
 }
 
 function toggleCalDay(el){el.classList.toggle('expanded')}
+
+function showTimeSlotPopover(hour,dayStr,el){
+  const tasks=getTasks().filter(t=>t.due_date===dayStr&&!t.time&&t.status!=='done');
+  let html='<div style="font-size:11px;font-weight:600;margin-bottom:6px">'+String(hour).padStart(2,'0')+':00</div>';
+  tasks.forEach(t=>{html+=`<div style="padding:4px 0;cursor:pointer;font-size:12px" onclick="event.stopPropagation();assignTaskTime('${t.id}','${String(hour).padStart(2,'0')+':00'}')">${escHtml(t.title)}</div>`});
+  html+=`<div style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px;font-size:11px;cursor:pointer;color:var(--accent)" onclick="event.stopPropagation();document.getElementById('quickAddInput').focus()">+ Add at ${String(hour).padStart(2,'0')}:00</div>`;
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('modalOverlay').style.display=''
+}
+function assignTaskTime(id,time){
+  const tasks=getTasks();const t=tasks.find(x=>x.id===id);
+  if(t){t.time=time;t.updated_at=nowISO();saveTasks(tasks);logActivity(id,'updated',t.title)}
+  closeModal();renderCalendar()
+}
 
 function renderEisenhower(){
   const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done');
@@ -1454,8 +1522,16 @@ function renderTaskQuote(){
   const el=document.getElementById('taskQuote');
   if(el)el.textContent=taskQuotes[idx]
 }
+function renderTemplateSelect(){
+  const sel=document.getElementById('templateSelect');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Apply template...</option>'+getTemplates().map(t=>`<option value="${escHtml(t.name)}">${escHtml(t.name)}</option>`).join('');
+  sel.value=cur
+}
 function renderCurrentView(){
   populateTaskFilters();
+  renderTemplateSelect();
   renderSortBar();
   if(taskView==='list')renderListView();
   else if(taskView==='kanban')renderKanban();
@@ -1467,7 +1543,26 @@ function renderCurrentView(){
 // --- Quick Add ---
 function quickAddTask(){
   const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
-  const tasks=getTasks();const t={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  let text=inp.value.trim();
+  const tasks=getTasks();const t={id:uid(),title:'',description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const pl={'high':'high','medium':'medium','low':'low'};
+  const words=text.split(/\s+/);const keep=[];
+  for(let i=0;i<words.length;i++){
+    const w=words[i].toLowerCase();
+    if(pl[w]){t.priority=pl[w];continue}
+    if(w==='today'){t.due_date=todayStr();continue}
+    if(w==='tomorrow'){const d=new Date();d.setDate(d.getDate()+1);t.due_date=d.toISOString().slice(0,10);continue}
+    if(w==='next'&&i+1<words.length){
+      const nx=words[i+1].toLowerCase();
+      if(nx==='week'){const d=new Date();d.setDate(d.getDate()+7);t.due_date=d.toISOString().slice(0,10);i++;continue}
+      const dm={'monday':1,'tuesday':2,'wednesday':3,'thursday':4,'friday':5,'saturday':6,'sunday':0};
+      if(dm[nx]!==undefined){const d=new Date();let diff=dm[nx]-d.getDay();if(diff<=0)diff+=7;d.setDate(d.getDate()+diff);t.due_date=d.toISOString().slice(0,10);i++;continue}
+    }
+    keep.push(words[i])
+  }
+  const datePat=/^(\d{1,2})[\/-](\d{1,2})$/;
+  const filtered=keep.filter(w=>{const m=w.match(datePat);if(m){const d=new Date();d.setMonth(parseInt(m[1])-1);d.setDate(parseInt(m[2]));if(d.getFullYear()<2000)d.setFullYear(new Date().getFullYear());t.due_date=d.toISOString().slice(0,10);return false}return true});
+  t.title=filtered.join(' ')||text;
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);inp.value='';renderCurrentView();renderTaskQuote()
 }
 
@@ -1572,11 +1667,24 @@ function renderTaskDetailPage(){
         <div style="display:flex;gap:4px"><input id="detailNoteInput" placeholder="Write a note..." onkeydown="if(event.key==='Enter')addDetailNote()"></div>
       </div>
       <div class="detail-field">
+        <label>Attachments (${(t.files||[]).length}/5 · ${((t.files||[]).reduce((s,f)=>s+(f.size||0),0)/1048576).toFixed(1)} MB)</label>
+        <div id="detailAttachments">${(t.files||[]).map((f,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px">${escHtml(f.name)}</span><span class="text-dim text-sm">(${(f.size/1024).toFixed(0)} KB)</span><a href="${escHtml(f.data)}" download="${escHtml(f.name)}" class="text-sm">Download</a><span class="tag-remove" onclick="removeDetailFile(${i})" style="cursor:pointer;margin-left:auto">✕</span></div>`).join('')||'<div class="text-dim text-sm" style="padding:4px 0">No attachments</div>'}</div>
+        <div style="margin-top:4px"><input type="file" id="detailFileInput" onchange="addDetailFile()"></div>
+      </div>
+      <div class="detail-field">
+        <label>Subtasks</label>
+        <div id="detailSubtasks">${tasks.filter(x=>x.parent_id===t.id&&!x.deleted_at).map(st=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><input type="checkbox" ${st.status==='done'?'checked':''} onchange="toggleSubtaskStatus('${st.id}',this.checked)" style="width:14px;height:14px"><span style="font-size:13px;cursor:pointer;text-decoration:${st.status==='done'?'line-through':'none'}" onclick="showTaskDetail('${st.id}')">${escHtml(st.title)}</span><span class="tag-remove" onclick="deleteTask('${st.id}')" style="cursor:pointer;margin-left:auto">✕</span></div>`).join('')||'<div class="text-dim text-sm" style="padding:4px 0">No subtasks</div>'}</div>
+        <div style="display:flex;gap:4px;margin-top:4px"><input id="detailSubtaskInput" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addDetailSubtask()"><button class="btn btn-primary btn-sm" onclick="addDetailSubtask()">Add</button></div>
+      </div>
+      <div class="detail-field">
         <label class="text-dim">Created ${fmtDateTime(t.created_at)} · Updated ${fmtDateTime(t.updated_at)}</label>
       </div>
       <div style="display:flex;gap:8px;justify-content:space-between">
         <button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}');navigateTo(previousPage)">Delete</button>
-        <button class="btn btn-primary" onclick="saveDetailTask('${t.id}')">Save</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary btn-sm" onclick="saveTemplateFromDetail()">Save as Template</button>
+          <button class="btn btn-primary" onclick="saveDetailTask('${t.id}')">Save</button>
+        </div>
       </div>
     </div>
   `;
@@ -1629,7 +1737,7 @@ function handleRecurrence(t){
   else if(t.recur==='weekly')d.setDate(d.getDate()+7);
   else if(t.recur==='monthly')d.setMonth(d.getMonth()+1);
   const nd=d.toISOString().slice(0,10);
-  const nt={id:uid(),title:t.title,description:t.description,status:'not_started',priority:t.priority,due_date:nd,category:t.category,tags:[...(t.tags||[])],recur:t.recur,depends_on:[],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const nt={id:uid(),title:t.title,description:t.description,status:'not_started',priority:t.priority,due_date:nd,category:t.category,tags:[...(t.tags||[])],recur:t.recur,depends_on:[],notes:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
   tasks.push(nt);saveTasks(tasks);logActivity(nt.id,'created',nt.title+' (recurring)')
 }
 function addDetailTag(){
@@ -1667,6 +1775,57 @@ function addDetailNote(){
   renderTaskDetailPage()
 }
 
+function addDetailFile(){
+  if(!detailTaskId)return;
+  const inp=document.getElementById('detailFileInput');if(!inp||!inp.files.length)return;
+  const tasks=getTasks();const t=tasks.find(x=>x.id===detailTaskId);if(!t)return;
+  if(!t.files)t.files=[];
+  if(t.files.length>=5){toast('Max 5 attachments','error');inp.value='';return}
+  const file=inp.files[0];
+  if(file.size>2*1048576){toast('File too large (max 2 MB)','error');inp.value='';return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    t.files.push({name:file.name,data:e.target.result,size:file.size,type:file.type});
+    t.updated_at=nowISO();saveTasks(tasks);renderTaskDetailPage()
+  };reader.readAsDataURL(file);
+  inp.value=''
+}
+function removeDetailFile(idx){
+  if(!detailTaskId)return;
+  const tasks=getTasks();const t=tasks.find(x=>x.id===detailTaskId);
+  if(t&&t.files){t.files.splice(idx,1);t.updated_at=nowISO();saveTasks(tasks)}
+  renderTaskDetailPage()
+}
+function addDetailSubtask(){
+  const inp=document.getElementById('detailSubtaskInput');if(!inp||!inp.value.trim()||!detailTaskId)return;
+  const tasks=getTasks();const parent=tasks.find(x=>x.id===detailTaskId);if(!parent)return;
+  const st={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],files:[],parent_id:detailTaskId,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  tasks.push(st);saveTasks(tasks);logActivity(st.id,'created',st.title);inp.value='';renderTaskDetailPage()
+}
+function toggleSubtaskStatus(id,checked){
+  const tasks=getTasks();const t=tasks.find(x=>x.id===id);
+  if(!t)return;t.status=checked?'done':'not_started';t.updated_at=nowISO();
+  if(t.status==='done'){logActivity(id,'completed',t.title);handleRecurrence(t)}
+  saveTasks(tasks);renderTaskDetailPage()
+}
+function saveTemplateFromDetail(){
+  if(!detailTaskId)return;
+  const tasks=getTasks();const t=tasks.find(x=>x.id===detailTaskId);if(!t)return;
+  const name=prompt('Template name:',t.title);if(!name)return;
+  const templates=getTemplates();
+  templates.push({name,title:t.title,description:t.description,priority:t.priority,category:t.category,tags:[...(t.tags||[])],recur:t.recur});
+  saveTemplates(templates);toast('Template saved','success')
+}
+function applyTemplate(name){
+  const templates=getTemplates();const tmpl=templates.find(t=>t.name===name);
+  if(!tmpl)return;
+  const tasks=getTasks();const t={id:uid(),title:tmpl.title,description:tmpl.description||'',status:'not_started',priority:tmpl.priority||'medium',due_date:'',start_date:'',time:'',category:tmpl.category||'',tags:[...(tmpl.tags||[])],recur:tmpl.recur||null,depends_on:[],notes:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);renderCurrentView()
+}
+function deleteTemplate(name){
+  if(!confirm('Delete template "'+name+'"?'))return;
+  saveTemplates(getTemplates().filter(t=>t.name!==name));toast('Template deleted','success');renderSettings()
+}
 // --- Delete / Bin ---
 function deleteTask(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
@@ -1733,7 +1892,8 @@ function renderSettings(){
   if(frogCb)frogCb.checked=!!cfg.frog_enabled;
   document.getElementById('settingsDateMode').value=cfg.date_mode||'smart';
   document.getElementById('settingsPerPage').value=cfg.per_page||25;
-  renderSettingsCategories()
+  renderSettingsCategories();
+  renderSettingsTemplates()
 }
 function renderSettingsCategories(){
   const tasks=getTasks();
@@ -1747,6 +1907,15 @@ function renderSettingsCategories(){
     const count=tasks.filter(t=>t.category===cat&&!t.deleted_at).length;
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(cat)}</strong> <span class="text-dim text-sm">(${count} task${count!==1?'s':''})</span></span><button class="btn btn-danger btn-sm" onclick="deleteCategory('${escHtml(cat)}')">Delete</button></div>`
   }).join('')
+}
+function renderSettingsTemplates(){
+  const el=document.getElementById('settingsTemplatesList');
+  if(!el)return;
+  const templates=getTemplates();
+  if(!templates.length){
+    el.innerHTML='<div class="text-dim text-sm" style="padding:8px 0">No saved templates yet.</div>';return
+  }
+  el.innerHTML=templates.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(t.name)}</strong></span><button class="btn btn-danger btn-sm" onclick="deleteTemplate('${escHtml(t.name)}')">Delete</button></div>`).join('')
 }
 function deleteCategory(cat){
   if(!confirm(`Delete category "${cat}"? Tasks will become uncategorized.`))return;
@@ -1808,6 +1977,8 @@ function exportData(format){
   a.download='doable-tasks.'+ext;a.click();URL.revokeObjectURL(a.href);
   toast(`Exported as ${format.toUpperCase()}`,'success')
 }
+function getTemplates(){return JSON.parse(localStorage.getItem('do_templates')||'[]')}
+function saveTemplates(t){localStorage.setItem('do_templates',JSON.stringify(t))}
 function clearAllData(){
   if(!confirm('This will permanently delete ALL data. Are you sure?'))return;
   if(!confirm('Really? All tasks, notes, activity — everything?'))return;
@@ -2008,6 +2179,24 @@ window.addEventListener('resize',function(){
   }
 });
 
+function requestNotifPermission(){
+  if('Notification'in window&&Notification.permission==='default')
+    Notification.requestPermission()
+}
+function checkDueTasks(){
+  if(!('Notification'in window)||Notification.permission!=='granted')return;
+  const tasks=getTasks().filter(t=>!t.deleted_at);
+  const today=todayStr();
+  const dueToday=tasks.filter(t=>t.due_date===today&&t.status!=='done');
+  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done');
+  if(dueToday.length){
+    new Notification('Do-able',{body:`${dueToday.length} task${dueToday.length>1?'s are':' is'} due today`,icon:'/icon.svg'})
+  }
+  if(overdue.length){
+    new Notification('Do-able',{body:`${overdue.length} overdue task${overdue.length>1?'s':''}!`,icon:'/icon.svg'})
+  }
+}
+
 // --- Init ---
 async function init(){
   await _initApi();
@@ -2020,6 +2209,8 @@ async function init(){
   const focus=getFocus();const today=todayStr();
   Object.keys(focus).forEach(d=>{if(d!==today)delete focus[d]});
   saveFocus(focus);
+  requestNotifPermission();
+  setTimeout(checkDueTasks,1000);
   renderCurrentPage()
 }
 

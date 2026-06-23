@@ -42,6 +42,7 @@ async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
                 created_at=t.get("created_at", now),
                 updated_at=t.get("updated_at", now),
                 deleted_at=t.get("deleted_at"),
+                parent_id=t.get("parent_id"),
             )
             db.add(task)
             await db.flush()
@@ -63,6 +64,9 @@ async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
             extras = {}
             if t.get("_sample"):
                 extras["_sample"] = "true"
+            if t.get("files"):
+                import json
+                extras["files"] = json.dumps(t["files"])
 
             for k, v in extras.items():
                 db.add(TaskField(task_id=task.id, key=k, value=v))

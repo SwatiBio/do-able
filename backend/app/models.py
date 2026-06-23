@@ -19,10 +19,12 @@ class Task(Base):
     time = Column(String, nullable=True)
     category = Column(String, default="")
     recur = Column(String, nullable=True)
+    parent_id = Column(Integer, ForeignKey("tasks.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
     updated_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
     deleted_at = Column(String, nullable=True)
 
+    children = relationship("Task", backref="parent", remote_side=[id])
     tags = relationship("Tag", back_populates="task", cascade="all, delete-orphan")
     fields = relationship("TaskField", back_populates="task", cascade="all, delete-orphan")
     deps = relationship("TaskDep", back_populates="task", cascade="all, delete-orphan", foreign_keys="[TaskDep.task_id]")
