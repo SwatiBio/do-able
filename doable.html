@@ -698,6 +698,116 @@ textarea{resize:vertical;min-height:80px}
 const LS_PREFIX = 'doable_';
 function lsGet(key,def=null){try{const v=localStorage.getItem(LS_PREFIX+key);return v?JSON.parse(v):def}catch{return def}}
 function lsSet(key,val){localStorage.setItem(LS_PREFIX+key,JSON.stringify(val))}
+
+// === API Client ===
+const _api = {
+  ready: false,
+  async _fetch(method, path, body) {
+    const opts = { method, headers: { 'Accept': 'application/json' } };
+    if (body != null) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    const r = await fetch('/api' + path, opts);
+    if (!r.ok) throw new Error(`API ${method} ${path}: ${r.status}`);
+    return r.status === 204 ? null : r.json();
+  },
+  get(p) { return this._fetch('GET', p); },
+  post(p, b) { return this._fetch('POST', p, b); },
+  put(p, b) { return this._fetch('PUT', p, b); },
+  del(p) { return this._fetch('DELETE', p); },
+};
+
+async function _initApi() {
+  try {
+    const [configRes, taskRes, noteRes, focusRes] = await Promise.all([
+      _api.get('/config'),
+      _api.get('/tasks?flat=true&per_page=500'),
+      _api.get('/notes'),
+      _api.get('/focus'),
+    ]);
+
+    if (taskRes && taskRes.tasks) {
+      const tasks = taskRes.tasks.map(t => ({
+        id: t.id,
+        title: t.title,
+        description: t.description || '',
+        status: t.status || 'not_started',
+        priority: t.priority || 'medium',
+        due_date: t.due_date || '',
+        start_date: t.start_date || '',
+        time: t.time || '',
+        category: t.category || '',
+        tags: t.tags || [],
+        recur: t.recur || null,
+        depends_on: (t.depends_on || []).map(d => typeof d === 'object' ? d.id : d),
+        notes: (t.notes || []).map(n => ({ id: n.id, text: n.text, timestamp: n.timestamp })),
+        created_at: t.created_at,
+        updated_at: t.updated_at,
+        deleted_at: t.deleted_at || null,
+        _sample: t._sample || undefined,
+      }));
+      lsSet('tasks', tasks);
+    }
+
+    const cfg = {
+      theme: configRes.theme === 'auto' ? 'nord-dark' : (configRes.theme || 'nord-dark'),
+      date_mode: configRes.date_mode || 'smart',
+      per_page: configRes.per_page || 25,
+    };
+    const oldCfg = lsGet('config', {});
+    cfg.frog_enabled = oldCfg.frog_enabled || false;
+    lsSet('config', cfg);
+
+    if (noteRes && noteRes.notes) {
+      lsSet('notes', noteRes.notes.map(n => ({
+        id: String(n.id), text: n.text, pinned: !!n.pinned,
+        created_at: n.created_at, updated_at: n.updated_at,
+      })));
+    }
+
+    if (focusRes && focusRes.task_ids) {
+      const d = new Date();
+      const today = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      lsSet('focus', { [today]: focusRes.task_ids });
+    }
+
+    _api.ready = true;
+    console.log('API connected');
+  } catch (e) {
+    _api.ready = false;
+    console.log('API unavailable, using localStorage');
+  }
+}
+
+let _syncTimer = null;
+async function _syncFull() {
+  if (!_api.ready) return;
+  if (_syncTimer) clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(async () => {
+    _syncTimer = null;
+    try {
+      const tasks = lsGet('tasks', []);
+      const notes = lsGet('notes', []);
+      const config = lsGet('config', {});
+      const resp = await _api.post('/sync/full', { tasks, notes, config });
+      if (resp && resp.id_map && Object.keys(resp.id_map).length > 0) {
+        const current = lsGet('tasks', []);
+        for (const [oldId, newId] of Object.entries(resp.id_map)) {
+          const t = current.find(x => String(x.id) === oldId);
+          if (t) t.id = newId;
+        }
+        for (const t of current) {
+          if (t.depends_on && t.depends_on.length) {
+            t.depends_on = t.depends_on.map(d => resp.id_map[String(d)] || d);
+          }
+        }
+        lsSet('tasks', current);
+      }
+    } catch (e) { /* silent */ }
+  }, 800);
+}
+
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function nowISO(){return new Date().toISOString()}
@@ -705,17 +815,20 @@ function fmtDate(d){if(!d)return'';const dateMode=lsGet('config',{}).date_mode||
 function fmtDateTime(iso){if(!iso)return'';const d=new Date(iso);const now=new Date();const diff=Math.round((now-d)/60000);if(diff<1)return'just now';if(diff<60)return`${diff}m ago`;const hrs=Math.floor(diff/60);if(hrs<24)return`${hrs}h ago`;const days=Math.floor(hrs/24);if(days<7)return`${days}d ago`;return d.toLocaleDateString()}
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
-// --- Data ---
+// --- Data (localStorage cache + background API sync) ---
 function getTasks(){return lsGet('tasks',[])}
-function saveTasks(t){lsSet('tasks',t)}
+function saveTasks(t){lsSet('tasks',t);_syncFull()}
 function getActivity(){return lsGet('activity',[])}
 function saveActivity(a){lsSet('activity',a)}
 function getConfig(){return lsGet('config',{theme:'nord-dark',date_mode:'smart',per_page:25})}
-function saveConfig(c){lsSet('config',c)}
+function saveConfig(c){lsSet('config',c);if(_api.ready)_syncCfg(c)}
 function getNotes(){return lsGet('notes',[])}
-function saveNotes(n){lsSet('notes',n)}
+function saveNotes(n){lsSet('notes',n);_syncFull()}
 function getFocus(){return lsGet('focus',{})}
-function saveFocus(f){lsSet('focus',f)}
+function saveFocus(f){lsSet('focus',f);if(_api.ready)syncFocus(f)}
+
+async function _syncCfg(c){try{await _api.put('/config',{theme:c.theme,date_mode:c.date_mode,per_page:c.per_page})}catch(e){}}
+async function syncFocus(f){try{const d=new Date();const t=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');await _api.put('/focus',{task_ids:f[t]||[]})}catch(e){}}
 
 function logActivity(taskId,action,details=''){
   let a=getActivity();a.unshift({id:uid(),task_id:taskId,action,details,timestamp:nowISO()});
@@ -1695,6 +1808,7 @@ function clearAllData(){
   if(!confirm('This will permanently delete ALL data. Are you sure?'))return;
   if(!confirm('Really? All tasks, notes, activity — everything?'))return;
   Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>localStorage.removeItem(k));
+  if(_api.ready){_api.post('/sync/full',{tasks:[],notes:[],config:{}}).catch(()=>{})}
   toast('All data cleared','info');renderCurrentPage()
 }
 
@@ -1891,16 +2005,14 @@ window.addEventListener('resize',function(){
 });
 
 // --- Init ---
-function init(){
+async function init(){
+  await _initApi();
   const cfg=getConfig();
-  // If config is empty, set defaults
   if(Object.keys(cfg).length===0){cfg.theme='nord-dark';cfg.date_mode='smart';cfg.per_page=25;cfg.frog_enabled=false;saveConfig(cfg)}
   applyTheme(cfg.theme);
   if(cfg.frog_enabled)startFrog();
-  // Add sample tasks if empty
   const tasks=getTasks();
   if(!tasks.length){loadSampleData(true);loadSampleNotes()}
-  // Auto-clear focus goals that are not today
   const focus=getFocus();const today=todayStr();
   Object.keys(focus).forEach(d=>{if(d!==today)delete focus[d]});
   saveFocus(focus);
