@@ -14,12 +14,18 @@ __pycache__/
 
 # Specific files
 todo-prompt.txt
+PRODUCT.md
 
 # Layers design audit (local only)
 layers/
+
+# Tool artifacts
+.impeccable/
 
 # OS / editor
 .DS_Store
 Thumbs.db
 *.log
 .env
+.vscode/
+.idea/
