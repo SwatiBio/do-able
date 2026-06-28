@@ -192,3 +192,14 @@
 | Updated README, design, api, directory-structure, TRACKER | done |
 | State machine formalized (not_started → in_progress → done/cancelled → deleted, reopen paths) | done |
 | docs/conceptual-model.md | done |
+
+## Type & Color Refinement
+
+| Feature | Status |
+|---------|--------|
+| Rem type scale (1.2 ratio, --fs-xs through --fs-xl) | done |
+| tabular-nums on body for aligned data | done |
+| Dark mode font-weight tuning (450 dark, 400 light) | done |
+| Active/focus/disabled interaction states | done |
+| Heatmap explicit color tokens (--hm-l0 through --hm-l4) | done |
+| Empty-state personality (Bin, Activity, Tasks, Kanban, Calendar) | done |

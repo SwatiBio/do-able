@@ -324,7 +324,7 @@ function renderListView(){
   const showDeps=taskColumns.includes('dependencies');
   const showRecur=taskColumns.includes('recur');
   let html='';
-  if(!pageTasks.length)html='<div class="empty-state"><p class="text-dim">No tasks match your filters.</p></div>';
+  if(!pageTasks.length)html='<div class="empty-state"><p>No tasks match your filters.</p><p class="text-dim text-sm">Try clearing some filters to see more.</p></div>';
     else{
       let cols='<th style="width:20px"></th><th style="width:36px"></th><th>Title</th><th style="width:80px">Priority</th><th style="width:100px">Status</th><th style="width:120px">Due</th>';
       if(showTags)cols+='<th style="width:120px">Tags</th>';

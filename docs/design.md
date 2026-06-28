@@ -61,11 +61,11 @@ Full-page editor (not a modal). Recent activity panel at top showing last 5 even
 
 ### Bin
 
-Table of soft-deleted tasks. Restore individual tasks, permanently delete single tasks, or empty the whole bin. Pre-delete warning when task has subtasks or dependents. Permanent deletion logs activity on dependent tasks.
+Table of soft-deleted tasks. Restore individual tasks, permanently delete single tasks, or empty the whole bin. Pre-delete warning when task has subtasks or dependents. Permanent deletion logs activity on dependent tasks. Empty state: "Nothing here yet." with a hint about deleted tasks landing here.
 
 ### Activity Log
 
-Chronological feed of all mutations. Filter by action type. Paginated (25 per page). Keeps the last 500 entries.
+Chronological feed of all mutations. Filter by action type. Paginated (25 per page). Keeps the last 500 entries. Empty state: "No activity yet." with a hint about actions appearing as you use the app.
 
 ### Settings
 
@@ -121,9 +121,11 @@ Colors:
 - Green (#a3be8c) for low priority, done status, success
 - Purple (#b48ead) for confetti accent
 
-Typography: system sans-serif for UI (with subtle letter-spacing in dark mode for readability), Georgia/serif for headings (with `text-wrap: balance`), monospace for data elements.
+Typography: system sans-serif for UI (font-weight 450 in dark mode, 400 in light; subtle letter-spacing in dark mode for readability), Georgia/serif for headings (with `text-wrap: balance`), monospace for data elements. Rem type scale at 1.2 ratio (--fs-xs through --fs-xl). `tabular-nums` on body for aligned numeric data.
 
-Surface tokens: three elevations in dark mode — `--bg` (page), `--bg-raised` (cards), `--bg-overlay` (modals/palette). `--accent-tint` (low-opacity accent) for selected items and hero cards.
+Surface tokens: three elevations in dark mode — `--bg` (page), `--bg-raised` (cards), `--bg-overlay` (modals/palette). `--accent-tint` (low-opacity accent) for selected items and hero cards. Heatmap uses explicit `--hm-l0` through `--hm-l4` color tokens (Nord-tinted progression) in both dark and light themes.
+
+Interaction states: `:active` scale transforms on buttons (btn 0.97, icon-btn 0.92, nav-item 0.98) for tactile feedback. Disabled inputs get `opacity: .5` + `cursor: not-allowed`.
 
 ## Frog Companion
 

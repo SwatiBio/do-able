@@ -131,7 +131,7 @@ function renderKanban(){
   const tasks=getFilteredTasks();
   let cats=[...new Set(tasks.map(t=>t.category).filter(Boolean))].sort();
   if(!cats.length){
-    document.getElementById('taskKanbanView').innerHTML='<div class="empty-state"><p class="text-dim">Add a category to view Kanban view.</p></div>';
+    document.getElementById('taskKanbanView').innerHTML='<div class="empty-state"><p>No categories yet.</p><p class="text-dim text-sm">Add a category to a task to see it organized here.</p></div>';
     return
   }
   const uncategorized=tasks.filter(t=>!t.category);
@@ -195,7 +195,7 @@ function renderCalendar(){
   </div>`;
 
   if(tasks.length===0&&previewTasks.length===0){
-    html+='<div class="empty-state" style="padding:40px 20px"><p class="text-dim">No scheduled tasks.</p><p class="text-dim text-sm">Add a due date or start date to a task to see it here.</p></div>';
+    html+='<div class="empty-state" style="padding:40px 20px"><p>Nothing scheduled.</p><p class="text-dim text-sm">Add a due date or start date to a task to see it here.</p></div>';
   }else if(calViewMode==='week'){
     html+=renderWeekView(tasks,previewTasks,today);
   }else{
@@ -837,7 +837,7 @@ function renderActivityLog(){
   logPage=Math.min(logPage,totalPages);
   const start=(logPage-1)*perPage;const pageEntries=entries.slice(start,start+perPage);
   const colors={created:'var(--green)',completed:'var(--accent)',deleted:'var(--red)',restored:'var(--orange)',updated:'var(--yellow)',dependency_removed:'var(--purple)',rescheduled:'#81a1c1',started:'#8fbcbb',cancelled:'#5e81ac',recurred:'#7b88a1',series_stopped:'#4c566a'};
-  document.getElementById('logList').innerHTML=pageEntries.length?pageEntries.map(e=>`<div class="activity-log-entry"><span class="activity-dot" style="background:${colors[e.action]||'var(--text-dim)'}"></span><span class="text-sm" style="flex:1">${escHtml(e.action)}${e.details?': '+escHtml(e.details):''}</span><span class="text-dim text-sm">${fmtDateTime(e.timestamp)}</span></div>`).join(''):'<div class="empty-state"><p class="text-dim">No activity entries.</p></div>';
+  document.getElementById('logList').innerHTML=pageEntries.length?pageEntries.map(e=>`<div class="activity-log-entry"><span class="activity-dot" style="background:${colors[e.action]||'var(--text-dim)'}"></span><span class="text-sm" style="flex:1">${escHtml(e.action)}${e.details?': '+escHtml(e.details):''}</span><span class="text-dim text-sm">${fmtDateTime(e.timestamp)}</span></div>`).join(''):'<div class="empty-state"><p>No activity yet.</p><p class="text-dim text-sm">Your actions will appear here as you add, complete, and organize tasks.</p></div>';
   document.getElementById('logPagination').innerHTML=totalPages>1?`<button class="btn btn-ghost btn-sm" onclick="logPage=Math.max(1,logPage-1);renderActivityLog()" ${logPage<=1?'disabled':''}>Prev</button><span>Page ${logPage} of ${totalPages}</span><button class="btn btn-ghost btn-sm" onclick="logPage=Math.min(${totalPages},logPage+1);renderActivityLog()" ${logPage>=totalPages?'disabled':''}>Next</button>`:''
 }
 
