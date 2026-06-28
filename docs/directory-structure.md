@@ -9,11 +9,10 @@ do-able/
   README.md                Getting started guide
   LICENSE                  MIT license
   .gitignore               Ignored files
-  docs/
   src/
     icon.svg               App icon for PWA and notifications
     site.webmanifest       PWA manifest with app name, icons, colors
-  backend/
+  docs/
     api.md                 API reference (localStorage + REST)
     conceptual-model.md    Objects, states, relationships, architecture decisions
     design.md              Design specification
@@ -36,7 +35,7 @@ do-able/
         scratch.py         /api/notes CRUD
         templates.py        /api/templates CRUD
         task_series.py      /api/series CRUD + stop
-        sync.py            /api/sync/full bulk import with ID remapping
+        sync.py            /api/sync/full initial data import with ID remapping (not used for routine sync)
         dashboard.py       /api/dashboard analytics
         search.py          /api/search full-text search
         backups.py         /api/backups list/create/restore
@@ -51,7 +50,7 @@ do-able/
         scratch_service.py Scratch notes CRUD
         template_service.py Template CRUD
         task_series_service.py Recurring series CRUD + stop
-        sync_service.py    Bulk import with depends_on ID resolution
+        sync_service.py    Initial data import with depends_on ID resolution
         dashboard_service.py Analytics queries
         search_service.py  Full-text search
         backup_service.py  Backup creation and restore

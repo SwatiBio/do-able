@@ -9,7 +9,7 @@ doable.html  <--->  FastAPI (Python)  <--->  SQLite
 
 The frontend caches everything in the browser's localStorage for instant reads. Every write goes to localStorage first (so the UI responds immediately) and then to the backend server in the background. The backend persists data to a SQLite database.
 
-If the server is offline, the frontend keeps working from localStorage. When connectivity returns, the next write syncs to the server.
+If the server is offline, mutations are queued in localStorage with sequence numbers. When connectivity returns, the queue replays in order.
 
 ## Layout
 
@@ -34,7 +34,7 @@ The topbar is 52px tall. Left to right: global search input, centered page title
 A bento grid layout with two columns on top (scratch notes + focus goals) and a full-width analytics section below.
 
 - Scratch notes with create, pin/unpin, delete
-- Focus goals: pick up to 3 tasks per day, click to cycle their status, progress counter with confetti when all done. Prominent dashed-border prompt when no goals set.
+- Focus goals: pick up to 3 tasks per day, click to cycle their status (cancelled tasks show reopen button), progress counter with confetti when all done. Prominent dashed-border prompt when no goals set.
 - This Week card: tasks completed this week with trend vs last week
 - Daily streak: consecutive days with completed tasks (⚡ for < 7 days, 🔥 for 7+)
 - Focus mode: topbar button opens modal aggregating focus goals, overdue, due today, and roulette — distraction-free "what to work on now" view
@@ -59,7 +59,7 @@ Four view modes:
 
 ### Task Detail
 
-Full-page editor (not a modal). Recent activity panel at top showing last 5 events for this task (created, updated, completed, rescheduled, dependency removed). Inline editing for title, description, priority, status, due date, start date, time, category, tags, recurrence, and dependencies. Subtask section with add/toggle/delete. Attachments section with file upload (5 files, 2 MB each). Annotations timeline. Save as Template button. Soft-delete to Bin.
+Full-page editor (not a modal). Recent activity panel at top showing last 5 events for this task (created, updated, completed, rescheduled, dependency removed). Inline editing for title, description, priority, status, due date, start date, time, category, tags, recurrence, and dependencies. Subtask section with add/toggle/delete. Attachments section with file upload (5 files, 2 MB each). Annotations timeline. Save as Template button. Stop recurring button (deactivates the series, clears recurrence). Soft-delete to Bin.
 
 ### Bin
 
@@ -159,7 +159,7 @@ Each task has these fields:
 id            string (unique)
 title         string
 description   string
-status        not_started | in_progress | done | cancelled
+status        not_started | in_progress | done | cancelled | deleted
 priority      high | medium | low
 due_date      YYYY-MM-DD or null
 start_date    YYYY-MM-DD or null

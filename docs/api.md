@@ -35,7 +35,7 @@ Array of task objects. Each task:
 }
 ```
 
-Status values: `not_started`, `in_progress`, `done`, `cancelled`
+Status values: `not_started`, `in_progress`, `done`, `cancelled`, `deleted`
 
 ### doable_activity
 
@@ -102,7 +102,7 @@ Array of visible column keys in list view.
 
 ### doable_templates
 
-Array of saved task templates. Synced to backend `/api/templates` and included in `/api/sync/full`.
+Array of saved task templates. Synced to backend `/api/templates` via individual CRUD.
 
 ```json
 [
@@ -120,7 +120,7 @@ Array of saved task templates. Synced to backend `/api/templates` and included i
 
 ### doable_series
 
-Array of recurring task series. Synced to backend `/api/series` and included in `/api/sync/full`. Each series is a mold for recurring task instances.
+Array of recurring task series. Synced to backend `/api/series` via individual CRUD. Each series is a mold for recurring task instances.
 
 ```json
 [
@@ -195,7 +195,6 @@ All defined globally in doable.html.
 | Function | What it does |
 |----------|-------------|
 | _initApi() | Loads tasks, config, notes, focus, templates, series from the API on startup |
-| _syncFull() | Bulk syncs tasks/notes/config/templates/series to POST /api/sync/full |
 
 ## Backend REST API
 
@@ -255,7 +254,7 @@ Base URL: http://localhost:8000
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | /api/sync/full | Bulk import tasks, notes, config, templates, series. Body: {tasks, notes, config, templates, series}. Returns {id_map, series_id_map} for ID remapping. |
+| POST | /api/sync/full | Initial data import only. Bulk replaces tasks, notes, config, templates, series. Body: {tasks, notes, config, templates, series}. Returns {id_map, series_id_map} for ID remapping. |
 
 ### Dashboard and Search
 
@@ -293,12 +292,12 @@ Base URL: http://localhost:8000
 ```
 User action -> Event handler -> JS function -> localStorage (instant)
                                                       |
-                                                API call (background)
+                                          API call per mutation (background)
                                                       |
                                                 FastAPI -> SQLite
 ```
 
-All reads are synchronous localStorage operations. Every write updates localStorage immediately and then makes an API call to persist the data server-side.
+All reads are synchronous localStorage operations. Every write updates localStorage immediately and then makes a targeted API call (create/update/delete) per mutated entity. Failed calls are queued in localStorage with sequence numbers and replayed when the connection returns.
 
 ## Features
 

@@ -44,7 +44,7 @@ On Windows you can also double-click `start.bat` from the project root. It start
 
 The first time you open the app, an onboarding modal asks how you want to start: try sample tasks, import from CSV, or start empty. You can remove samples later from Settings > Data > Remove Samples.
 
-A SQLite database gets created automatically at `backend/.todo/todo.db`. No setup needed.
+A SQLite database gets created automatically at `~/.todo/todo.db`. No setup needed.
 
 ### Without the backend
 

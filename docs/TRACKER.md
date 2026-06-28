@@ -7,6 +7,8 @@
 | CSS (Nord theme, layout, responsive) | done |
 | HTML structure (orbital ring, sidebar, topbar, pages) | done |
 | JS data layer (localStorage read/write, ID generation) | done |
+| Offline write queue (per-mutation, replayed on reconnect) | pending |
+| File split: index.html / app.js / ui.js / events.js | pending |
 | JS navigation (page switching, sidebar toggle, backdrop) | done |
 | Theme toggle (Nord Dark/Light/System) | done |
 
@@ -16,7 +18,7 @@
 | Feature | Status |
 |---------|--------|
 | Scratch notes (create, pin/unpin, delete) | done |
-| Focus goals (max 3, dropdown, status cycling, progress counter, confetti) | done |
+| Focus goals (max 3, dropdown, status cycling, cancelled reopen, progress counter, confetti) | done |
 | Focus goals auto-reset daily | done |
 | Overdue tasks list (max 5) | done |
 | Bar charts by priority | done |
@@ -82,6 +84,7 @@
 | Annotations timeline | done |
 | Save as Template button | done |
 | Soft-delete to Bin | done |
+| Stop recurring button (deactivates series, clears recurrence) | done |
 | Unsaved changes warning | done |
 
 ### Bin
@@ -170,3 +173,5 @@
 | Smart reminders (browser notifications) | done |
 | start.bat / stop.bat scripts | done |
 | Updated README, design, api, directory-structure, TRACKER | done |
+| State machine formalized (not_started → in_progress → done/cancelled → deleted, reopen paths) | done |
+| docs/conceptual-model.md | done |
