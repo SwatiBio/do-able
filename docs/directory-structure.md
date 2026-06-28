@@ -2,7 +2,7 @@
 
 ```
 do-able/
-  doable.html              The entire frontend (2600+ lines, single file)
+  index.html               HTML shell (navigation, modals, CSS)
   start.bat                Starts uvicorn and opens the browser (Windows)
   stop.bat                 Kills the server process (Windows)
   sw.js                    Service worker for PWA offline caching
@@ -10,6 +10,9 @@ do-able/
   LICENSE                  MIT license
   .gitignore               Ignored files
   src/
+    app.js                 Data layer (localStorage, API client, save/load)
+    ui.js                  Rendering (all render* functions, modals, navigation)
+    events.js              Event handlers (toggleTaskDone, schedule, CRUD)
     icon.svg               App icon for PWA and notifications
     site.webmanifest       PWA manifest with app name, icons, colors
   docs/
@@ -67,7 +70,7 @@ do-able/
 
 ## What each piece does
 
-The frontend is a single HTML file. All CSS and JavaScript live inside it. No build step, no npm, no bundler. You can open it directly in a browser and it works offline using localStorage.
+The frontend is an HTML shell (`index.html`) with JavaScript split across `src/app.js`, `src/ui.js`, `src/events.js`. No build step, no npm, no bundler. You can open `index.html` directly in a browser and it works offline using localStorage.
 
 The backend is a FastAPI async server. It uses SQLAlchemy 2.0 with aiosqlite for async SQLite access. The database file is created automatically at `backend/.todo/todo.db` on first run.
 

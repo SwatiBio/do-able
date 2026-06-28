@@ -6,7 +6,7 @@ A task manager that runs in your browser with an optional Python backend for per
 
 Two parts:
 
-1. **Frontend** (`doable.html`): A single HTML file with all CSS and JavaScript inside. No build step, no dependencies. Open it in a browser and it works.
+1. **Frontend** (`index.html` + `src/`): An HTML shell with JS split across `src/app.js`, `src/ui.js`, `src/events.js`. No build step, no dependencies. Open it in a browser and it works.
 2. **Backend** (`backend/`): A FastAPI server that saves your data to SQLite. Your tasks survive even if you clear your browser data.
 
 The app reads from localStorage (instant) and writes to both localStorage and the backend (in the background). If the server is down, the app keeps working from localStorage alone.
@@ -48,7 +48,7 @@ A SQLite database gets created automatically at `~/.todo/todo.db`. No setup need
 
 ### Without the backend
 
-You can open `doable.html` directly in a browser without running any server. Everything works offline using localStorage. The only downside is your data lives and dies with the browser.
+You can open `index.html` directly in a browser without running any server. Everything works offline using localStorage. The only downside is your data lives and dies with the browser.
 
 ### On your phone
 

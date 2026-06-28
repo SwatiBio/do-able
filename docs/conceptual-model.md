@@ -152,14 +152,14 @@ deleted      ──→ not_started   (restore from bin)
 
 ### File Split
 
-Split the monolithic `doable.html` into:
+Split the monolithic `doable.html` into `index.html` + `src/`:
 
 | File | Responsibility |
 |------|---------------|
 | `index.html` | HTML shell, CSS, PWA manifest link |
-| `app.js` | Data layer (localStorage, API client, save/load) |
-| `ui.js` | Rendering (all render* functions, modals, navigation) |
-| `events.js` | Event handlers (toggleTaskDone, cycleDashFocus, etc.) |
+| `src/app.js` | Data layer (localStorage, API client, save/load) |
+| `src/ui.js` | Rendering (all render* functions, modals, navigation) |
+| `src/events.js` | Event handlers (toggleTaskDone, cycleDashFocus, etc.) |
 
 No build step. `<script>` tags loaded in order.
 

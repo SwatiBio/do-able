@@ -7,8 +7,8 @@
 | CSS (Nord theme, layout, responsive) | done |
 | HTML structure (orbital ring, sidebar, topbar, pages) | done |
 | JS data layer (localStorage read/write, ID generation) | done |
-| Offline write queue (per-mutation, replayed on reconnect) | pending |
-| File split: index.html / app.js / ui.js / events.js | pending |
+| Offline write queue (dirty flag, replayed on reconnect) | done |
+| File split: index.html / src/app.js / src/ui.js / src/events.js | done |
 | JS navigation (page switching, sidebar toggle, backdrop) | done |
 | Theme toggle (Nord Dark/Light/System) | done |
 
@@ -18,6 +18,7 @@
 | Feature | Status |
 |---------|--------|
 | Scratch notes (create, pin/unpin, delete) | done |
+| Inline quick-add with NL parsing | done |
 | Focus goals (max 3, dropdown, status cycling, cancelled reopen, progress counter, confetti) | done |
 | Focus goals auto-reset daily | done |
 | Overdue tasks list (max 5) | done |
@@ -163,7 +164,7 @@
 | Sync endpoint with ID remapping | done |
 | Dashboard, Search, Backup, Bin, Activity, Export endpoints | done |
 | Frontend API client with background sync | done |
-| doable.html served at GET / | done |
+| index.html served at GET / | done |
 | PWA (sw.js, manifest, service worker) | done |
 | Natural language quick-add | done |
 | Subtasks (parent_id, fold, indent) | done |

@@ -3,7 +3,7 @@
 ## Architecture
 
 ```
-doable.html  <--->  FastAPI (Python)  <--->  SQLite
+index.html + src/  <--->  FastAPI (Python)  <--->  SQLite
   (UI)                (REST API)           (database)
 ```
 
@@ -33,6 +33,7 @@ The topbar is 52px tall. Left to right: global search input, centered page title
 
 A bento grid layout with two columns on top (scratch notes + focus goals) and a full-width analytics section below.
 
+- Inline quick-add: type a task with natural language parsing (priority, dates, weekdays) directly on the dashboard without navigating away. Shared parser with the Tasks page.
 - Scratch notes with create, pin/unpin, delete
 - Focus goals: pick up to 3 tasks per day, click to cycle their status (cancelled tasks show reopen button), progress counter with confetti when all done. Prominent dashed-border prompt when no goals set.
 - This Week card: tasks completed this week with trend vs last week
@@ -199,7 +200,7 @@ FastAPI async server with SQLAlchemy 2.0 and SQLite (via aiosqlite).
 - Import: CSV (tasks from file)
 - Export: JSON, CSV, Markdown
 
-The root route (`GET /`) serves `doable.html` as a static file.
+The root route (`GET /`) serves `index.html` as a static file (JS loaded from `src/`).
 
 ## Tufte principles
 

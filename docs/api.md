@@ -144,7 +144,7 @@ Array of recurring task series. Synced to backend `/api/series` via individual C
 
 ## Frontend functions
 
-All defined globally in doable.html.
+All defined globally in `src/app.js`, `src/ui.js`, `src/events.js`.
 
 | Function | What it does |
 |----------|-------------|
@@ -167,7 +167,10 @@ All defined globally in doable.html.
 | saveCategoryColor(cat, color) | Sets/clears a category color in config |
 | categoryDot(cat) | Returns HTML for a colored dot, or empty string |
 | logActivity(taskId, action, details) | Adds an activity entry |
-| quickAddTask() | Creates a task from the quick-add input (parses natural language) |
+| parseQuickAdd(text) | Parses natural language from text, returns {title, priority, due_date}. Shared by dashboard and Tasks page quick-add |
+| buildTask(parsed) | Builds a full task object from a parsed quick-add result |
+| quickAddTask() | Creates a task from the Tasks page quick-add input (uses parseQuickAdd + buildTask) |
+| dashQuickAddTask() | Creates a task from the dashboard inline quick-add input, re-renders dashboard, shows toast |
 | toggleTaskDone(id, checked) | Toggles completion, fires confetti, handles recurrence |
 | showTaskDetail(id) | Opens the full-page task editor |
 | handleRecurrence(task) | Creates the next instance of a recurring task |
@@ -303,7 +306,7 @@ All reads are synchronous localStorage operations. Every write updates localStor
 
 | Feature | How it works |
 |---------|-------------|
-| Natural language quick-add | Parses keywords like "tomorrow", "high", "next monday" from the input and strips them from the title |
+| Natural language quick-add | Parses keywords like "tomorrow", "high", "next monday" from the input and strips them from the title. Shared `parseQuickAdd` parser used by both the dashboard inline input and the Tasks page input |
 | Subtasks | parent_id field on tasks, indented in list view with fold toggle |
 | Templates | Save task structures to localStorage, apply from quick-add dropdown or detail page |
 | Attachments | File upload stored as base64, max 5 files of 2 MB each |
