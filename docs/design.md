@@ -23,7 +23,7 @@ If the server is offline, mutations are queued in localStorage with sequence num
 +----------+----------------------------------+
 ```
 
-The sidebar uses an "orbital ring" design: a 44px circular button fixed at the bottom-left corner of the screen. Clicking it slides open a 200px navigation panel from the left with a backdrop overlay. On mobile the ring shrinks and the sidebar takes the full width.
+The sidebar uses an "orbital ring" design: a 44px circular button fixed at the bottom-left corner of the screen. Clicking it slides open a 200px navigation panel from the left with a backdrop overlay. On first load the ring pulses with an accent glow animation three times to draw attention, until the user opens the sidebar once (state persisted in config). On mobile the ring is 44px (WCAG touch target minimum) and the sidebar takes the full width.
 
 The topbar is 52px tall. Left to right: global search input, centered page title (`#topbarTitle`), command palette trigger (⌘K / Ctrl+K), focus-mode button, theme-cycle button, offline badge.
 
@@ -72,7 +72,7 @@ Chronological feed of all mutations. Filter by action type. Paginated (25 per pa
 
 ### Settings
 
-Collapsible accordion sections:
+Collapsible accordion sections with CSS-drawn chevron indicators (no text content, avoiding screen-reader noise):
 
 - Appearance: theme (Nord Dark / Nord Light / System), frog companion toggle, notification enable button
 - Display: date mode (smart relative or ISO), tasks per page
@@ -151,7 +151,7 @@ The app is a Progressive Web App. It has a service worker (`sw.js`) that caches 
 - **Modal focus trap**: Tab and Shift+Tab cycle within the modal. Focus is saved on open and restored on close. Escape key closes the modal.
 - **Offline indicator**: pulsing orange "Offline" badge in the topbar when backend is unreachable. All writes fall back to localStorage and sync on reconnection.
 - **Loading state**: spinner overlay shown on initial page load until data fetch completes.
-- **Reduced motion**: `@media (prefers-reduced-motion: reduce)` disables frog animations (all states), confetti, calendar today-pulse, and toast slide-in. Frog auto-cycle timer is also suppressed via JS. The frog remains visible but static.
+- **Reduced motion**: `@media (prefers-reduced-motion: reduce)` disables frog animations (all states), confetti, calendar today-pulse, toast slide-in, and sidebar ring-hint pulse. Frog auto-cycle timer is also suppressed via JS. The frog remains visible but static.
 
 ## Data model
 

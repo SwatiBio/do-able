@@ -26,6 +26,10 @@
 | Bar charts by category (top 8) | done |
 | Heatmap grid (53 weeks x 7 days) | done |
 | Heatmap empty state (compact preview when no done tasks) | done |
+| My Day focus counter format (matches Focus Goals card) | done |
+| prefers-reduced-motion gating (frog, confetti, pulse, toast, ring-hint) | done |
+| Sidebar ring discoverability (pulse hint on first load) | done |
+| Settings accordion chevron (CSS-drawn, no text a11y leak) | done |
 | My Day section (overdue + due today + focus) | done |
 | Task roulette (random incomplete picker) | done |
 | Frog reading book (empty state) | done |

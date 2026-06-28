@@ -32,6 +32,8 @@ a:hover{text-decoration:underline}
 .sidebar-ring{position:fixed;left:16px;bottom:24px;width:44px;height:44px;border:2px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:101;transition:all .3s;background:var(--bg);box-shadow:0 2px 12px rgba(0,0,0,.25),0 0 8px rgba(136,192,208,.15)}
 .sidebar-ring:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,.35),0 0 16px rgba(136,192,208,.35)}
 .sidebar-ring.open{opacity:0;pointer-events:none}
+@keyframes ring-hint{0%,100%{box-shadow:0 2px 12px rgba(0,0,0,.25),0 0 8px rgba(136,192,208,.15)}50%{box-shadow:0 2px 12px rgba(0,0,0,.25),0 0 18px rgba(136,192,208,.55)}}
+.sidebar-ring.ring-hint{animation:ring-hint 2s ease-in-out 3}
 .sidebar-backdrop{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}
 .sidebar-backdrop.open{opacity:1;pointer-events:auto}
 .topbar{height:var(--topbar-h);display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;position:relative}
@@ -352,8 +354,8 @@ textarea{resize:vertical;min-height:80px}
 .settings-section{margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .settings-section h2{margin:0;padding:14px 20px;font-size:14px;font-weight:600;cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);transition:background .15s}
 .settings-section h2:hover{background:var(--bg-raised)}
-.settings-section h2::after{content:'−';font-size:16px;color:var(--text-dim);transition:transform .2s}
-.settings-section.collapsed h2::after{content:'+'}
+.settings-section h2::after{content:'';width:7px;height:7px;border:solid var(--text-dim);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .2s;flex-shrink:0}
+.settings-section.collapsed h2::after{transform:rotate(-45deg)}
 .settings-section.collapsed .settings-body{display:none}
 .settings-body{padding:8px 20px 4px;background:var(--bg)}
 .settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
@@ -429,12 +431,13 @@ textarea{resize:vertical;min-height:80px}
   .confetti-piece{display:none!important}
   .cal-today-pulse{animation:none!important}
   .toast{animation:none!important}
+  .sidebar-ring.ring-hint{animation:none!important}
 }
 </style>
 </head>
 <body>
 <div class="layout">
-  <div class="sidebar-ring" id="sidebarRing" onclick="toggleSidebar()" role="button" aria-label="Toggle navigation menu" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSidebar()}">
+  <div class="sidebar-ring" id="sidebarRing" onclick="toggleSidebar()" role="button" aria-label="Toggle navigation menu" title="Open navigation menu (Ctrl+Shift+L)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSidebar()}">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </div>
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>

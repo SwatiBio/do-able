@@ -55,6 +55,8 @@ function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebarRing').classList.toggle('open');
   document.getElementById('sidebarBackdrop').classList.toggle('open');
+  const r=document.getElementById('sidebarRing');
+  if(r&&r.classList.contains('ring-hint')){r.classList.remove('ring-hint');const c=getConfig();c.ring_hint_seen=true;saveConfig(c)}
 }
 
 // --- Global Search ---
@@ -697,6 +699,7 @@ async function init(){
   if(Object.keys(cfg).length===0){cfg.theme='nord-dark';cfg.date_mode='smart';cfg.per_page=25;cfg.frog_enabled=false;saveConfig(cfg)}
   applyTheme(cfg.theme);
   if(cfg.frog_enabled)startFrog();
+  if(!cfg.ring_hint_seen){const r=document.getElementById('sidebarRing');if(r)r.classList.add('ring-hint')}
   const tasks=getTasks();
   if(!lsGet('onboarding_seen',false)&&tasks.length===0){showOnboarding()}
   const focus=getFocus();const today=todayStr();
