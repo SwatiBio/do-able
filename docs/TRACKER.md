@@ -134,6 +134,17 @@
 | Palette trigger button in topbar (⌘K / Ctrl+K) | done |
 | ARIA roles (dialog/combobox/listbox/option) | done |
 
+## Dashboard & Visual Polish
+
+| Feature | Status |
+|---------|--------|
+| Asymmetric bento dashboard layout (My Day hero left, Focus/Roulette/Streak right) | done |
+| Type refinement (text-wrap: balance, dark-mode letter-spacing, tabular-nums) | done |
+| Color tokens (--bg-overlay modal surface, --accent-tint selected/hero) | done |
+| Roulette spin animation (cycles titles before landing) | done |
+| Palette open/close scale-in animation | done |
+| Focus goals "All done!" complete state (green) | done |
+
 ## Layer 3: Polish
 
 | Step | Status |

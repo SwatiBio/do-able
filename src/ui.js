@@ -88,11 +88,25 @@ function renderDashboard(){
 }
 function pickRandomTask(){
   const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done'&&t.status!=='cancelled');
-  if(!tasks.length){document.getElementById('dashRouletteResult').textContent='No tasks to pick!';return}
-  const p=tasks[Math.floor(Math.random()*tasks.length)];
   const el=document.getElementById('dashRouletteResult');
-  el.innerHTML=`<a href="#" onclick="showTaskDetail('${p.id}');return false" style="color:var(--accent);text-decoration:none">→ ${escHtml(p.title)}</a>`;
-  setTimeout(()=>el.innerHTML='',6000)
+  if(!tasks.length){el.textContent='No tasks to pick!';return}
+  const p=tasks[Math.floor(Math.random()*tasks.length)];
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||tasks.length===1){
+    el.innerHTML=`<a href="#" onclick="showTaskDetail('${p.id}');return false" style="color:var(--accent);text-decoration:none">→ ${escHtml(p.title)}</a>`;
+    setTimeout(()=>el.innerHTML='',6000);return
+  }
+  let spins=0;const maxSpins=14;const titles=tasks.map(t=>t.title);
+  el.innerHTML=`<span style="color:var(--text-dim)">…</span>`;
+  const tick=()=>{
+    if(spins>=maxSpins){
+      el.innerHTML=`<a href="#" onclick="showTaskDetail('${p.id}');return false" style="color:var(--accent);text-decoration:none">→ ${escHtml(p.title)}</a>`;
+      setTimeout(()=>el.innerHTML='',6000);return
+    }
+    const r=titles[Math.floor(Math.random()*titles.length)];
+    el.innerHTML=`<span style="color:var(--text-dim)">→ ${escHtml(r)}</span>`;
+    spins++;setTimeout(tick,spins<6?60:spins<10?120:200)
+  };
+  tick()
 }
 function showFocusMode(){
   const tasks=getTasks().filter(t=>!t.deleted_at);
@@ -243,7 +257,8 @@ function renderDashFocusGoals(){
   const ids=focus[today]||[];const goals=ids.map(id=>getTasks().find(t=>t.id===id)).filter(Boolean);
   const doneCount=goals.filter(t=>t.status==='done').length;
   const selHtml=`<div class="goal-selector" style="margin-bottom:8px"><select id="dashFocusSelect" style="flex:1">${tasks.map(t=>`<option value="${t.id}">${escHtml(t.title)}</option>`).join('')}</select><button class="btn btn-primary btn-sm" onclick="addDashFocusGoal()">Add</button></div>`;
-  const cntHtml=goals.length?`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount} of ${goals.length} done</div>`:'';
+  const allDone=goals.length>0&&doneCount===goals.length;
+  const cntHtml=goals.length?allDone?`<div style="font-size:13px;color:var(--green);font-weight:600;margin-bottom:8px">All done!</div>`:`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount} of ${goals.length} done</div>`:'';
   const cardsHtml=goals.length?goals.map(t=>{
     if(t.status==='cancelled')return`<div class="focus-card" style="margin-bottom:4px;opacity:0.6"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" style="color:var(--red)">${escHtml(t.title)} <span class="text-sm" style="color:var(--red)">(cancelled)</span></div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div><button class="btn btn-secondary btn-sm" onclick="reopenFocusTask('${t.id}')">↻ Reopen</button></div>`;
     return`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`

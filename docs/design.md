@@ -31,19 +31,16 @@ The topbar is 52px tall. Left to right: global search input, centered page title
 
 ### Dashboard
 
-A bento grid layout with two columns on top (scratch notes + focus goals) and a full-width analytics section below.
+An asymmetric bento layout: a wider left column (quick-add + My Day as hero + This Week) and a narrower right column (Focus Goals + Task Roulette + Streak), with full-width scratch notes and heatmap below.
 
 - Inline quick-add: type a task with natural language parsing (priority, dates, weekdays) directly on the dashboard without navigating away. Shared parser with the Tasks page.
-- Scratch notes with create, pin/unpin, delete
-- Focus goals: pick up to 3 tasks per day, click to cycle their status (cancelled tasks show reopen button), progress counter with confetti when all done. Prominent dashed-border prompt when no goals set.
+- Scratch notes (full-width) with create, pin/unpin, delete
+- Focus goals: pick up to 3 tasks per day, click to cycle their status (cancelled tasks show reopen button), progress counter with confetti when all done. Shows "All done!" in green when all goals complete. Prominent dashed-border prompt when no goals set.
+- My Day hero card: overdue (max 5), due-today, and focus goals together
 - This Week card: tasks completed this week with trend vs last week
 - Daily streak: consecutive days with completed tasks (⚡ for < 7 days, 🔥 for 7+)
-- Focus mode: topbar button opens modal aggregating focus goals, overdue, due today, and roulette — distraction-free "what to work on now" view
-- Overdue tasks list (max 5)
-- My Day section showing overdue, due-today, and focus goals together
-- Task roulette button that picks a random incomplete task
-- Priority bar chart and category bar chart (top 8 categories)
-- Heatmap grid: 53 weeks by 7 days, color-coded by completion density, month labels, today highlighted. Compact empty state (title, hint, gradient preview) when no tasks completed.
+- Task roulette: picks a random incomplete task with a spin animation cycling through titles before landing
+- Heatmap grid (full-width): 53 weeks by 7 days, color-coded by completion density, month labels, today highlighted. Compact empty state (title, hint, gradient preview) when no tasks completed.
 - Frog reading a book when there are no tasks (empty state)
 
 ### Tasks
@@ -124,7 +121,9 @@ Colors:
 - Green (#a3be8c) for low priority, done status, success
 - Purple (#b48ead) for confetti accent
 
-Typography: system sans-serif for UI, Georgia/serif for headings, monospace for data elements.
+Typography: system sans-serif for UI (with subtle letter-spacing in dark mode for readability), Georgia/serif for headings (with `text-wrap: balance`), monospace for data elements.
+
+Surface tokens: three elevations in dark mode — `--bg` (page), `--bg-raised` (cards), `--bg-overlay` (modals/palette). `--accent-tint` (low-opacity accent) for selected items and hero cards.
 
 ## Frog Companion
 
