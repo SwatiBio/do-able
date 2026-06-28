@@ -168,7 +168,7 @@ function renderDashMyDay(tasks){
     dueToday.forEach(t=>{html+=`<div class="due-row"><span class="priority-dot ${t.priority||'medium'}"></span><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a></div>`})
   }
   if(focusGoals.length){
-    html+=`<div style="color:var(--green);font-size:12px;font-weight:600;margin-bottom:4px;margin-top:${(overdue.length||dueToday.length)?'8px':'0'}">Focus Goals (${focusGoals.filter(g=>g.status==='done').length}/${focusGoals.length})</div>`;
+    html+=`<div style="color:var(--green);font-size:12px;font-weight:600;margin-bottom:4px;margin-top:${(overdue.length||dueToday.length)?'8px':'0'}">Focus Goals (${focusGoals.filter(g=>g.status==='done').length} of ${focusGoals.length} done)</div>`;
     focusGoals.forEach(t=>{html+=`<div class="due-row" style="${t.status==='done'?'opacity:.5':''}"><span class="priority-dot ${t.priority||'medium'}"></span><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title" style="${t.status==='done'?'text-decoration:line-through':''}">${escHtml(t.title)}</a></div>`})
   }
   if(!overdue.length&&!dueToday.length&&!focusGoals.length)html='<span class="text-dim text-sm">All clear for today! 🎯</span>';
@@ -405,6 +405,7 @@ function toast(msg,type='info'){
 
 // --- Confetti ---
 function fireConfetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const c=document.getElementById('confettiContainer');
   const colors=['var(--red)','var(--accent)','var(--green)','var(--orange)','var(--yellow)','var(--purple)'];
   for(let i=0;i<60;i++){
@@ -492,7 +493,7 @@ function startFrog(){
   if(!el)return;el.classList.remove('frog-hidden');
   const pos=frogRandPos();frogX=0;frogY=pos.y;
   el.style.left=pos.x+'px';el.style.top=pos.y+'px';
-  setFrogState('idle');scheduleFrogAction()
+  setFrogState('idle');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)scheduleFrogAction()
 }
 function stopFrog(){
   frogEnabled=false;clearTimeout(frogTimer);
@@ -529,7 +530,7 @@ function setFrogState(state){
   }else{el.classList.add('frog-idle');frogState='idle'}
 }
 function scheduleFrogAction(){
-  clearTimeout(frogTimer);if(!frogEnabled)return;
+  clearTimeout(frogTimer);if(!frogEnabled)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const delay=12000+Math.random()*18000;
   frogTimer=setTimeout(()=>{
     if(!frogEnabled)return;

@@ -138,7 +138,7 @@ An interactive SVG frog that sits on the screen. Seven states:
 - Peek: peeks behind the modal overlay
 - Perch: hops to a new position
 
-Auto-cycles between idle/sleep/stretch every 12 to 30 seconds. Clicking the frog triggers a happy animation and a hop to a new spot. Gets happy automatically when confetti fires. Rides inside toast notifications. Toggled in Settings.
+Auto-cycles between idle/sleep/stretch every 12 to 30 seconds. Clicking the frog triggers a happy animation and a hop to a new spot. Gets happy automatically when confetti fires. Rides inside toast notifications. Toggled in Settings. All frog animations and confetti are gated by `prefers-reduced-motion`: under reduced motion, the frog stays static (no auto-cycling) and confetti does not fire.
 
 ## PWA
 
@@ -151,6 +151,7 @@ The app is a Progressive Web App. It has a service worker (`sw.js`) that caches 
 - **Modal focus trap**: Tab and Shift+Tab cycle within the modal. Focus is saved on open and restored on close. Escape key closes the modal.
 - **Offline indicator**: pulsing orange "Offline" badge in the topbar when backend is unreachable. All writes fall back to localStorage and sync on reconnection.
 - **Loading state**: spinner overlay shown on initial page load until data fetch completes.
+- **Reduced motion**: `@media (prefers-reduced-motion: reduce)` disables frog animations (all states), confetti, calendar today-pulse, and toast slide-in. Frog auto-cycle timer is also suppressed via JS. The frog remains visible but static.
 
 ## Data model
 

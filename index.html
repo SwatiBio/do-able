@@ -423,6 +423,13 @@ textarea{resize:vertical;min-height:80px}
   .topbar{padding:0 12px}
   .main-content{padding:16px}
 }
+@media (prefers-reduced-motion: reduce){
+  .frog-idle .frog-svg,.frog-walk .frog-svg,.frog-sleep .frog-svg,.frog-stretch .frog-svg,.frog-happy .frog-svg,.frog-perch .frog-svg,.frog-hopping .frog-svg{animation:none!important}
+  .frog-peek,.sleep-zzz,.frog-hopping{animation:none!important;transition:none!important}
+  .confetti-piece{display:none!important}
+  .cal-today-pulse{animation:none!important}
+  .toast{animation:none!important}
+}
 </style>
 </head>
 <body>
