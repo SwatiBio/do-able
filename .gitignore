@@ -21,6 +21,9 @@ layers/
 
 # Tool artifacts
 .impeccable/
+.playwright-mcp/
+*-snapshot.yml
+activity-filled.yml
 
 # OS / editor
 .DS_Store
