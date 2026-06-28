@@ -39,7 +39,7 @@ async def first_run_setup():
         from app.database import async_session
         async with async_session() as db:
             from app.services.config_service import set_config_value
-            await set_config_value(db, "theme", "auto")
+            await set_config_value(db, "theme", "nord-dark")
             await set_config_value(db, "date_mode", "smart")
             await set_config_value(db, "notifications", "true")
             await set_config_value(db, "per_page", "25")

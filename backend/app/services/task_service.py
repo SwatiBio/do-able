@@ -219,6 +219,7 @@ async def mark_done(db: AsyncSession, task_id: int) -> tuple[Task, Optional[Task
             due_date=new_date,
             category=task.category,
             recur=task.recur,
+            series_id=task.series_id,
             created_at=now,
             updated_at=now,
         )

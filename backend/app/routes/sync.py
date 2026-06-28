@@ -6,21 +6,28 @@ from sqlalchemy import delete as sa_delete
 
 from app.database import get_db
 from app.models import ActivityLog, Annotation, Config, Note, Tag, Task, TaskDep, TaskField, TaskSeries, Template
+from app.schemas import FullSyncRequest
 
 router = APIRouter(prefix="/api/sync", tags=["sync"])
 
 
 @router.post("/full")
-async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
+async def full_sync(data: FullSyncRequest, db: AsyncSession = Depends(get_db)):
     now = datetime.now(timezone.utc).isoformat()
 
     id_map = {}
     series_id_map = {}
 
-    if "series" in data:
+    series_list = data.series or []
+    tasks_list = data.tasks or []
+    config_data = data.config or {}
+    notes_list = data.notes or []
+    templates_list = data.templates or []
+
+    if series_list:
         import json
         await db.execute(sa_delete(TaskSeries))
-        for s in data["series"]:
+        for s in series_list:
             local_id = str(s.get("id", ""))
             is_digit = local_id.isdigit()
             series = TaskSeries(
@@ -43,15 +50,14 @@ async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
             if not is_digit:
                 series_id_map[local_id] = series.id
 
-    if "tasks" in data:
+    if tasks_list:
         await db.execute(sa_delete(Tag))
         await db.execute(sa_delete(TaskField))
         await db.execute(sa_delete(TaskDep))
         await db.execute(sa_delete(Annotation))
         await db.execute(sa_delete(Task))
 
-        # First pass: create all tasks
-        for t in data["tasks"]:
+        for t in tasks_list:
             local_id = str(t.get("id", ""))
             is_digit = local_id.isdigit()
 
@@ -97,7 +103,6 @@ async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
                     timestamp=n.get("timestamp", now),
                 ))
 
-            # Preserve frontend-specific fields
             extras = {}
             if t.get("_sample"):
                 extras["_sample"] = "true"
@@ -114,8 +119,7 @@ async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
                 timestamp=now,
             ))
 
-        # Second pass: process depends_on (all server IDs known now)
-        for t in data["tasks"]:
+        for t in tasks_list:
             local_id = str(t.get("id", ""))
             is_digit = local_id.isdigit()
             server_id = int(local_id) if is_digit else id_map.get(local_id)
@@ -129,14 +133,14 @@ async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
                 if mapped:
                     db.add(TaskDep(task_id=server_id, depends_on=mapped))
 
-    if "config" in data:
+    if config_data:
         await db.execute(sa_delete(Config))
-        for k, v in data["config"].items():
+        for k, v in config_data.items():
             db.add(Config(key=k, value=str(v).lower() if isinstance(v, bool) else str(v)))
 
-    if "notes" in data:
+    if notes_list:
         await db.execute(sa_delete(Note))
-        for n in data["notes"]:
+        for n in notes_list:
             db.add(Note(
                 text=n.get("text", ""),
                 pinned=int(n.get("pinned", False)),
@@ -144,10 +148,10 @@ async def full_sync(data: dict, db: AsyncSession = Depends(get_db)):
                 updated_at=n.get("updated_at", now),
             ))
 
-    if "templates" in data:
+    if templates_list:
         import json
         await db.execute(sa_delete(Template))
-        for tmpl in data["templates"]:
+        for tmpl in templates_list:
             db.add(Template(
                 name=tmpl.get("name", ""),
                 title=tmpl.get("title", ""),

@@ -265,3 +265,11 @@ class TaskSeriesOut(BaseModel):
     active: bool
     created_at: str
     updated_at: str
+
+
+class FullSyncRequest(BaseModel):
+    tasks: list[dict] = []
+    notes: list[dict] = []
+    config: dict = {}
+    templates: list[dict] = []
+    series: list[dict] = []

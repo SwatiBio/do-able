@@ -805,7 +805,7 @@ async function _initApi() {
     }
 
     const cfg = {
-      theme: configRes.theme === 'auto' ? 'nord-dark' : (configRes.theme || 'nord-dark'),
+      theme: configRes.theme === 'auto' ? 'system' : (configRes.theme || 'nord-dark'),
       date_mode: configRes.date_mode || 'smart',
       per_page: configRes.per_page || 25,
     };
@@ -875,24 +875,49 @@ function fmtDateTime(iso){if(!iso)return'';const d=new Date(iso);const now=new D
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
 // --- Data (API-first writes, localStorage as cache) ---
+function _isNumericId(id){return/^\d+$/.test(String(id))}
+function _taskPayload(t){
+  return{
+    title:t.title,description:t.description||'',status:t.status||'not_started',priority:t.priority||'medium',
+    due_date:t.due_date||null,start_date:t.start_date||null,time:t.time||null,category:t.category||'',
+    tags:t.tags||[],recur:t.recur||null,
+    series_id:_isNumericId(t.series_id)?Number(t.series_id):null,
+    depends_on:(t.depends_on||[]).filter(d=>_isNumericId(d)).map(Number),
+    depends_on_str:(t.depends_on||[]).filter(d=>!_isNumericId(d)),
+    annotations:t.annotations||[],files:t.files||[],
+    parent_id:_isNumericId(t.parent_id)?Number(t.parent_id):null,
+    _sample:t._sample||undefined,
+  }
+}
 function getTasks(){return lsGet('tasks',[])}
 async function saveTasks(t){
+  const prev=getTasks();
+  const prevIds=new Set(prev.map(x=>x.id));
+  const curIds=new Set(t.map(x=>x.id));
   lsSet('tasks',t);
   try{
-    const resp=await _api.post('/sync/full',{tasks:t,notes:getNotes(),config:getConfig(),templates:getTemplates(),series:getSeries()});
-    if(resp&&resp.id_map&&Object.keys(resp.id_map).length>0){
-      const cur=getTasks();
-      for(const[oldId,newId]of Object.entries(resp.id_map)){
-        const task=cur.find(x=>String(x.id)===oldId);
-        if(task)task.id=String(newId);
-      }
-      for(const task of cur){
-        if(task.depends_on&&task.depends_on.length)
-          task.depends_on=task.depends_on.map(d=>{const m=resp.id_map[String(d)];return m?String(m):d});
-      }
-      lsSet('tasks',cur);
+    for(const p of prev){
+      if(!curIds.has(p.id)&&_isNumericId(p.id))
+        await _api.del('/tasks/'+p.id).catch(()=>{})
     }
-  }catch(e){/* offline, data saved locally */}
+    for(const task of t){
+      const pld=_taskPayload(task);
+      if(_isNumericId(task.id)){
+        await _api.put('/tasks/'+task.id,pld).catch(()=>{})
+      }else{
+        const resp=await _api.post('/tasks',pld).catch(()=>null);
+        if(resp&&resp.id){
+          const oldId=task.id;task.id=String(resp.id);
+          const stored=getTasks();
+          for(const other of stored){
+            if(other.depends_on&&other.depends_on.includes(oldId))
+              other.depends_on=other.depends_on.map(d=>d===oldId?task.id:d)
+          }
+          lsSet('tasks',stored)
+        }
+      }
+    }
+  }catch(e){}
 }
 function getActivity(){return lsGet('activity',[])}
 function saveActivity(a){lsSet('activity',a)}
@@ -916,8 +941,24 @@ function categoryDot(cat){
 }
 function getNotes(){return lsGet('notes',[])}
 async function saveNotes(n){
+  const prev=getNotes();
+  const prevIds=new Set(prev.map(x=>x.id));
+  const curIds=new Set(n.map(x=>x.id));
   lsSet('notes',n);
-  try{await _api.post('/sync/full',{tasks:getTasks(),notes:n,config:getConfig(),templates:getTemplates(),series:getSeries()})}catch(e){}
+  try{
+    for(const p of prev){
+      if(!curIds.has(p.id)&&_isNumericId(p.id))
+        await _api.del('/notes/'+p.id).catch(()=>{})
+    }
+    for(const note of n){
+      if(_isNumericId(note.id)){
+        await _api.put('/notes/'+note.id,{text:note.text,pinned:note.pinned}).catch(()=>{})
+      }else{
+        const resp=await _api.post('/notes',{text:note.text,pinned:!!note.pinned}).catch(()=>null);
+        if(resp&&resp.id)note.id=String(resp.id)
+      }
+    }
+  }catch(e){}
 }
 function getFocus(){return lsGet('focus',{})}
 async function saveFocus(f){
@@ -1066,7 +1107,7 @@ function showFocusMode(){
     html+='<div style="text-align:center;padding-top:12px;border-top:1px solid var(--border)"><button class="roulette-btn" onclick="closeModal();pickRandomTask();navigateTo(\'dashboard\')" style="margin:0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8L8 16M8 8l8 8"/></svg>Just pick one for me</button></div>'
   }
   html+='</div>';
-  showModal('Focus',html)
+  showModal(html)
 }
 function renderDashHeatmap(tasks){
   const today=new Date();const ds=today.toISOString().slice(0,10);
@@ -1284,14 +1325,17 @@ function statusBadge(s){
   const m={not_started:'Not started',in_progress:'In progress',done:'Done',cancelled:'Cancelled'};const c={not_started:'var(--text-dim)',in_progress:'var(--orange)',done:'var(--green)',cancelled:'var(--red)'};
   return `<span class="badge" style="color:${c[s]||'var(--text-dim)'}">${m[s]||s}</span>`
 }
+const _recurrenceFired=new Set();
 function toggleTaskDone(el,id){
   const checked=el.checked;
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);if(!t)return;
   if(checked){
     t.status='done';t.updated_at=nowISO();saveTasks(tasks);logActivity(id,'updated',t.title);
-    fireConfetti();handleRecurrence(t);
+    fireConfetti();
+    if(!_recurrenceFired.has(id)){handleRecurrence(t);_recurrenceFired.add(id)}
   }else{
-    t.status='not_started';t.updated_at=nowISO();saveTasks(tasks);logActivity(id,'updated',t.title)
+    t.status='not_started';t.updated_at=nowISO();saveTasks(tasks);logActivity(id,'updated',t.title);
+    _recurrenceFired.delete(id)
   }
   renderCurrentView()
 }
@@ -1514,7 +1558,8 @@ function getCalPreviews(tasks){
     const dueStr=t.due_date;
     if(dueStr>=startStr&&dueStr<=endStr)return;
     let next=new Date(dueStr+'T00:00:00');
-    for(let i=0;i<52;i++){
+    let maxIter=1000;
+    while(maxIter-->0){
       if(t.recur==='daily')next.setDate(next.getDate()+1);
       else if(t.recur==='weekly')next.setDate(next.getDate()+7);
       else if(t.recur==='monthly')next.setMonth(next.getMonth()+1);
@@ -2014,10 +2059,11 @@ function deleteTask(id){
   const dependents=tasks.filter(x=>(x.depends_on||[]).includes(id)&&!x.deleted_at);
   if(subtasks.length||dependents.length){
     let msg='Move "'+t.title+'" to bin?';
-    if(subtasks.length)msg+='\n\nThis task has '+subtasks.length+' subtask'+(subtasks.length>1?'s':'')+' — they will become top-level tasks if permanently deleted.';
-    if(dependents.length)msg+='\n\n'+dependents.length+' task'+(dependents.length>1?'s depend':' depends')+' on this — the dependency will be removed if permanently deleted.';
+    if(subtasks.length)msg+='\n\nThis task has '+subtasks.length+' subtask'+(subtasks.length>1?'s':'')+' — they will become top-level tasks.';
+    if(dependents.length)msg+='\n\n'+dependents.length+' task'+(dependents.length>1?'s depend':' depends')+' on this — the dependency will be removed.';
     if(!confirm(msg))return;
   }
+  _cleanupDeletedTaskReferences(tasks,id,t.title);
   t.deleted_at=nowISO();t.updated_at=nowISO();saveTasks(tasks);
   logActivity(id,'deleted',t.title);toast('Task moved to bin','info');renderCurrentPage()
 }
@@ -2059,12 +2105,13 @@ function emptyBin(){
 // --- Focus (Dashboard) ---
 function cycleDashFocusStatus(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
-  if(!t)return;  const cyc={not_started:'in_progress',in_progress:'done',done:'not_started'};
+  if(!t||t.status==='cancelled')return;
+  const cyc={not_started:'in_progress',in_progress:'done',done:'not_started'};
   t.status=cyc[t.status]||'not_started';t.updated_at=nowISO();
   if(t.status==='done')logActivity(id,'completed',t.title);
   if(t.status==='in_progress')logActivity(id,'started',t.title);
   saveTasks(tasks);
-  if(t.status==='done')handleRecurrence(t);
+  if(t.status==='done'&&!_recurrenceFired.has(id)){handleRecurrence(t);_recurrenceFired.add(id)}
   renderDashFocusGoals()
 }
 function addDashFocusGoal(){
@@ -2295,13 +2342,45 @@ function importCSV(event){
 }
 function getTemplates(){return lsGet('templates',[])}
 async function saveTemplates(t){
+  const prev=getTemplates();
+  const prevIds=new Set(prev.map(x=>x.id));
+  const curIds=new Set(t.map(x=>x.id));
   lsSet('templates',t);
-  try{await _api.post('/sync/full',{tasks:getTasks(),notes:getNotes(),config:getConfig(),templates:t,series:getSeries()})}catch(e){}
+  try{
+    for(const p of prev){
+      if(!curIds.has(p.id)&&_isNumericId(p.id))
+        await _api.del('/templates/'+p.id).catch(()=>{})
+    }
+    for(const tmpl of t){
+      if(_isNumericId(tmpl.id)){
+        await _api.put('/templates/'+tmpl.id,{name:tmpl.name,title:tmpl.title,description:tmpl.description||'',priority:tmpl.priority||'medium',category:tmpl.category||'',tags:tmpl.tags||[],recur:tmpl.recur||null}).catch(()=>{})
+      }else{
+        const resp=await _api.post('/templates',{name:tmpl.name,title:tmpl.title,description:tmpl.description||'',priority:tmpl.priority||'medium',category:tmpl.category||'',tags:tmpl.tags||[],recur:tmpl.recur||null}).catch(()=>null);
+        if(resp&&resp.id)tmpl.id=String(resp.id)
+      }
+    }
+  }catch(e){}
 }
 function getSeries(){return lsGet('series',[])}
 async function saveSeries(s){
+  const prev=getSeries();
+  const prevIds=new Set(prev.map(x=>x.id));
+  const curIds=new Set(s.map(x=>x.id));
   lsSet('series',s);
-  try{await _api.post('/sync/full',{tasks:getTasks(),notes:getNotes(),config:getConfig(),templates:getTemplates(),series:s})}catch(e){}
+  try{
+    for(const p of prev){
+      if(!curIds.has(p.id)&&_isNumericId(p.id))
+        await _api.del('/series/'+p.id).catch(()=>{})
+    }
+    for(const series of s){
+      if(_isNumericId(series.id)){
+        await _api.put('/series/'+series.id,{title:series.title,description:series.description||'',priority:series.priority||'medium',category:series.category||'',tags:series.tags||[],recur:series.recur,start_date:series.start_date||null,time:series.time||null,files:series.files||[],active:series.active!==false}).catch(()=>{})
+      }else{
+        const resp=await _api.post('/series',{title:series.title,description:series.description||'',priority:series.priority||'medium',category:series.category||'',tags:series.tags||[],recur:series.recur,start_date:series.start_date||null,time:series.time||null,files:series.files||[],active:series.active!==false}).catch(()=>null);
+        if(resp&&resp.id)series.id=String(resp.id)
+      }
+    }
+  }catch(e){}
 }
 function ensureSeriesForTask(t){
   if(t.recur&&!t.series_id){
