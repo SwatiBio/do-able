@@ -6,6 +6,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.database import DATA_DIR, close_db, init_db
 
@@ -102,6 +103,8 @@ async def serve_manifest():
 @app.get("/icon.svg")
 async def serve_icon():
     return FileResponse(PROJECT_DIR / "src/icon.svg", media_type="image/svg+xml")
+
+app.mount("/src", StaticFiles(directory=PROJECT_DIR / "src"), name="src")
 
 
 if __name__ == "__main__":

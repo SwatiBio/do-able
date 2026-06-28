@@ -365,34 +365,34 @@ function renderEisenhower(){
 
 function populateTaskFilters(){} // no-op: filter dropdowns removed
 const taskQuotes=[
-  "The secret of getting ahead is getting started. — Mark Twain",
+  "The secret of getting ahead is getting started. - Mark Twain",
   "The best time to plant a tree was 20 years ago. The second best time is now.",
   "You don't have to be extreme, just consistent.",
   "Small daily improvements over time lead to stunning results.",
   "Done is better than perfect.",
-  "The only way to do great work is to love what you do. — Steve Jobs",
-  "Start where you are. Use what you have. Do what you can. — Arthur Ashe",
-  "It does not matter how slowly you go as long as you do not stop. — Confucius",
+  "The only way to do great work is to love what you do. - Steve Jobs",
+  "Start where you are. Use what you have. Do what you can. - Arthur Ashe",
+  "It does not matter how slowly you go as long as you do not stop. - Confucius",
   "The harder you work for something, the greater you'll feel when you achieve it.",
   "Success is the sum of small efforts repeated day in and day out.",
-  "Believe you can and you're halfway there. — Theodore Roosevelt",
+  "Believe you can and you're halfway there. - Theodore Roosevelt",
   "Your limitation is only your imagination.",
   "Push yourself because no one else is going to do it for you.",
   "Great things never come from comfort zones.",
   "Dream it. Wish it. Do it.",
-  "Talent without working hard is nothing. — Cristiano Ronaldo",
-  "The future depends on what you do today. — Mahatma Gandhi",
-  "Don't watch the clock; do what it does. Keep going. — Sam Levenson",
+  "Talent without working hard is nothing. - Cristiano Ronaldo",
+  "The future depends on what you do today. - Mahatma Gandhi",
+  "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
   "You are stronger than you think.",
   "Progress, not perfection.",
   "The only bad workout is the one that didn't happen.",
   "Every expert was once a beginner.",
   "Do something today that your future self will thank you for.",
   "If you get tired, learn to rest, not to quit.",
-  "A year from now you may wish you had started today. — Karen Lamb",
-  "Little by little, one travels far. — J.R.R. Tolkien",
-  "The way to get started is to quit talking and begin doing. — Walt Disney",
-  "Don't let yesterday take up too much of today. — Will Rogers"
+  "A year from now you may wish you had started today. - Karen Lamb",
+  "Little by little, one travels far. - J.R.R. Tolkien",
+  "The way to get started is to quit talking and begin doing. - Walt Disney",
+  "Don't let yesterday take up too much of today. - Will Rogers"
 ];
 let lastQuoteIdx=-1;
 function renderTaskQuote(){
@@ -757,8 +757,8 @@ function deleteTask(id){
   const dependents=tasks.filter(x=>(x.depends_on||[]).includes(id)&&!x.deleted_at);
   if(subtasks.length||dependents.length){
     let msg='Move "'+t.title+'" to bin?';
-    if(subtasks.length)msg+='\n\nThis task has '+subtasks.length+' subtask'+(subtasks.length>1?'s':'')+' — they will become top-level tasks.';
-    if(dependents.length)msg+='\n\n'+dependents.length+' task'+(dependents.length>1?'s depend':' depends')+' on this — the dependency will be removed.';
+    if(subtasks.length)msg+='\n\nThis task has '+subtasks.length+' subtask'+(subtasks.length>1?'s':'')+'. They will become top-level tasks.';
+    if(dependents.length)msg+='\n\n'+dependents.length+' task'+(dependents.length>1?'s depend':' depends')+' on this. The dependency will be removed.';
     if(!confirm(msg))return;
   }
   _cleanupDeletedTaskReferences(tasks,id,t.title);
@@ -897,13 +897,13 @@ function editSeries(id){
   const recur=prompt('Recurrence (daily/weekly/monthly):',s.recur||'');if(recur===null)return;
   const priority=prompt('Priority (low/medium/high):',s.priority||'medium');if(priority===null)return;
   s.title=title;s.recur=recur||null;s.priority=priority;s.updated_at=nowISO();
-  saveSeries(series);toast('Series updated — future instances will use new values','success');renderSettingsSeries()
+  saveSeries(series);toast('Series updated. Future instances will use new values','success');renderSettingsSeries()
 }
 function stopSeries(id){
   const series=getSeries();const s=series.find(x=>x.id===id);
   if(!s)return;
   s.active=false;s.updated_at=nowISO();
-  saveSeries(series);logActivity(null,'series_stopped',s.title);toast('Series stopped — no more new instances','info');renderSettingsSeries()
+  saveSeries(series);logActivity(null,'series_stopped',s.title);toast('Series stopped. No more new instances','info');renderSettingsSeries()
 }
 function deleteSeries(id){
   if(!confirm('Delete this series? Existing tasks keep their data but new instances will not be created from this series.'))return;
@@ -1056,7 +1056,7 @@ function stopSeriesForTask(seriesId,taskId){
 }
 function clearAllData(){
   if(!confirm('This will permanently delete ALL data. Are you sure?'))return;
-  if(!confirm('Really? All tasks, notes, annotations, activity — everything?'))return;
+  if(!confirm('Really? All tasks, notes, annotations, activity, everything?'))return;
   Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>localStorage.removeItem(k));
   if(_api.ready){_api.post('/sync/full',{tasks:[],notes:[],config:{},templates:[],series:[]}).catch(()=>{})}
   toast('All data cleared','info');renderCurrentPage()

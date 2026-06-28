@@ -221,7 +221,7 @@ function renderDashStreak(){
 // --- Notes ---
 function renderNotes(){
   const notes=getNotes().sort((a,b)=>b.pinned-a.pinned||new Date(b.updated_at)-new Date(a.updated_at));
-  document.getElementById('scratchList').innerHTML=notes.map(n=>`<div class="scratch-note"><div class="scratch-note-text">${escHtml(n.text)}</div><div class="scratch-note-actions"><button class="icon-btn" onclick="togglePinNote('${n.id}')" title="${n.pinned?'Unpin':'Pin'}" style="width:24px;height:24px">${n.pinned?'📌':'📍'}</button><button class="icon-btn" onclick="deleteNote('${n.id}')" title="Delete" style="width:24px;height:24px">✕</button></div></div>`).join('')
+  document.getElementById('scratchList').innerHTML=notes.map(n=>`<div class="scratch-note"><div class="scratch-note-text">${escHtml(n.text)}</div><div class="scratch-note-actions"><button class="icon-btn" onclick="togglePinNote('${n.id}')" title="${n.pinned?'Unpin':'Pin'}" style="width:24px;height:24px;opacity:${n.pinned?1:0.4}">📌</button><button class="icon-btn" onclick="deleteNote('${n.id}')" title="Delete" style="width:24px;height:24px">✕</button></div></div>`).join('')
 }
 function addNote(){
   const inp=document.getElementById('scratchInput');
@@ -241,7 +241,7 @@ function renderDashFocusGoals(){
   const ids=focus[today]||[];const goals=ids.map(id=>getTasks().find(t=>t.id===id)).filter(Boolean);
   const doneCount=goals.filter(t=>t.status==='done').length;
   const selHtml=`<div class="goal-selector" style="margin-bottom:8px"><select id="dashFocusSelect" style="flex:1">${tasks.map(t=>`<option value="${t.id}">${escHtml(t.title)}</option>`).join('')}</select><button class="btn btn-primary btn-sm" onclick="addDashFocusGoal()">Add</button></div>`;
-  const cntHtml=`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount}/${goals.length}</div>`;
+  const cntHtml=goals.length?`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount} of ${goals.length} done</div>`:'';
   const cardsHtml=goals.length?goals.map(t=>{
     if(t.status==='cancelled')return`<div class="focus-card" style="margin-bottom:4px;opacity:0.6"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" style="color:var(--red)">${escHtml(t.title)} <span class="text-sm" style="color:var(--red)">(cancelled)</span></div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div><button class="btn btn-secondary btn-sm" onclick="reopenFocusTask('${t.id}')">↻ Reopen</button></div>`;
     return`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`
@@ -594,16 +594,16 @@ function showOnboarding(){
   <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px">
     <div class="settings-label" style="margin-bottom:8px">Quick tour</div>
     <div style="font-size:13px;line-height:1.8">
-      <div><strong>Kanban</strong> — drag tasks between categories</div>
-      <div><strong>Calendar</strong> — time-based planning with drag-to-reschedule</div>
-      <div><strong>Focus goals</strong> — pick up to 3 tasks for today</div>
-      <div><strong>Eisenhower Matrix</strong> — triage by urgency and importance</div>
-      <div><strong>Templates</strong> — save reusable task molds</div>
-      <div><strong>Recurring series</strong> — automate repeating tasks</div>
+      <div><strong>Kanban</strong>: drag tasks between categories</div>
+      <div><strong>Calendar</strong>: time-based planning with drag-to-reschedule</div>
+      <div><strong>Focus goals</strong>: pick up to 3 tasks for today</div>
+      <div><strong>Eisenhower Matrix</strong>: triage by urgency and importance</div>
+      <div><strong>Templates</strong>: save reusable task molds</div>
+      <div><strong>Recurring series</strong>: automate repeating tasks</div>
     </div>
   </div>
   <div style="background:var(--bg);border-radius:var(--radius);padding:12px;margin-bottom:16px">
-    <div class="text-sm">Personalize in <strong>Settings</strong> — categories, tags, theme, and more.</div>
+    <div class="text-sm">Personalize in <strong>Settings</strong>: categories, tags, theme, and more.</div>
   </div>
   <div style="text-align:center">
     <button class="btn btn-primary" onclick="dismissOnboarding()">Get started</button>
