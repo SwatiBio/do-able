@@ -6,12 +6,14 @@ do-able/
   start.bat                Starts uvicorn and opens the browser (Windows)
   stop.bat                 Kills the server process (Windows)
   sw.js                    Service worker for PWA offline caching
-  site.webmanifest         PWA manifest with app name, icons, colors
-  icon.svg                 App icon for PWA and notifications
   README.md                Getting started guide
   LICENSE                  MIT license
   .gitignore               Ignored files
   docs/
+  src/
+    icon.svg               App icon for PWA and notifications
+    site.webmanifest       PWA manifest with app name, icons, colors
+  backend/
     api.md                 API reference (localStorage + REST)
     conceptual-model.md    Objects, states, relationships, architecture decisions
     design.md              Design specification

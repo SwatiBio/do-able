@@ -97,11 +97,11 @@ async def serve_sw():
 
 @app.get("/site.webmanifest")
 async def serve_manifest():
-    return FileResponse(PROJECT_DIR / "site.webmanifest", media_type="application/manifest+json")
+    return FileResponse(PROJECT_DIR / "src/site.webmanifest", media_type="application/manifest+json")
 
 @app.get("/icon.svg")
 async def serve_icon():
-    return FileResponse(PROJECT_DIR / "icon.svg", media_type="image/svg+xml")
+    return FileResponse(PROJECT_DIR / "src/icon.svg", media_type="image/svg+xml")
 
 
 if __name__ == "__main__":
