@@ -2293,6 +2293,7 @@ function importCSV(event){
   };
   reader.readAsText(file)
 }
+function getTemplates(){return lsGet('templates',[])}
 async function saveTemplates(t){
   lsSet('templates',t);
   try{await _api.post('/sync/full',{tasks:getTasks(),notes:getNotes(),config:getConfig(),templates:t,series:getSeries()})}catch(e){}
