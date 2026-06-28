@@ -24,6 +24,7 @@
 | Bar charts by priority | done |
 | Bar charts by category (top 8) | done |
 | Heatmap grid (53 weeks x 7 days) | done |
+| Heatmap empty state (compact preview when no done tasks) | done |
 | My Day section (overdue + due today + focus) | done |
 | Task roulette (random incomplete picker) | done |
 | Frog reading book (empty state) | done |

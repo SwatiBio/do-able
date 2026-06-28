@@ -42,7 +42,7 @@ A bento grid layout with two columns on top (scratch notes + focus goals) and a 
 - My Day section showing overdue, due-today, and focus goals together
 - Task roulette button that picks a random incomplete task
 - Priority bar chart and category bar chart (top 8 categories)
-- Heatmap grid: 53 weeks by 7 days, color-coded by completion density, month labels, today highlighted
+- Heatmap grid: 53 weeks by 7 days, color-coded by completion density, month labels, today highlighted. Compact empty state (title, hint, gradient preview) when no tasks completed.
 - Frog reading a book when there are no tasks (empty state)
 
 ### Tasks

@@ -144,6 +144,15 @@ textarea{resize:vertical;min-height:80px}
 .heatmap-legend .cell.l2{background:var(--accent);opacity:.55}
 .heatmap-legend .cell.l3{background:var(--accent);opacity:.75}
 .heatmap-legend .cell.l4{background:var(--accent);opacity:1}
+.heatmap-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px 12px;text-align:center}
+.heatmap-empty-title{font-family:var(--font-serif);font-size:13px;color:var(--text-dim)}
+.heatmap-empty-hint{font-size:12px;color:var(--text-faint);line-height:1.5;max-width:260px}
+.heatmap-empty-legend{display:flex;gap:4px;opacity:.5;margin-top:2px}
+.heatmap-empty-legend .cell{width:12px;height:12px;border-radius:2px;background:var(--bg-muted)}
+.heatmap-empty-legend .cell.l1{background:var(--accent);opacity:.3}
+.heatmap-empty-legend .cell.l2{background:var(--accent);opacity:.55}
+.heatmap-empty-legend .cell.l3{background:var(--accent);opacity:.75}
+.heatmap-empty-legend .cell.l4{background:var(--accent);opacity:1}
 /* Compact dashboard (single-page fit) */
 #page-dashboard .section{margin-bottom:12px}
 #page-dashboard .bento-grid{gap:8px}
@@ -1144,6 +1153,7 @@ function renderDashHeatmap(tasks){
   const today=new Date();const ds=today.toISOString().slice(0,10);
   const start=new Date(today);start.setDate(start.getDate()-370);start.setDate(start.getDate()-start.getDay());
   const doneMap={};tasks.filter(t=>t.status==='done').forEach(t=>{const d=t.updated_at?t.updated_at.slice(0,10):null;if(d)doneMap[d]=(doneMap[d]||0)+1});
+  if(Object.keys(doneMap).length===0){document.getElementById('dashRecap').innerHTML='<div class="heatmap-empty"><span class="heatmap-empty-title">Activity map</span><span class="heatmap-empty-hint">Complete a task to light up your year.</span><div class="heatmap-empty-legend" aria-hidden="true"><span class="cell"></span><span class="cell l1"></span><span class="cell l2"></span><span class="cell l3"></span><span class="cell l4"></span></div></div>';return}
   const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const dl=['','Mon','','Wed','','Fri',''];
   let html='<div class="heatmap-wrapper"><table class="heatmap-table"><tr><th></th>';
   for(let w=0;w<53;w++){const d=new Date(start);d.setDate(d.getDate()+w*7);html+=`<th>${d.getDate()<=7?ms[d.getMonth()]:''}</th>`}
