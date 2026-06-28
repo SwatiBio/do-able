@@ -429,10 +429,8 @@ function renderCurrentView(){
 }
 
 // --- Quick Add ---
-function quickAddTask(){
-  const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
-  let text=inp.value.trim();
-  const tasks=getTasks();const t={id:uid(),title:'',description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+function parseQuickAdd(text){
+  const t={priority:'medium',due_date:''};
   const pl={'high':'high','medium':'medium','low':'low'};
   const words=text.split(/\s+/);const keep=[];
   for(let i=0;i<words.length;i++){
@@ -451,7 +449,20 @@ function quickAddTask(){
   const datePat=/^(\d{1,2})[\/-](\d{1,2})$/;
   const filtered=keep.filter(w=>{const m=w.match(datePat);if(m){const d=new Date();d.setMonth(parseInt(m[1])-1);d.setDate(parseInt(m[2]));if(d.getFullYear()<2000)d.setFullYear(new Date().getFullYear());t.due_date=d.toISOString().slice(0,10);return false}return true});
   t.title=filtered.join(' ')||text;
+  return t
+}
+function buildTask(p){
+  return {id:uid(),title:p.title,description:'',status:'not_started',priority:p.priority,due_date:p.due_date,start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null}
+}
+function quickAddTask(){
+  const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
+  const tasks=getTasks();const t=buildTask(parseQuickAdd(inp.value.trim()));
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);inp.value='';renderCurrentView();renderTaskQuote()
+}
+function dashQuickAddTask(){
+  const inp=document.getElementById('dashQuickAdd');if(!inp||!inp.value.trim())return;
+  const tasks=getTasks();const t=buildTask(parseQuickAdd(inp.value.trim()));
+  tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);inp.value='';renderDashboard();toast('Task added','success')
 }
 
 // --- Task Detail ---

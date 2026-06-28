@@ -632,7 +632,7 @@ const _paletteCommands=[
   {label:'Tasks: Kanban view',hint:'',run:()=>{navigateTo('tasks');switchTaskView('kanban')},group:'Task views'},
   {label:'Tasks: Calendar view',hint:'',run:()=>{navigateTo('tasks');switchTaskView('calendar')},group:'Task views'},
   {label:'Tasks: Eisenhower view',hint:'',run:()=>{navigateTo('tasks');switchTaskView('eisenhower')},group:'Task views'},
-  {label:'New task',hint:_m+_e,run:()=>{navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0)},group:'Actions'},
+  {label:'New task',hint:_m+_e,run:()=>{if(currentPage==='dashboard'){const i=document.getElementById('dashQuickAdd');if(i)i.focus()}else{navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0)}},group:'Actions'},
   {label:'Focus mode',hint:_m+_s+'F',run:()=>showFocusMode(),group:'Actions'},
   {label:'Task roulette',hint:'',run:()=>{if(document.getElementById('modalOverlay').style.display!=='none')closeModal();pickRandomTask();navigateTo('dashboard')},group:'Actions'},
   {label:'Toggle theme',hint:'',run:()=>cycleTheme(),group:'Actions'},
@@ -681,7 +681,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(_isOverlayOpen())return;
-  if(mod&&e.code==='Enter'){if(_inField())return;e.preventDefault();navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0);return}
+  if(mod&&e.code==='Enter'){if(_inField())return;e.preventDefault();if(currentPage==='dashboard'){const i=document.getElementById('dashQuickAdd');if(i)i.focus()}else{navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0)}return}
   if(mod&&e.shiftKey&&e.code==='KeyF'){e.preventDefault();showFocusMode();return}
   if(mod&&e.shiftKey&&e.code==='KeyL'){e.preventDefault();toggleSidebar();return}
   if(mod&&e.shiftKey&&/^Digit[1-5]$/.test(e.code)){e.preventDefault();const pages=['dashboard','tasks','bin','log','settings'];navigateTo(pages[+e.code.slice(5)-1]);return}

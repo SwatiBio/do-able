@@ -488,8 +488,10 @@ textarea{resize:vertical;min-height:80px}
 
       <!-- Dashboard -->
       <div class="page active" id="page-dashboard">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn btn-primary btn-sm" onclick="navigateTo('tasks')">+ Add Task</button>
+        <div class="quick-add" style="margin-bottom:10px">
+          <input type="text" id="dashQuickAdd" placeholder='Add a task... "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')dashQuickAddTask()">
+          <button class="btn btn-primary btn-sm" onclick="dashQuickAddTask()">Add</button>
+          <span class="nl-info" title="Natural language tips: priority (high/medium/low), dates (today, tomorrow, next monday, MM-DD)&#10;Example: Buy milk tomorrow high">ⓘ</span>
         </div>
         <div class="bento-grid" id="dashTop">
             <div class="dash-card">
