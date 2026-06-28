@@ -1221,7 +1221,10 @@ function renderDashFocusGoals(){
   const doneCount=goals.filter(t=>t.status==='done').length;
   const selHtml=`<div class="goal-selector" style="margin-bottom:8px"><select id="dashFocusSelect" style="flex:1">${tasks.map(t=>`<option value="${t.id}">${escHtml(t.title)}</option>`).join('')}</select><button class="btn btn-primary btn-sm" onclick="addDashFocusGoal()">Add</button></div>`;
   const cntHtml=`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount}/${goals.length}</div>`;
-  const cardsHtml=goals.length?goals.map(t=>`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`).join(''):'<div style="padding:12px;background:var(--bg);border-radius:var(--radius);border:1px dashed var(--border)"><div style="font-size:13px;margin-bottom:4px">No focus goals for today</div><div class="text-dim text-sm">Pick up to 3 tasks above to prioritize what matters today.</div></div>';
+  const cardsHtml=goals.length?goals.map(t=>{
+    if(t.status==='cancelled')return`<div class="focus-card" style="margin-bottom:4px;opacity:0.6"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" style="color:var(--red)">${escHtml(t.title)} <span class="text-sm" style="color:var(--red)">(cancelled)</span></div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div><button class="btn btn-secondary btn-sm" onclick="reopenFocusTask('${t.id}')">↻ Reopen</button></div>`;
+    return`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`
+  }).join(''):'<div style="padding:12px;background:var(--bg);border-radius:var(--radius);border:1px dashed var(--border)"><div style="font-size:13px;margin-bottom:4px">No focus goals for today</div><div class="text-dim text-sm">Pick up to 3 tasks above to prioritize what matters today.</div></div>';
   if(goals.length&&doneCount===goals.length)fireConfetti();
   document.getElementById('dashFocusGoals').innerHTML=selHtml+cntHtml+cardsHtml
 }
@@ -1854,7 +1857,7 @@ function renderTaskDetailPage(){
         <label>Recurrence</label>
         <div class="text-dim text-sm" style="margin-bottom:4px">Auto-create a copy when completed</div>
         <select id="detailRecur">${recurringOpts}</select>
-        ${t.series_id?(()=>{const s=getSeries().find(x=>x.id===t.series_id);return s?`<div class="text-dim text-sm" style="margin-top:4px">Part of series: <a href="#" onclick="filterBySeries('${t.series_id}');return false" style="color:var(--accent)"><strong>${escHtml(s.title)}</strong></a>${s.active?'':' (stopped)'}</div>`:''})():''}
+        ${t.series_id?(()=>{const s=getSeries().find(x=>x.id===t.series_id);return s?`<div class="text-dim text-sm" style="margin-top:4px">Part of series: <a href="#" onclick="filterBySeries('${t.series_id}');return false" style="color:var(--accent)"><strong>${escHtml(s.title)}</strong></a>${s.active?` · <a href="#" onclick="stopSeriesForTask('${t.series_id}','${t.id}');return false" style="color:var(--red)">Stop recurring</a>`:' (stopped)'}</div>`:''})():''}
       </div>
       <div class="detail-field">
         <label>Dependencies</label>
@@ -2113,6 +2116,13 @@ function cycleDashFocusStatus(id){
   saveTasks(tasks);
   if(t.status==='done'&&!_recurrenceFired.has(id)){handleRecurrence(t);_recurrenceFired.add(id)}
   renderDashFocusGoals()
+}
+function reopenFocusTask(id){
+  const tasks=getTasks();const t=tasks.find(x=>x.id===id);
+  if(!t||t.status!=='cancelled')return;
+  t.status='not_started';t.updated_at=nowISO();
+  logActivity(id,'restored',t.title);
+  saveTasks(tasks);renderDashFocusGoals()
 }
 function addDashFocusGoal(){
   const sel=document.getElementById('dashFocusSelect');
@@ -2389,6 +2399,15 @@ function ensureSeriesForTask(t){
     series.push(ns);saveSeries(series);
     t.series_id=ns.id
   }
+}
+function stopSeriesForTask(seriesId,taskId){
+  const series=getSeries();const s=series.find(x=>x.id===seriesId);
+  if(!s||!s.active)return;
+  s.active=false;saveSeries(series);
+  const tasks=getTasks();const t=tasks.find(x=>x.id===taskId);
+  if(t){t.recur=null;t.series_id=null;t.updated_at=nowISO();saveTasks(tasks)}
+  logActivity(taskId,'series_stopped',s.title);toast('Recurring series stopped','info');
+  renderTaskDetailPage()
 }
 function clearAllData(){
   if(!confirm('This will permanently delete ALL data. Are you sure?'))return;
@@ -2674,7 +2693,7 @@ async function init(){
   applyTheme(cfg.theme);
   if(cfg.frog_enabled)startFrog();
   const tasks=getTasks();
-  if(!lsGet('onboarding_seen',false)){showOnboarding()}
+  if(!lsGet('onboarding_seen',false)&&tasks.length===0){showOnboarding()}
   const focus=getFocus();const today=todayStr();
   Object.keys(focus).forEach(d=>{if(d!==today)delete focus[d]});
   saveFocus(focus);
