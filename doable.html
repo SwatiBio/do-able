@@ -40,6 +40,10 @@ a:hover{text-decoration:underline}
 .topbar-search input::placeholder{color:var(--text-dim);opacity:.7}
 .topbar-search input:focus{border-color:var(--accent)}
 .topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.offline-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--orange);background:var(--bg-raised);padding:3px 8px;border-radius:var(--radius);border:1px solid var(--orange)}
+.offline-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
 .icon-btn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:transparent;color:var(--text-dim);cursor:pointer;border-radius:var(--radius);transition:color .15s,background .15s}
 .icon-btn:hover{color:var(--text);background:var(--bg-hover)}
 
@@ -99,6 +103,7 @@ h3{font-family:var(--font-serif)}
 input:where(:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]):not([type="reset"]):not([type="hidden"])),textarea,select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-raised);color:var(--text);outline:none;width:100%}
 select option,option,datalist option{background:var(--bg-raised);color:var(--text)}
 input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+*:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 input[type="file"]::file-selector-button{padding:4px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-raised);color:var(--text);cursor:pointer;font:inherit;font-size:12px}
 input[type="file"]::file-selector-button:hover{background:var(--bg-hover)}
 textarea{resize:vertical;min-height:80px}
@@ -389,11 +394,11 @@ textarea{resize:vertical;min-height:80px}
 </head>
 <body>
 <div class="layout">
-  <div class="sidebar-ring" id="sidebarRing" onclick="toggleSidebar()">
+  <div class="sidebar-ring" id="sidebarRing" onclick="toggleSidebar()" role="button" aria-label="Toggle navigation menu" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSidebar()}">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </div>
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
     <div class="sidebar-header">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>Do-able</span>
@@ -422,17 +427,29 @@ textarea{resize:vertical;min-height:80px}
     </nav>
   </aside>
   <div class="main">
-    <header class="topbar">
+    <header class="topbar" role="banner">
       <div class="topbar-search">
         <input type="search" placeholder="Search tasks..." id="globalSearch" oninput="onGlobalSearch(this.value)">
       </div>
       <div class="topbar-actions">
-        <button class="icon-btn" onclick="cycleTheme()" title="Toggle theme">
+        <button class="icon-btn" onclick="showFocusMode()" title="Focus mode — narrow down what to work on" aria-label="Focus mode">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </button>
+        <span id="offlineIndicator" class="offline-badge" style="display:none" title="Changes are saved locally but not synced to the backend">
+          <span class="offline-dot"></span>Offline
+        </span>
+        <button class="icon-btn" onclick="cycleTheme()" title="Toggle theme" aria-label="Toggle theme">
           <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
       </div>
     </header>
     <main class="main-content" id="mainContent">
+      <div id="loadingOverlay" style="display:flex;align-items:center;justify-content:center;position:fixed;inset:var(--topbar-h) 0 0 var(--sidebar-w);background:var(--bg);z-index:100">
+        <div style="text-align:center">
+          <div style="display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px"></div>
+          <div class="text-dim text-sm">Loading...</div>
+        </div>
+      </div>
 
       <!-- Dashboard -->
       <div class="page active" id="page-dashboard">
@@ -445,7 +462,7 @@ textarea{resize:vertical;min-height:80px}
               <div class="scratch-section" id="scratchSection">
               <div class="scratch-input-area">
                 <textarea id="scratchInput" placeholder="Write a quick note..." rows="1"></textarea>
-                <button class="btn btn-primary btn-sm" onclick="addScratchNote()" style="align-self:flex-end">Add Note</button>
+                <button class="btn btn-primary btn-sm" onclick="addNote()" style="align-self:flex-end">Add Note</button>
               </div>
               <div id="scratchList"></div>
             </div>
@@ -459,6 +476,11 @@ textarea{resize:vertical;min-height:80px}
             <div class="dashboard-grid">
               <div class="dash-card" id="dashMyDayList">
                 <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">My Day</div>
+              </div>
+              <div class="dash-card" id="dashWeekProgress">
+                <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">This Week</div>
+                <div id="dashWeekContent"></div>
+                <div id="dashStreak" style="margin-top:12px;padding-top:8px;border-top:1px solid var(--border)"></div>
               </div>
               <div class="dash-card">
                 <div style="display:flex;flex-direction:column;gap:8px">
@@ -486,21 +508,22 @@ textarea{resize:vertical;min-height:80px}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <h1 style="margin-bottom:0">Tasks</h1>
           <div class="view-toggle">
-            <button class="icon-btn active" data-view="list" onclick="switchTaskView('list')" title="List view">
+            <button class="icon-btn active" data-view="list" onclick="switchTaskView('list')" title="List view" aria-label="List view">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             </button>
-            <button class="icon-btn" data-view="kanban" onclick="switchTaskView('kanban')" title="Kanban">
+            <button class="icon-btn" data-view="kanban" onclick="switchTaskView('kanban')" title="Kanban" aria-label="Kanban view">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
             </button>
-            <button class="icon-btn" data-view="calendar" onclick="switchTaskView('calendar')" title="Calendar">
+            <button class="icon-btn" data-view="calendar" onclick="switchTaskView('calendar')" title="Calendar" aria-label="Calendar view">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </button>
-            <button class="icon-btn" data-view="eisenhower" onclick="switchTaskView('eisenhower')" title="Eisenhower Matrix">
+            <button class="icon-btn" data-view="eisenhower" onclick="switchTaskView('eisenhower')" title="Eisenhower Matrix" aria-label="Eisenhower Matrix view">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
             </button>
           </div>
         </div>
         <div id="taskQuote" class="text-dim" style="font-size:12px;font-style:italic;margin-bottom:10px;font-family:var(--font-serif);line-height:1.5"></div>
+        <div id="eisenhowerHint" style="display:none"></div>
         <div class="quick-add">
           <input type="text" id="quickAddInput" placeholder='e.g. "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')quickAddTask()">
           <button class="btn btn-primary btn-sm" onclick="quickAddTask()">Add</button>
@@ -533,7 +556,7 @@ textarea{resize:vertical;min-height:80px}
       <!-- Bin -->
       <div class="page" id="page-bin">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <h1 style="margin-bottom:0">Recycle Bin</h1>
+          <h1 style="margin-bottom:0">Bin</h1>
           <button class="btn btn-danger btn-sm" onclick="emptyBin()">Empty Bin</button>
         </div>
         <table class="bin-table" id="binTable">
@@ -548,7 +571,7 @@ textarea{resize:vertical;min-height:80px}
 
       <!-- Activity Log -->
       <div class="page" id="page-log">
-        <h1>Activity Log <span class="text-dim text-sm" style="font-weight:400">(Last 10 days)</span></h1>
+        <h1>Activity <span class="text-dim text-sm" style="font-weight:400">(Last 10 days)</span></h1>
         <div class="filter-bar">
           <select id="logFilterAction" onchange="logPage=1;renderActivityLog()">
             <option value="all">All actions</option>
@@ -557,6 +580,12 @@ textarea{resize:vertical;min-height:80px}
             <option value="deleted">Deleted</option>
             <option value="restored">Restored</option>
             <option value="updated">Updated</option>
+            <option value="dependency_removed">Dependency removed</option>
+            <option value="rescheduled">Rescheduled</option>
+            <option value="started">Started</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="recurred">Recurred</option>
+            <option value="series_stopped">Series stopped</option>
           </select>
         </div>
         <div class="activity-log-list" id="logList"></div>
@@ -630,8 +659,12 @@ textarea{resize:vertical;min-height:80px}
           </div>
         </div>
         <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Export</h2>
+          <h2 onclick="toggleAccordion(this)">Import / Export</h2>
           <div class="settings-body">
+            <div class="settings-row">
+              <div><div class="settings-label">Import tasks from CSV</div><div class="settings-desc">Add tasks from a CSV file (matching Do-able export format, or any CSV with a "title" column)</div></div>
+              <input type="file" id="csvFileInput" accept=".csv" style="width:auto" onchange="importCSV(event)">
+            </div>
             <div class="settings-row">
               <div><div class="settings-label">Export tasks</div></div>
               <div style="display:flex;gap:8px">
@@ -673,16 +706,23 @@ textarea{resize:vertical;min-height:80px}
             <div id="settingsTemplatesList"></div>
           </div>
         </div>
+        <div class="settings-section">
+          <h2 onclick="toggleAccordion(this)">Recurring Series</h2>
+          <div class="settings-body">
+            <div class="settings-desc" style="margin-bottom:8px">Created automatically when you set recurrence on a task. New instances carry the series' files, start date, and time.</div>
+            <div id="settingsSeriesList"></div>
+          </div>
+        </div>
       </div>
 
     </main>
   </div>
 </div>
 
-<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="if(event.target===this)closeModal()">
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="if(event.target===this)closeModal()" role="dialog" aria-modal="true" aria-labelledby="modalContent">
   <div class="modal" id="modalContent"></div>
 </div>
-<div class="toast-container" id="toastContainer"></div>
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 <div class="confetti-container" id="confettiContainer"></div>
 <div id="frogCharacter" class="frog-character frog-hidden" onclick="frogClick()">
   <svg class="frog-svg" viewBox="0 0 64 56" width="60" height="52">
@@ -732,11 +772,13 @@ const _api = {
 
 async function _initApi() {
   try {
-    const [configRes, taskRes, noteRes, focusRes] = await Promise.all([
+    const [configRes, taskRes, noteRes, focusRes, templateRes, seriesRes] = await Promise.all([
       _api.get('/config'),
       _api.get('/tasks?flat=true&per_page=100'),
       _api.get('/notes'),
       _api.get('/focus'),
+      _api.get('/templates'),
+      _api.get('/series'),
     ]);
 
     if (taskRes && taskRes.tasks) {
@@ -753,11 +795,12 @@ async function _initApi() {
         tags: t.tags || [],
         recur: t.recur || null,
         depends_on: (t.depends_on || []).map(d => String(typeof d === 'object' ? d.id : d)),
-        notes: (t.notes || []).map(n => ({ id: String(n.id), text: n.text, timestamp: n.timestamp })),
+        annotations: (t.annotations || []).map(n => ({ id: String(n.id), text: n.text, timestamp: n.timestamp })),
         created_at: t.created_at,
         updated_at: t.updated_at,
         deleted_at: t.deleted_at || null,
         parent_id: t.parent_id ? String(t.parent_id) : null,
+        series_id: t.series_id ? String(t.series_id) : null,
         files: t.files || [],
         _sample: t.sample || t._sample || undefined,
       }));
@@ -771,6 +814,7 @@ async function _initApi() {
     };
     const oldCfg = lsGet('config', {});
     cfg.frog_enabled = oldCfg.frog_enabled || false;
+    cfg.category_colors = configRes.category_colors || oldCfg.category_colors || '{}';
     lsSet('config', cfg);
 
     if (noteRes && noteRes.notes) {
@@ -786,12 +830,44 @@ async function _initApi() {
       lsSet('focus', { [today]: focusRes.task_ids });
     }
 
+    if (templateRes && templateRes.templates) {
+      lsSet('templates', templateRes.templates.map(t => ({
+        name: t.name,
+        title: t.title,
+        description: t.description || '',
+        priority: t.priority || 'medium',
+        category: t.category || '',
+        tags: t.tags || [],
+        recur: t.recur || null,
+      })));
+    }
+
+    if (seriesRes && seriesRes.series) {
+      lsSet('series', seriesRes.series.map(s => ({
+        id: String(s.id),
+        title: s.title,
+        description: s.description || '',
+        priority: s.priority || 'medium',
+        category: s.category || '',
+        tags: s.tags || [],
+        recur: s.recur,
+        start_date: s.start_date || null,
+        time: s.time || null,
+        files: s.files || [],
+        active: s.active !== false,
+        created_at: s.created_at,
+        updated_at: s.updated_at,
+      })));
+    }
+
     _api.ready = true;
     console.log('API connected');
-  } catch (e) {
+   } catch (e) {
     _api.ready = false;
     console.log('API unavailable, using localStorage');
-  }
+   }
+   const oi=document.getElementById('offlineIndicator');
+   if(oi)oi.style.display=_api.ready?'none':'flex'
 }
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
@@ -806,7 +882,7 @@ function getTasks(){return lsGet('tasks',[])}
 async function saveTasks(t){
   lsSet('tasks',t);
   try{
-    const resp=await _api.post('/sync/full',{tasks:t,notes:getNotes(),config:getConfig()});
+    const resp=await _api.post('/sync/full',{tasks:t,notes:getNotes(),config:getConfig(),templates:getTemplates(),series:getSeries()});
     if(resp&&resp.id_map&&Object.keys(resp.id_map).length>0){
       const cur=getTasks();
       for(const[oldId,newId]of Object.entries(resp.id_map)){
@@ -826,12 +902,25 @@ function saveActivity(a){lsSet('activity',a)}
 function getConfig(){return lsGet('config',{theme:'nord-dark',date_mode:'smart',per_page:25})}
 async function saveConfig(c){
   lsSet('config',c);
-  try{await _api.put('/config',{theme:c.theme,date_mode:c.date_mode,per_page:c.per_page})}catch(e){}
+  try{await _api.put('/config',{theme:c.theme,date_mode:c.date_mode,per_page:c.per_page,category_colors:c.category_colors||'{}'})}catch(e){}
+}
+function getCategoryColors(){
+  const cfg=getConfig();
+  try{return typeof cfg.category_colors==='string'?JSON.parse(cfg.category_colors):(cfg.category_colors||{})}catch{return{}}
+}
+function saveCategoryColor(cat,color){
+  const colors=getCategoryColors();
+  if(color)colors[cat]=color;else delete colors[cat];
+  const cfg=getConfig();cfg.category_colors=JSON.stringify(colors);saveConfig(cfg);
+}
+function categoryDot(cat){
+  const c=getCategoryColors()[cat];
+  return c?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px;vertical-align:middle"></span>`:'';
 }
 function getNotes(){return lsGet('notes',[])}
 async function saveNotes(n){
   lsSet('notes',n);
-  try{await _api.post('/sync/full',{tasks:getTasks(),notes:n,config:getConfig()})}catch(e){}
+  try{await _api.post('/sync/full',{tasks:getTasks(),notes:n,config:getConfig(),templates:getTemplates(),series:getSeries()})}catch(e){}
 }
 function getFocus(){return lsGet('focus',{})}
 async function saveFocus(f){
@@ -919,9 +1008,11 @@ function onGlobalSearch(q){
 // --- Dashboard ---
 function renderDashboard(){
   const tasks=getTasks().filter(t=>!t.deleted_at);
-  renderScratchNotes();
+  renderNotes();
   renderDashFocusGoals();
   renderDashMyDay(tasks);
+  renderDashWeekProgress();
+  renderDashStreak();
   renderDashHeatmap(tasks);
   const area=document.getElementById('dashAnalytics');
   const existing=area.querySelector('.dash-empty-frog');
@@ -933,12 +1024,49 @@ function renderDashboard(){
   }
 }
 function pickRandomTask(){
-  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done');
+  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done'&&t.status!=='cancelled');
   if(!tasks.length){document.getElementById('dashRouletteResult').textContent='No tasks to pick!';return}
   const p=tasks[Math.floor(Math.random()*tasks.length)];
   const el=document.getElementById('dashRouletteResult');
   el.innerHTML=`<a href="#" onclick="showTaskDetail('${p.id}');return false" style="color:var(--accent);text-decoration:none">→ ${escHtml(p.title)}</a>`;
   setTimeout(()=>el.innerHTML='',6000)
+}
+function showFocusMode(){
+  const tasks=getTasks().filter(t=>!t.deleted_at);
+  const today=todayStr();
+  const focus=getFocus();const focusIds=focus[today]||[];
+  const focusGoals=focusIds.map(id=>tasks.find(t=>t.id===id)).filter(t=>t&&t.status!=='done'&&t.status!=='cancelled');
+  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done'&&t.status!=='cancelled').sort((a,b)=>(a.due_date<b.due_date?-1:1));
+  const dueToday=tasks.filter(t=>t.due_date===today&&t.status!=='done'&&t.status!=='cancelled');
+  const active=tasks.filter(t=>t.status!=='done'&&t.status!=='cancelled');
+  let html='<div style="max-width:500px;margin:0 auto">';
+  if(!active.length){
+    html+='<div class="empty-state" style="padding:40px 0"><p class="text-dim">Nothing active. Enjoy the breather.</p></div>'
+  }else{
+    html+='<div style="text-align:center;margin-bottom:24px"><div style="font-size:15px;color:var(--text-dim);margin-bottom:4px">What matters most right now?</div></div>';
+    if(focusGoals.length){
+      html+='<div style="margin-bottom:20px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--green);font-weight:600;margin-bottom:8px">Your focus goals</div>';
+      focusGoals.forEach(t=>{html+=`<div class="focus-item" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px;cursor:pointer" onclick="closeModal();showTaskDetail('${t.id}')"><span class="priority-dot ${t.priority||'medium'}"></span><span style="flex:1;font-size:14px">${escHtml(t.title)}</span></div>`});
+      html+='</div>'
+    }
+    if(overdue.length){
+      html+='<div style="margin-bottom:20px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--red);font-weight:600;margin-bottom:8px">Overdue ('+overdue.length+')</div>';
+      overdue.slice(0,3).forEach(t=>{html+=`<div class="focus-item" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px;cursor:pointer" onclick="closeModal();showTaskDetail('${t.id}')"><span class="priority-dot ${t.priority||'medium'}"></span><span style="flex:1;font-size:14px">${escHtml(t.title)}</span><span class="text-dim text-sm">${fmtDate(t.due_date)}</span></div>`});
+      if(overdue.length>3)html+='<div class="text-dim text-sm" style="padding:4px 12px">+'+(overdue.length-3)+' more</div>';
+      html+='</div>'
+    }
+    if(dueToday.length){
+      html+='<div style="margin-bottom:20px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);font-weight:600;margin-bottom:8px">Due today</div>';
+      dueToday.forEach(t=>{html+=`<div class="focus-item" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px;cursor:pointer" onclick="closeModal();showTaskDetail('${t.id}')"><span class="priority-dot ${t.priority||'medium'}"></span><span style="flex:1;font-size:14px">${escHtml(t.title)}</span></div>`});
+      html+='</div>'
+    }
+    if(!focusGoals.length&&!overdue.length&&!dueToday.length){
+      html+='<div class="empty-state" style="padding:20px 0"><p class="text-dim text-sm">Nothing overdue or due today.</p></div>'
+    }
+    html+='<div style="text-align:center;padding-top:12px;border-top:1px solid var(--border)"><button class="roulette-btn" onclick="closeModal();pickRandomTask();navigateTo(\'dashboard\')" style="margin:0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8L8 16M8 8l8 8"/></svg>Just pick one for me</button></div>'
+  }
+  html+='</div>';
+  showModal('Focus',html)
 }
 function renderDashHeatmap(tasks){
   const today=new Date();const ds=today.toISOString().slice(0,10);
@@ -964,8 +1092,8 @@ function renderDashHeatmap(tasks){
 
 function renderDashMyDay(tasks){
   const today=todayStr();
-  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done');
-  const dueToday=tasks.filter(t=>t.due_date===today&&t.status!=='done');
+  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done'&&t.status!=='cancelled');
+  const dueToday=tasks.filter(t=>t.due_date===today&&t.status!=='done'&&t.status!=='cancelled');
   const focus=getFocus();const focusIds=focus[today]||[];
   const focusGoals=focusIds.map(id=>tasks.find(t=>t.id===id)).filter(Boolean);
   let html='';
@@ -990,31 +1118,69 @@ function renderDashMyDay(tasks){
   content.innerHTML=html;
   card.appendChild(content);
 }
-// --- Scratch Notes ---
-function renderScratchNotes(){
-  const notes=getNotes().sort((a,b)=>b.pinned-a.pinned||new Date(b.updated_at)-new Date(a.updated_at));
-  document.getElementById('scratchList').innerHTML=notes.map(n=>`<div class="scratch-note"><div class="scratch-note-text">${escHtml(n.text)}</div><div class="scratch-note-actions"><button class="icon-btn" onclick="togglePinScratch('${n.id}')" title="${n.pinned?'Unpin':'Pin'}" style="width:24px;height:24px">${n.pinned?'📌':'📍'}</button><button class="icon-btn" onclick="deleteScratchNote('${n.id}')" title="Delete" style="width:24px;height:24px">✕</button></div></div>`).join('')
+function renderDashWeekProgress(){
+  const activity=getActivity();
+  const now=new Date();
+  const weekAgo=new Date(now);weekAgo.setDate(weekAgo.getDate()-7);
+  const weekAgoStr=weekAgo.toISOString();
+  const twoWeeksAgo=new Date(now);twoWeeksAgo.setDate(twoWeeksAgo.getDate()-14);
+  const twoWeeksAgoStr=twoWeeksAgo.toISOString();
+  const thisWeek=activity.filter(e=>e.action==='completed'&&e.timestamp>=weekAgoStr).length;
+  const lastWeek=activity.filter(e=>e.action==='completed'&&e.timestamp>=twoWeeksAgoStr&&e.timestamp<weekAgoStr).length;
+  const el=document.getElementById('dashWeekContent');
+  if(!el)return;
+  if(thisWeek===0&&lastWeek===0){el.innerHTML='<div class="text-dim text-sm">Completed tasks this week will appear here.</div>';return}
+  const trend=thisWeek>lastWeek?'up':thisWeek<lastWeek?'down':'same';
+  const trendIcon=thisWeek>lastWeek?'↑':thisWeek<lastWeek?'↓':'=';
+  const trendColor=thisWeek>lastWeek?'var(--green)':thisWeek<lastWeek?'var(--red)':'var(--text-dim)';
+  el.innerHTML=`<div style="font-size:28px;font-weight:700;font-family:var(--font-serif)">${thisWeek}</div><div class="text-dim text-sm">tasks completed <span style="color:${trendColor}">${trendIcon} ${lastWeek} last week</span></div>`
 }
-function addScratchNote(){
+function renderDashStreak(){
+  const el=document.getElementById('dashStreak');
+  if(!el)return;
+  const activity=getActivity();
+  const completed=activity.filter(e=>e.action==='completed');
+  if(!completed.length){el.innerHTML='';return}
+  const days=new Set();
+  completed.forEach(e=>{const d=e.timestamp.slice(0,10);days.add(d)});
+  let streak=0;
+  const today=new Date();
+  for(let d=new Date(today);;d.setDate(d.getDate()-1)){
+    const ds=d.toISOString().slice(0,10);
+    if(days.has(ds)){streak++}
+    else{
+      if(streak===0&&ds===today.toISOString().slice(0,10))continue;
+      break
+    }
+  }
+  if(streak===0){el.innerHTML='';return}
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:6px"><span style="font-size:20px">${streak>=7?'🔥':'⚡'}</span><span style="font-size:13px"><strong style="font-family:var(--font-serif);font-size:16px">${streak}</strong> day${streak!==1?'s':''} streak</span></div>`
+}
+// --- Notes ---
+function renderNotes(){
+  const notes=getNotes().sort((a,b)=>b.pinned-a.pinned||new Date(b.updated_at)-new Date(a.updated_at));
+  document.getElementById('scratchList').innerHTML=notes.map(n=>`<div class="scratch-note"><div class="scratch-note-text">${escHtml(n.text)}</div><div class="scratch-note-actions"><button class="icon-btn" onclick="togglePinNote('${n.id}')" title="${n.pinned?'Unpin':'Pin'}" style="width:24px;height:24px">${n.pinned?'📌':'📍'}</button><button class="icon-btn" onclick="deleteNote('${n.id}')" title="Delete" style="width:24px;height:24px">✕</button></div></div>`).join('')
+}
+function addNote(){
   const inp=document.getElementById('scratchInput');
   if(!inp.value.trim())return;
   const notes=getNotes();notes.push({id:uid(),text:inp.value.trim(),pinned:false,created_at:nowISO(),updated_at:nowISO()});
-  saveNotes(notes);inp.value='';renderScratchNotes()
+  saveNotes(notes);inp.value='';renderNotes()
 }
-function togglePinScratch(id){
-  const notes=getNotes();const n=notes.find(x=>x.id===id);if(n){n.pinned=!n.pinned;n.updated_at=nowISO();saveNotes(notes)}renderScratchNotes()
+function togglePinNote(id){
+  const notes=getNotes();const n=notes.find(x=>x.id===id);if(n){n.pinned=!n.pinned;n.updated_at=nowISO();saveNotes(notes)}renderNotes()
 }
-function deleteScratchNote(id){
-  saveNotes(getNotes().filter(n=>n.id!==id));renderScratchNotes()
+function deleteNote(id){
+  saveNotes(getNotes().filter(n=>n.id!==id));renderNotes()
 }
 function renderDashFocusGoals(){
-  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done');
+  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done'&&t.status!=='cancelled');
   const focus=getFocus();const today=todayStr();
   const ids=focus[today]||[];const goals=ids.map(id=>getTasks().find(t=>t.id===id)).filter(Boolean);
   const doneCount=goals.filter(t=>t.status==='done').length;
   const selHtml=`<div class="goal-selector" style="margin-bottom:8px"><select id="dashFocusSelect" style="flex:1">${tasks.map(t=>`<option value="${t.id}">${escHtml(t.title)}</option>`).join('')}</select><button class="btn btn-primary btn-sm" onclick="addDashFocusGoal()">Add</button></div>`;
   const cntHtml=`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount}/${goals.length}</div>`;
-  const cardsHtml=goals.length?goals.map(t=>`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`).join(''):'<div class="text-dim text-sm">Add tasks above to set today\'s goals.</div>';
+  const cardsHtml=goals.length?goals.map(t=>`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`).join(''):'<div style="padding:12px;background:var(--bg);border-radius:var(--radius);border:1px dashed var(--border)"><div style="font-size:13px;margin-bottom:4px">No focus goals for today</div><div class="text-dim text-sm">Pick up to 3 tasks above to prioritize what matters today.</div></div>';
   if(goals.length&&doneCount===goals.length)fireConfetti();
   document.getElementById('dashFocusGoals').innerHTML=selHtml+cntHtml+cardsHtml
 }
@@ -1038,6 +1204,7 @@ function getFilteredTasks(){
   if(taskFilter.status!=='all')tasks=tasks.filter(t=>t.status===taskFilter.status);
   if(taskFilter.priority!=='all')tasks=tasks.filter(t=>t.priority===taskFilter.priority);
   if(taskFilter.category!=='all')tasks=tasks.filter(t=>t.category===taskFilter.category);
+  if(taskFilter.series!=='all')tasks=tasks.filter(t=>t.series_id===taskFilter.series);
   if(taskFilter.due!=='all'){
     if(taskFilter.due==='today')tasks=tasks.filter(t=>t.due_date===today);
     else if(taskFilter.due==='overdue')tasks=tasks.filter(t=>t.due_date&&t.due_date<today);
@@ -1056,7 +1223,7 @@ function getFilteredTasks(){
       let va=a[s.field],vb=b[s.field];
       if(s.field==='priority'){const p={high:0,medium:1,low:2};va=p[va]||1;vb=p[vb]||1}
       else if(s.field==='due_date'){va=va||'9999-99-99';vb=vb||'9999-99-99'}
-      else if(s.field==='status'){const st={not_started:0,started:1,done:2};va=st[va]||0;vb=st[vb]||0}
+      else if(s.field==='status'){const st={not_started:0,in_progress:1,done:2,cancelled:3};va=st[va]||0;vb=st[vb]||0}
       else{va=String(va||'');vb=String(vb||'')}
       if(va!==vb)return s.dir==='desc'?(va<vb?1:-1):(va<vb?-1:1)
     }
@@ -1081,7 +1248,7 @@ function renderListView(){
       if(showTags)cols+='<th style="width:120px">Tags</th>';
       if(showCat)cols+='<th style="width:100px">Category</th>';
   if(taskColumns.includes('time'))cols+='<th style="width:80px">Time</th>';
-  if(showAnno)cols+='<th style="width:60px">Notes</th>';
+  if(showAnno)cols+='<th style="width:90px">Annotations</th>';
   if(showDeps)cols+='<th style="width:60px">Deps</th>';
   if(showRecur)cols+='<th style="width:80px">Recur</th>';
       html=`<table class="task-table"><thead><tr>${cols}</tr></thead><tbody>${pageTasks.map(t=>renderTaskRow(t)).join('')}</tbody></table>`
@@ -1103,18 +1270,18 @@ function renderTaskRow(t){
   if(hasChildren)titleHtml+=`<span style="cursor:pointer;font-size:11px;margin-right:4px;user-select:none" onclick="event.stopPropagation();${isFolded?'foldedParents.delete':'foldedParents.add'}('${t.id}');renderCurrentView()">${isFolded?'▸':'▾'}</span>`;
   if(t.parent_id)titleHtml+='<span style="margin-right:4px;font-size:12px">↳</span>';
   titleHtml+=`<span class="task-title" onclick="showTaskDetail('${t.id}')">${escHtml(t.title)}</span>`;
-  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone(this,'${t.id}')" title="Mark done"></td><td>${titleHtml}</td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
+  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone(this,'${t.id}')" title="Mark done"></td><td>${titleHtml}</td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'&&t.status!=='cancelled'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
   if(taskColumns.includes('time'))cells+=`<td class="text-sm text-dim">${t.time||'—'}</td>`;
   if(showTags)cells+=`<td>${(t.tags||[]).map(tag=>`<span class="tag-pill">${escHtml(tag)}</span>`).join('')}</td>`;
-  if(showCat)cells+=`<td class="text-dim text-sm">${escHtml(t.category||'—')}</td>`;
-  if(showAnno)cells+=`<td class="text-dim text-sm">${(t.notes||[]).length||'—'}</td>`;
-  if(showDeps)cells+=`<td class="text-dim text-sm">${(t.depends_on||[]).length||'—'}</td>`;
+  if(showCat)cells+=`<td class="text-dim text-sm">${t.category?categoryDot(t.category)+escHtml(t.category):'—'}</td>`;
+  if(showAnno)cells+=`<td class="text-dim text-sm">${(t.annotations||[]).length||'—'}</td>`;
+  if(showDeps){const blocksCount=t.status==='done'||t.status==='cancelled'?0:tasks.filter(x=>(x.depends_on||[]).includes(t.id)&&x.status!=='done'&&x.status!=='cancelled'&&!x.deleted_at).length;cells+=`<td class="text-dim text-sm">${(t.depends_on||[]).length||'—'}${blocksCount?` <span style="color:var(--orange);font-weight:600" title="Blocks ${blocksCount} task${blocksCount!==1?'s':''}">→${blocksCount}</span>`:''}</td>`}
   if(showRecur)cells+=`<td class="text-dim text-sm">${t.recur?escHtml(t.recur):'—'}</td>`;
   const style=t.parent_id?' style="padding-left:32px"':'';
-  return `<tr class="${t.status==='done'?'task-row-done':''}"${style}>${cells}</tr>`
+  return `<tr class="${(t.status==='done'||t.status==='cancelled')?'task-row-done':''}"${style}>${cells}</tr>`
 }
 function statusBadge(s){
-  const m={not_started:'Not started',started:'Started',done:'Done'};const c={not_started:'var(--text-dim)',started:'var(--orange)',done:'var(--green)'};
+  const m={not_started:'Not started',in_progress:'In progress',done:'Done',cancelled:'Cancelled'};const c={not_started:'var(--text-dim)',in_progress:'var(--orange)',done:'var(--green)',cancelled:'var(--red)'};
   return `<span class="badge" style="color:${c[s]||'var(--text-dim)'}">${m[s]||s}</span>`
 }
 function toggleTaskDone(el,id){
@@ -1131,7 +1298,7 @@ function toggleTaskDone(el,id){
 // --- Sort UI ---
 const sortFieldMeta={
   priority:{label:'Priority',asc:'High → Low',desc:'Low → High'},
-  status:{label:'Status',asc:'Not started → Done',desc:'Done → Not started'},
+  status:{label:'Status',asc:'Not started → Cancelled',desc:'Cancelled → Not started'},
   due_date:{label:'Due date',asc:'Earliest → Latest',desc:'Latest → Earliest'},
   title:{label:'Title',asc:'A → Z',desc:'Z → A'}
 };
@@ -1175,6 +1342,7 @@ function renderSortBar(){
     const m=sortFieldMeta[s.field];
     html+=`<span class="sort-chip">${m?m.label:s.field}: ${s.dir==='asc'?m?m.asc:'↑':m?m.desc:'↓'}<span class="chip-remove" onclick="removeSort(${i})">✕</span></span>`
   });
+  if(taskFilter.series!=='all'){const s=getSeries().find(x=>x.id===taskFilter.series);html+=`<span class="sort-chip" style="background:var(--purple);color:var(--bg)">Series: ${escHtml(s?s.title:taskFilter.series)}<span class="chip-remove" onclick="taskFilter.series='all';renderSortBar();renderCurrentView()">✕</span></span>`}
   html+='</div>';
   bar.innerHTML=html
 }
@@ -1198,13 +1366,17 @@ const columnOptions=[
   {key:'dependencies',label:'Dependencies'},
   {key:'recur',label:'Recurrence'}
 ];
-let taskFilter={status:'all',priority:'all',category:'all',due:'all'};
+let taskFilter={status:'all',priority:'all',category:'all',due:'all',series:'all'};
 let filterMenuOpen=false;
 function setTaskFilter(field,value){
   taskFilter[field]=value;renderSortBar();renderCurrentView()
 }
 function clearTaskFilters(){
-  taskFilter={status:'all',priority:'all',category:'all',due:'all'};renderSortBar();renderCurrentView()
+  taskFilter={status:'all',priority:'all',category:'all',due:'all',series:'all'};renderSortBar();renderCurrentView()
+}
+function filterBySeries(seriesId){
+  taskFilter={status:'all',priority:'all',category:'all',due:'all',series:seriesId};
+  taskView='list';navigateTo('tasks')
 }
 function toggleFilterMenu(btn){
   filterMenuOpen=!filterMenuOpen;
@@ -1243,14 +1415,16 @@ function renderKanban(){
   const showDeps=taskColumns.includes('dependencies');
   const showRecur=taskColumns.includes('recur');
   const grouped=cats.map(cat=>({name:cat==='__none__'?'Uncategorized':cat,key:cat,tasks:cat==='__none__'?uncategorized:tasks.filter(t=>t.category===cat)}));
-  document.getElementById('taskKanbanView').innerHTML=`<div class="kanban-board">${grouped.map(g=>`<div class="kanban-column" data-category="${escHtml(g.key)}"><div class="kanban-col-header">${escHtml(g.name)} (${g.tasks.length})</div>${g.tasks.map(t=>{
+  document.getElementById('taskKanbanView').innerHTML=`<div class="kanban-board">${grouped.map(g=>`<div class="kanban-column" data-category="${escHtml(g.key)}"><div class="kanban-col-header">${categoryDot(g.name)}${escHtml(g.name)} (${g.tasks.length})</div>${g.tasks.map(t=>{
     let meta=[];
     if(t.due_date)meta.push('<span>'+fmtDate(t.due_date)+'</span>');
     if(showTags&&(t.tags||[]).length)meta.push(t.tags.map(tag=>escHtml(tag)).join(', '));
-    if(showAnno&&(t.notes||[]).length)meta.push((t.notes||[]).length+' note'+((t.notes||[]).length>1?'s':''));
+    if(showAnno&&(t.annotations||[]).length)meta.push((t.annotations||[]).length+' annotation'+((t.annotations||[]).length>1?'s':''));
     if(showDeps&&(t.depends_on||[]).length)meta.push((t.depends_on||[]).length+' dep'+((t.depends_on||[]).length>1?'s':''));
+    if(showDeps&&t.status!=='done'&&t.status!=='cancelled'){const allTasks=getTasks();const bCount=allTasks.filter(x=>(x.depends_on||[]).includes(t.id)&&x.status!=='done'&&x.status!=='cancelled'&&!x.deleted_at).length;if(bCount)meta.push(`<span style="color:var(--orange);font-weight:600">blocks ${bCount}</span>`)}
     if(showRecur&&t.recur)meta.push(escHtml(t.recur));
-    return`<div class="kanban-card" draggable="true" ondragstart="onDragStart(event,'${t.id}')" onclick="showTaskDetail('${t.id}')"><div class="kanban-card-row"><span class="priority-dot ${t.priority||'medium'}"></span><span class="kanban-card-title">${escHtml(t.title)}</span></div>${meta.length?'<div class="kanban-card-row text-dim text-sm">'+meta.join(' · ')+'</div>':''}</div>`
+    const catColor=getCategoryColors()[g.name];
+    return`<div class="kanban-card" ${catColor?`style="border-left:3px solid ${catColor}"`:''} draggable="true" ondragstart="onDragStart(event,'${t.id}')" onclick="showTaskDetail('${t.id}')"><div class="kanban-card-row"><span class="priority-dot ${t.priority||'medium'}"></span><span class="kanban-card-title">${escHtml(t.title)}</span></div>${meta.length?'<div class="kanban-card-row text-dim text-sm">'+meta.join(' · ')+'</div>':''}</div>`
   }).join('')}<div class="kanban-drop-zone" ondrop="onDropKanban(event,'${g.key}')" ondragover="event.preventDefault();event.target.classList.add('drag-over')" ondragleave="event.target.classList.remove('drag-over')">Drop here</div></div>`).join('')}</div>`
 }
 let dragId=null;
@@ -1294,7 +1468,9 @@ function renderCalendar(){
     <input type="date" id="calJumpDate" onchange="calJumpTo(this.value)" style="width:140px;font-size:12px;padding:4px 8px" title="Jump to date">
   </div>`;
 
-  if(calViewMode==='week'){
+  if(tasks.length===0&&previewTasks.length===0){
+    html+='<div class="empty-state" style="padding:40px 20px"><p class="text-dim">No scheduled tasks.</p><p class="text-dim text-sm">Add a due date or start date to a task to see it here.</p></div>';
+  }else if(calViewMode==='week'){
     html+=renderWeekView(tasks,previewTasks,today);
   }else{
     html+=renderMonthView(tasks,previewTasks,m,y,today);
@@ -1362,7 +1538,7 @@ function renderMonthView(tasks,previewTasks,m,y,today){
     const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const dayTasks=allTasks.filter(t=>t.due_date===ds);
     const isToday=ds===today;
-    const isOverdue=!isToday&&ds<today&&dayTasks.some(t=>!t._preview&&t.status!=='done');
+    const isOverdue=!isToday&&ds<today&&dayTasks.some(t=>!t._preview&&t.status!=='done'&&t.status!=='cancelled');
     html+=`<div class="calendar-day${isToday?' today':''}${isOverdue?' overdue':''}" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')" onclick="toggleCalDay(this)"><div class="calendar-day-num">${d}</div>`;
     const multiDay=allTasks.filter(t=>t.start_date&&t.start_date<ds&&t.due_date&&t.due_date>=ds&&t.due_date!==ds);
     multiDay.forEach(t=>{
@@ -1424,14 +1600,14 @@ function calDrop(e,dateStr){
   if(t)t.classList.remove('drag-over');
   if(!calDragId)return;
   const tasks=getTasks();const ti=tasks.find(x=>x.id===calDragId);
-  if(ti&&ti.due_date!==dateStr){ti.due_date=dateStr;ti.updated_at=nowISO();saveTasks(tasks);logActivity(ti.id,'updated',ti.title);renderCalendar()}
+  if(ti&&ti.due_date!==dateStr){const oldDue=ti.due_date||'no date';ti.due_date=dateStr;ti.updated_at=nowISO();saveTasks(tasks);logActivity(ti.id,'rescheduled',oldDue+' → '+(dateStr||'no date'));toast('Rescheduled to '+dateStr,'info');renderCalendar()}
   calDragId=null
 }
 
 function toggleCalDay(el){el.classList.toggle('expanded')}
 
 function showTimeSlotPopover(hour,dayStr,el){
-  const tasks=getTasks().filter(t=>t.due_date===dayStr&&!t.time&&t.status!=='done');
+  const tasks=getTasks().filter(t=>t.due_date===dayStr&&!t.time&&t.status!=='done'&&t.status!=='cancelled');
   let html='<div style="font-size:11px;font-weight:600;margin-bottom:6px">'+String(hour).padStart(2,'0')+':00</div>';
   tasks.forEach(t=>{html+=`<div style="padding:4px 0;cursor:pointer;font-size:12px" onclick="event.stopPropagation();assignTaskTime('${t.id}','${String(hour).padStart(2,'0')+':00'}')">${escHtml(t.title)}</div>`});
   html+=`<div style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px;font-size:11px;cursor:pointer;color:var(--accent)" onclick="event.stopPropagation();document.getElementById('quickAddInput').focus()">+ Add at ${String(hour).padStart(2,'0')}:00</div>`;
@@ -1445,7 +1621,7 @@ function assignTaskTime(id,time){
 }
 
 function renderEisenhower(){
-  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done');
+  const tasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done'&&t.status!=='cancelled');
   const today=new Date();
   const isUrgent=t=>{if(!t.due_date)return false;const d=new Date(t.due_date);const diff=Math.ceil((d-today)/864e5);return diff<=3||t.due_date<todayStr()};
   const isImportant=t=>t.priority==='high'||t.priority==='medium';
@@ -1510,6 +1686,14 @@ function renderCurrentView(){
   populateTaskFilters();
   renderTemplateSelect();
   renderSortBar();
+  const activeTasks=getTasks().filter(t=>!t.deleted_at&&t.status!=='done'&&t.status!=='cancelled');
+  const hint=document.getElementById('eisenhowerHint');
+  if(hint){
+    if(activeTasks.length>15&&taskView!=='eisenhower'){
+      hint.style.display='block';
+      hint.innerHTML='<div style="margin-bottom:8px;padding:8px 12px;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius);font-size:13px"><span style="color:var(--yellow)">\u26A0</span> <strong>'+activeTasks.length+'</strong> active tasks \u2014 <a href="#" onclick="switchTaskView(\'eisenhower\');return false" style="color:var(--accent)">try the Eisenhower Matrix</a> for priority triage</div>'
+    }else{hint.style.display='none'}
+  }
   if(taskView==='list')renderListView();
   else if(taskView==='kanban')renderKanban();
   else if(taskView==='calendar')renderCalendar();
@@ -1521,7 +1705,7 @@ function renderCurrentView(){
 function quickAddTask(){
   const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
   let text=inp.value.trim();
-  const tasks=getTasks();const t={id:uid(),title:'',description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const tasks=getTasks();const t={id:uid(),title:'',description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
   const pl={'high':'high','medium':'medium','low':'low'};
   const words=text.split(/\s+/);const keep=[];
   for(let i=0;i<words.length;i++){
@@ -1550,6 +1734,9 @@ let detailDirty=false;
 let detailSnapshot=null;
 
 function showTaskDetail(id){
+  if(currentPage==='task-detail'&&detailDirty&&id!==detailTaskId){
+    if(!confirm('You have unsaved changes. Leave without saving?'))return
+  }
   detailTaskId=id;
   previousPage=currentPage;
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
@@ -1566,6 +1753,13 @@ function renderTaskDetailPage(){
   let recurringOpts='<option value="">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option>';
   if(t.recur&&t.recur!=='')recurringOpts=recurringOpts.replace(`value="${t.recur}"`,`value="${t.recur}" selected`);
   document.getElementById('taskDetailContent').innerHTML=`
+    ${(function(){
+      const entries=getActivity().filter(e=>e.task_id===detailTaskId).slice(0,5);
+      if(!entries.length)return'';
+      const colors={created:'var(--green)',completed:'var(--accent)',deleted:'var(--red)',restored:'var(--orange)',updated:'var(--yellow)',dependency_removed:'var(--purple)',rescheduled:'#81a1c1',started:'#8fbcbb',cancelled:'#5e81ac',recurred:'#7b88a1',series_stopped:'#4c566a'};
+      const labels={created:'Created',completed:'Completed',deleted:'Deleted',restored:'Restored',updated:'Updated',dependency_removed:'Dependency removed',rescheduled:'Rescheduled',started:'Started',cancelled:'Cancelled',recurred:'Recurred',series_stopped:'Series stopped'};
+      return'<div style="margin-bottom:12px;padding:8px 12px;background:var(--bg);border-radius:var(--radius);border-left:3px solid var(--border)">'+entries.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:3px 0"><span class="activity-dot" style="background:${colors[e.action]||'var(--text-dim)'}"></span><span class="text-sm" style="color:var(--text-dim)">${labels[e.action]||e.action}${e.details?': '+escHtml(e.details):''}</span><span class="text-dim" style="font-size:11px;margin-left:auto">${fmtDateTime(e.timestamp)}</span></div>`).join('')+'</div>'
+    })()}
     <div class="detail-form">
       <div class="detail-field">
         <input class="detail-title-input" id="detailTitle" value="${escHtml(t.title)}">
@@ -1581,7 +1775,7 @@ function renderTaskDetailPage(){
         </div>
         <div class="detail-field">
           <label>Status</label>
-          <select id="detailStatus"><option value="not_started" ${t.status==='not_started'?'selected':''}>Not started</option><option value="started" ${t.status==='started'?'selected':''}>Started</option><option value="done" ${t.status==='done'?'selected':''}>Done</option></select>
+          <select id="detailStatus"><option value="not_started" ${t.status==='not_started'?'selected':''}>Not started</option><option value="in_progress" ${t.status==='in_progress'?'selected':''}>In progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="cancelled" ${t.status==='cancelled'?'selected':''}>Cancelled</option></select>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -1600,7 +1794,7 @@ function renderTaskDetailPage(){
           <input type="time" id="detailTime" value="${t.time||''}">
         </div>
         <div class="detail-field">
-          <label>Category</label>
+          <label>${t.category?categoryDot(t.category):''}Category</label>
           <select id="detailCategory"><option value="">None</option>${cats.map(c=>`<option value="${escHtml(c)}" ${t.category===c?'selected':''}>${escHtml(c)}</option>`).join('')}</select>
           <input id="detailCategoryNew" placeholder="Type new category, press Enter to add" style="margin-top:6px;font-size:12px;padding:6px 8px" onkeydown="if(event.key==='Enter'){event.preventDefault();addDetailCategory()}">
         </div>
@@ -1615,16 +1809,17 @@ function renderTaskDetailPage(){
         <label>Recurrence</label>
         <div class="text-dim text-sm" style="margin-bottom:4px">Auto-create a copy when completed</div>
         <select id="detailRecur">${recurringOpts}</select>
+        ${t.series_id?(()=>{const s=getSeries().find(x=>x.id===t.series_id);return s?`<div class="text-dim text-sm" style="margin-top:4px">Part of series: <a href="#" onclick="filterBySeries('${t.series_id}');return false" style="color:var(--accent)"><strong>${escHtml(s.title)}</strong></a>${s.active?'':' (stopped)'}</div>`:''})():''}
       </div>
       <div class="detail-field">
         <label>Dependencies</label>
         <div class="text-dim text-sm" style="margin-bottom:4px">Tasks that must be done before this one can start</div>
-        ${(t.depends_on||[]).some(d=>{const dt=tasks.find(x=>x.id===d);return dt&&dt.status!=='done'})?`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-hover);border-radius:var(--radius);margin-bottom:8px;font-size:13px;color:var(--orange)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Waiting on incomplete dependencies</span></div>`:''}
+        ${(t.depends_on||[]).some(d=>{const dt=tasks.find(x=>x.id===d);return dt&&dt.status!=='done'&&t.status!=='cancelled'})?`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-hover);border-radius:var(--radius);margin-bottom:8px;font-size:13px;color:var(--orange)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Waiting on incomplete dependencies</span></div>`:''}
         <div id="detailDeps">${(t.depends_on||[]).map(d=>{
           const dt=tasks.find(x=>x.id===d);
           if(!dt)return'';
-          const sc={not_started:'var(--text-dim)',started:'var(--orange)',done:'var(--green)'};
-          const sl={not_started:'Not started',started:'Started',done:'Done'};
+          const sc={not_started:'var(--text-dim)',in_progress:'var(--orange)',done:'var(--green)',cancelled:'var(--red)'};
+          const sl={not_started:'Not started',in_progress:'In progress',done:'Done',cancelled:'Cancelled'};
           return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0"><span class="priority-dot ${dt.priority||'medium'}"></span><span class="badge" style="color:${sc[dt.status]||'var(--text-dim)'};font-size:11px;padding:1px 6px;background:var(--bg-hover)">${sl[dt.status]||dt.status}</span><a href="#" onclick="showTaskDetail('${d}');return false" style="color:var(--text);cursor:pointer;font-size:13px">${escHtml(dt.title)}</a><span class="tag-remove" onclick="removeDetailDep('${d}')" style="cursor:pointer;margin-left:auto">✕</span></div>`
         }).join('')}</div>
         ${(()=>{const bl=tasks.filter(x=>x.depends_on&&x.depends_on.includes(t.id));return bl.length?`<div style="margin-top:8px;margin-bottom:8px;font-size:13px;color:var(--text-dim)">Blocks ${bl.length} other task${bl.length>1?'s':''}</div>`:''})()}
@@ -1636,12 +1831,12 @@ function renderTaskDetailPage(){
       </div>
       <div class="detail-field">
         <label>Annotations</label>
-        <div class="text-dim text-sm" style="margin-bottom:4px">Notes and comments attached to this task</div>
-        ${(t.notes&&t.notes.length)?t.notes.map(n=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><div style="flex:1;font-size:13px">${escHtml(n.text)}</div><div class="text-dim text-sm" style="flex-shrink:0">${fmtDateTime(n.timestamp)}</div></div>`).join(''):'<div class="text-dim text-sm" style="padding:4px 0">No annotations yet</div>'}
+        <div class="text-dim text-sm" style="margin-bottom:4px">Timestamped comments attached to this task</div>
+        ${(t.annotations&&t.annotations.length)?t.annotations.map(n=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><div style="flex:1;font-size:13px">${escHtml(n.text)}</div><div class="text-dim text-sm" style="flex-shrink:0">${fmtDateTime(n.timestamp)}</div></div>`).join(''):'<div class="text-dim text-sm" style="padding:4px 0">No annotations yet</div>'}
       </div>
       <div class="detail-field">
         <label>Add annotation</label>
-        <div style="display:flex;gap:4px"><input id="detailNoteInput" placeholder="Write a note..." onkeydown="if(event.key==='Enter')addDetailNote()"></div>
+        <div style="display:flex;gap:4px"><input id="detailAnnotationInput" placeholder="Write an annotation..." onkeydown="if(event.key==='Enter')addDetailAnnotation()"></div>
       </div>
       <div class="detail-field">
         <label>Attachments (${(t.files||[]).length}/5 · ${((t.files||[]).reduce((s,f)=>s+(f.size||0),0)/1048576).toFixed(1)} MB)</label>
@@ -1650,7 +1845,7 @@ function renderTaskDetailPage(){
       </div>
       <div class="detail-field">
         <label>Subtasks</label>
-        <div id="detailSubtasks">${tasks.filter(x=>x.parent_id===t.id&&!x.deleted_at).map(st=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><input type="checkbox" ${st.status==='done'?'checked':''} onchange="toggleSubtaskStatus('${st.id}',this.checked)" style="width:14px;height:14px"><span style="font-size:13px;cursor:pointer;text-decoration:${st.status==='done'?'line-through':'none'}" onclick="showTaskDetail('${st.id}')">${escHtml(st.title)}</span><span class="tag-remove" onclick="deleteTask('${st.id}')" style="cursor:pointer;margin-left:auto">✕</span></div>`).join('')||'<div class="text-dim text-sm" style="padding:4px 0">No subtasks</div>'}</div>
+        <div id="detailSubtasks">${tasks.filter(x=>x.parent_id===t.id&&!x.deleted_at).map(st=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><input type="checkbox" ${st.status==='done'?'checked':''} onchange="toggleSubtaskStatus('${st.id}',this.checked)" style="width:14px;height:14px"><span style="font-size:13px;cursor:pointer;text-decoration:${(st.status==='done'||st.status==='cancelled')?'line-through':'none'}" onclick="showTaskDetail('${st.id}')">${escHtml(st.title)}</span><span class="tag-remove" onclick="deleteTask('${st.id}')" style="cursor:pointer;margin-left:auto">✕</span></div>`).join('')||'<div class="text-dim text-sm" style="padding:4px 0">No subtasks</div>'}</div>
         <div style="display:flex;gap:4px;margin-top:4px"><input id="detailSubtaskInput" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addDetailSubtask()"><button class="btn btn-primary btn-sm" onclick="addDetailSubtask()">Add</button></div>
       </div>
       <div class="detail-field">
@@ -1685,21 +1880,26 @@ function addDetailCategory(){
 
 function saveDetailTask(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);if(!t)return;
-  const oldStatus=t.status;
+  const oldStatus=t.status;const oldDue=t.due_date||'';
   t.title=document.getElementById('detailTitle').value.trim()||t.title;
   t.description=document.getElementById('detailDesc').value;
   t.priority=document.getElementById('detailPriority').value;
   t.status=document.getElementById('detailStatus').value;
-  t.due_date=document.getElementById('detailDue').value||null;
+  const newDue=document.getElementById('detailDue').value||'';
+  t.due_date=newDue||null;
   t.start_date=document.getElementById('detailStartDate').value||null;
   t.time=document.getElementById('detailTime').value||null;
   const newCat=document.getElementById('detailCategoryNew').value.trim();
   if(newCat&&newCat!==t.category)toast('Category added','success');
   t.category=newCat||document.getElementById('detailCategory').value;
   t.recur=document.getElementById('detailRecur').value||null;
+  ensureSeriesForTask(t);
   t.updated_at=nowISO();
   saveTasks(tasks);
   if(t.status!==oldStatus&&t.status==='done')handleRecurrence(t);
+  if(t.status!==oldStatus&&t.status==='in_progress')logActivity(id,'started',t.title);
+  if(t.status!==oldStatus&&t.status==='cancelled')logActivity(id,'cancelled',t.title);
+  if(newDue!==oldDue)logActivity(id,'rescheduled',(oldDue||'no date')+' → '+(newDue||'no date'));
   logActivity(id,'updated',t.title);
   detailDirty=false;
   toast('Task saved','success');
@@ -1714,8 +1914,10 @@ function handleRecurrence(t){
   else if(t.recur==='weekly')d.setDate(d.getDate()+7);
   else if(t.recur==='monthly')d.setMonth(d.getMonth()+1);
   const nd=d.toISOString().slice(0,10);
-  const nt={id:uid(),title:t.title,description:t.description,status:'not_started',priority:t.priority,due_date:nd,category:t.category,tags:[...(t.tags||[])],recur:t.recur,depends_on:[],notes:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
-  tasks.push(nt);saveTasks(tasks);logActivity(nt.id,'created',nt.title+' (recurring)')
+  const series=getSeries().find(s=>String(s.id)===String(t.series_id)&&s.active);
+  const base=series||t;
+  const nt={id:uid(),title:base.title,description:base.description||'',status:'not_started',priority:base.priority||'medium',due_date:nd,start_date:series?(series.start_date||''):(t.start_date||''),time:series?(series.time||null):(t.time||null),category:base.category||'',tags:[...(base.tags||[])],recur:base.recur,depends_on:[],annotations:[],files:series?JSON.parse(JSON.stringify(series.files||[])):[],series_id:t.series_id||null,parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  tasks.push(nt);saveTasks(tasks);logActivity(nt.id,'created',nt.title+' (recurring)');logActivity(t.id,'recurred',nt.title)
 }
 function addDetailTag(){
   const inp=document.getElementById('detailTagInput');if(!inp.value.trim()||!detailTaskId)return;
@@ -1744,11 +1946,11 @@ function removeDetailDep(depId){
   if(t){t.depends_on=(t.depends_on||[]).filter(x=>x!==depId);t.updated_at=nowISO();saveTasks(tasks)}
   renderTaskDetailPage()
 }
-function addDetailNote(){
+function addDetailAnnotation(){
   if(!detailTaskId)return;
-  const inp=document.getElementById('detailNoteInput');if(!inp||!inp.value.trim())return;
+  const inp=document.getElementById('detailAnnotationInput');if(!inp||!inp.value.trim())return;
   const tasks=getTasks();const t=tasks.find(x=>x.id===detailTaskId);
-  if(t){if(!t.notes)t.notes=[];t.notes.push({id:uid(),text:inp.value.trim(),timestamp:nowISO()});t.updated_at=nowISO();saveTasks(tasks);logActivity(detailTaskId,'updated','Added annotation')}
+  if(t){if(!t.annotations)t.annotations=[];t.annotations.push({id:uid(),text:inp.value.trim(),timestamp:nowISO()});t.updated_at=nowISO();saveTasks(tasks);logActivity(detailTaskId,'updated','Added annotation')}
   renderTaskDetailPage()
 }
 
@@ -1776,7 +1978,7 @@ function removeDetailFile(idx){
 function addDetailSubtask(){
   const inp=document.getElementById('detailSubtaskInput');if(!inp||!inp.value.trim()||!detailTaskId)return;
   const tasks=getTasks();const parent=tasks.find(x=>x.id===detailTaskId);if(!parent)return;
-  const st={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,depends_on:[],notes:[],files:[],parent_id:detailTaskId,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const st={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:detailTaskId,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
   tasks.push(st);saveTasks(tasks);logActivity(st.id,'created',st.title);inp.value='';renderTaskDetailPage()
 }
 function toggleSubtaskStatus(id,checked){
@@ -1796,7 +1998,8 @@ function saveTemplateFromDetail(){
 function applyTemplate(name){
   const templates=getTemplates();const tmpl=templates.find(t=>t.name===name);
   if(!tmpl)return;
-  const tasks=getTasks();const t={id:uid(),title:tmpl.title,description:tmpl.description||'',status:'not_started',priority:tmpl.priority||'medium',due_date:'',start_date:'',time:'',category:tmpl.category||'',tags:[...(tmpl.tags||[])],recur:tmpl.recur||null,depends_on:[],notes:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const tasks=getTasks();const t={id:uid(),title:tmpl.title,description:tmpl.description||'',status:'not_started',priority:tmpl.priority||'medium',due_date:'',start_date:'',time:'',category:tmpl.category||'',tags:[...(tmpl.tags||[])],recur:tmpl.recur||null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  if(t.recur)ensureSeriesForTask(t);
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);renderCurrentView()
 }
 function deleteTemplate(name){
@@ -1806,13 +2009,39 @@ function deleteTemplate(name){
 // --- Delete / Bin ---
 function deleteTask(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
-  if(!t)return;t.deleted_at=nowISO();t.updated_at=nowISO();saveTasks(tasks);
+  if(!t)return;
+  const subtasks=tasks.filter(x=>x.parent_id===id&&!x.deleted_at);
+  const dependents=tasks.filter(x=>(x.depends_on||[]).includes(id)&&!x.deleted_at);
+  if(subtasks.length||dependents.length){
+    let msg='Move "'+t.title+'" to bin?';
+    if(subtasks.length)msg+='\n\nThis task has '+subtasks.length+' subtask'+(subtasks.length>1?'s':'')+' — they will become top-level tasks if permanently deleted.';
+    if(dependents.length)msg+='\n\n'+dependents.length+' task'+(dependents.length>1?'s depend':' depends')+' on this — the dependency will be removed if permanently deleted.';
+    if(!confirm(msg))return;
+  }
+  t.deleted_at=nowISO();t.updated_at=nowISO();saveTasks(tasks);
   logActivity(id,'deleted',t.title);toast('Task moved to bin','info');renderCurrentPage()
+}
+function _cleanupDeletedTaskReferences(tasks,id,title){
+  tasks.forEach(x=>{
+    if(x.parent_id===id)x.parent_id=null;
+    if((x.depends_on||[]).includes(id)){
+      x.depends_on=x.depends_on.filter(d=>d!==id);
+      if(!x.deleted_at)logActivity(x.id,'dependency_removed',title);
+    }
+  });
+}
+function deleteTaskPermanently(id){
+  const tasks=getTasks();const t=tasks.find(x=>x.id===id);
+  if(!t)return;
+  if(!confirm('Permanently delete "'+t.title+'"? This cannot be undone.'))return;
+  _cleanupDeletedTaskReferences(tasks,id,t.title);
+  saveTasks(tasks.filter(x=>x.id!==id));
+  toast('Task permanently deleted','info');renderBin()
 }
 function renderBin(){
   const tasks=getTasks().filter(t=>t.deleted_at);
   document.getElementById('binEmpty').style.display=tasks.length?'none':'';
-  document.getElementById('binBody').innerHTML=tasks.map(t=>`<tr><td><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a></td><td class="text-sm text-dim">${fmtDateTime(t.deleted_at)}</td><td class="text-sm">${t.status}</td><td><button class="btn btn-secondary btn-sm" onclick="restoreTask('${t.id}')">Restore</button></td></tr>`).join('')
+  document.getElementById('binBody').innerHTML=tasks.map(t=>`<tr><td><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a></td><td class="text-sm text-dim">${fmtDateTime(t.deleted_at)}</td><td class="text-sm">${t.status}</td><td style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="restoreTask('${t.id}')">Restore</button><button class="btn btn-danger btn-sm" onclick="deleteTaskPermanently('${t.id}')">Delete</button></td></tr>`).join('')
 }
 function restoreTask(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
@@ -1821,16 +2050,19 @@ function restoreTask(id){
 }
 function emptyBin(){
   if(!confirm('Permanently delete all binned tasks?'))return;
-  const tasks=getTasks().filter(t=>!t.deleted_at);saveTasks(tasks);
+  const tasks=getTasks();
+  tasks.filter(t=>t.deleted_at).forEach(t=>{_cleanupDeletedTaskReferences(tasks,t.id,t.title)});
+  saveTasks(tasks.filter(t=>!t.deleted_at));
   toast('Bin emptied','info');renderBin()
 }
 
 // --- Focus (Dashboard) ---
 function cycleDashFocusStatus(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
-  if(!t)return;const cyc={not_started:'started',started:'done',done:'not_started'};
+  if(!t)return;  const cyc={not_started:'in_progress',in_progress:'done',done:'not_started'};
   t.status=cyc[t.status]||'not_started';t.updated_at=nowISO();
   if(t.status==='done')logActivity(id,'completed',t.title);
+  if(t.status==='in_progress')logActivity(id,'started',t.title);
   saveTasks(tasks);
   if(t.status==='done')handleRecurrence(t);
   renderDashFocusGoals()
@@ -1852,7 +2084,7 @@ function renderActivityLog(){
   const perPage=25;const totalPages=Math.ceil(entries.length/perPage)||1;
   logPage=Math.min(logPage,totalPages);
   const start=(logPage-1)*perPage;const pageEntries=entries.slice(start,start+perPage);
-  const colors={created:'var(--green)',completed:'var(--accent)',deleted:'var(--red)',restored:'var(--orange)',updated:'var(--yellow)'};
+  const colors={created:'var(--green)',completed:'var(--accent)',deleted:'var(--red)',restored:'var(--orange)',updated:'var(--yellow)',dependency_removed:'var(--purple)',rescheduled:'#81a1c1',started:'#8fbcbb',cancelled:'#5e81ac',recurred:'#7b88a1',series_stopped:'#4c566a'};
   document.getElementById('logList').innerHTML=pageEntries.length?pageEntries.map(e=>`<div class="activity-log-entry"><span class="activity-dot" style="background:${colors[e.action]||'var(--text-dim)'}"></span><span class="text-sm" style="flex:1">${escHtml(e.action)}${e.details?': '+escHtml(e.details):''}</span><span class="text-dim text-sm">${fmtDateTime(e.timestamp)}</span></div>`).join(''):'<div class="empty-state"><p class="text-dim">No activity entries.</p></div>';
   document.getElementById('logPagination').innerHTML=totalPages>1?`<button class="btn btn-ghost btn-sm" onclick="logPage=Math.max(1,logPage-1);renderActivityLog()" ${logPage<=1?'disabled':''}>Prev</button><span>Page ${logPage} of ${totalPages}</span><button class="btn btn-ghost btn-sm" onclick="logPage=Math.min(${totalPages},logPage+1);renderActivityLog()" ${logPage>=totalPages?'disabled':''}>Next</button>`:''
 }
@@ -1870,7 +2102,8 @@ function renderSettings(){
   document.getElementById('settingsDateMode').value=cfg.date_mode||'smart';
   document.getElementById('settingsPerPage').value=cfg.per_page||25;
   renderSettingsCategories();
-  renderSettingsTemplates()
+  renderSettingsTemplates();
+  renderSettingsSeries()
 }
 function renderSettingsCategories(){
   const tasks=getTasks();
@@ -1882,7 +2115,9 @@ function renderSettingsCategories(){
   }
   el.innerHTML=cats.map(cat=>{
     const count=tasks.filter(t=>t.category===cat&&!t.deleted_at).length;
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(cat)}</strong> <span class="text-dim text-sm">(${count} task${count!==1?'s':''})</span></span><button class="btn btn-danger btn-sm" onclick="deleteCategory('${escHtml(cat)}')">Delete</button></div>`
+    const colors=getCategoryColors();
+    const c=colors[cat]||'';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px"><input type="color" value="${c||'#5e81ac'}" oninput="saveCategoryColor('${escHtml(cat)}',this.value)" title="Category color" style="width:24px;height:24px;border:none;border-radius:4px;background:none;cursor:pointer;padding:0;opacity:${c?'1':'0.3'}" onfocus="this.style.opacity='1'"><strong>${escHtml(cat)}</strong> <span class="text-dim text-sm">(${count} task${count!==1?'s':''})</span></span><div style="display:flex;gap:4px">${c?`<button class="btn btn-secondary btn-sm" onclick="saveCategoryColor('${escHtml(cat)}','');renderSettingsCategories()" title="Clear color">Clear</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteCategory('${escHtml(cat)}')">Delete</button></div></div>`
   }).join('')
 }
 function renderSettingsTemplates(){
@@ -1894,11 +2129,41 @@ function renderSettingsTemplates(){
   }
   el.innerHTML=templates.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(t.name)}</strong></span><button class="btn btn-danger btn-sm" onclick="deleteTemplate('${escHtml(t.name)}')">Delete</button></div>`).join('')
 }
+function renderSettingsSeries(){
+  const el=document.getElementById('settingsSeriesList');
+  if(!el)return;
+  const series=getSeries();
+  if(!series.length){
+    el.innerHTML='<div class="text-dim text-sm" style="padding:8px 0">No recurring series yet.</div>';return
+  }
+  el.innerHTML=series.map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(s.title)}</strong> <span class="text-dim text-sm">(${escHtml(s.recur)})${s.active?'':' <span style="color:var(--text-dim)">stopped</span>'}</span></span><div style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="editSeries('${s.id}')">Edit</button>${s.active?`<button class="btn btn-secondary btn-sm" onclick="stopSeries('${s.id}')">Stop</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteSeries('${s.id}')">Delete</button></div></div>`).join('')
+}
+function editSeries(id){
+  const series=getSeries();const s=series.find(x=>x.id===id);
+  if(!s)return;
+  const title=prompt('Title:',s.title);if(title===null)return;
+  const recur=prompt('Recurrence (daily/weekly/monthly):',s.recur||'');if(recur===null)return;
+  const priority=prompt('Priority (low/medium/high):',s.priority||'medium');if(priority===null)return;
+  s.title=title;s.recur=recur||null;s.priority=priority;s.updated_at=nowISO();
+  saveSeries(series);toast('Series updated — future instances will use new values','success');renderSettingsSeries()
+}
+function stopSeries(id){
+  const series=getSeries();const s=series.find(x=>x.id===id);
+  if(!s)return;
+  s.active=false;s.updated_at=nowISO();
+  saveSeries(series);logActivity(null,'series_stopped',s.title);toast('Series stopped — no more new instances','info');renderSettingsSeries()
+}
+function deleteSeries(id){
+  if(!confirm('Delete this series? Existing tasks keep their data but new instances will not be created from this series.'))return;
+  const series=getSeries().filter(s=>s.id!==id);
+  saveSeries(series);toast('Series deleted','success');renderSettingsSeries()
+}
 function deleteCategory(cat){
   if(!confirm(`Delete category "${cat}"? Tasks will become uncategorized.`))return;
   const tasks=getTasks();
   tasks.forEach(t=>{if(t.category===cat)t.category=''});
   saveTasks(tasks);
+  saveCategoryColor(cat,'');
   logActivity(null,'updated',`Deleted category: ${cat}`);
   toast('Category deleted','success');
   renderSettingsCategories();
@@ -1911,7 +2176,7 @@ function updateConfig(key,val){
 
 // --- Backup / Export ---
 function createBackup(){
-  const data={tasks:getTasks(),activity:getActivity(),config:getConfig(),notes:getNotes(),focus:getFocus(),exported_at:nowISO()};
+  const data={tasks:getTasks(),activity:getActivity(),config:getConfig(),notes:getNotes(),focus:getFocus(),templates:getTemplates(),series:getSeries(),exported_at:nowISO()};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='doable-backup-'+todayStr()+'.json';a.click();URL.revokeObjectURL(a.href);
@@ -1928,6 +2193,8 @@ function restoreBackup(event){
       if(data.config)saveConfig(data.config);
       if(data.notes)saveNotes(data.notes);
       if(data.focus)saveFocus(data.focus);
+      if(data.templates)saveTemplates(data.templates);
+      if(data.series)saveSeries(data.series);
       toast('Data restored from backup','success');
       renderCurrentPage()
     }catch{toast('Invalid backup file','error')}
@@ -1939,14 +2206,14 @@ function exportData(format){
   let content='',mime='',ext='';
   if(format==='json'){content=JSON.stringify(tasks,null,2);mime='application/json';ext='json'}
   else if(format==='csv'){
-    const headers=['id','title','status','priority','due_date','category','tags','created_at','notes'];
+    const headers=['id','title','status','priority','due_date','category','tags','created_at','annotations'];
     content=headers.join(',')+'\n'+tasks.map(t=>headers.map(h=>{
-      let v=t[h];if(h==='tags')v=(t.tags||[]).join(';');if(h==='notes')v=(t.notes||[]).map(n=>n.text).join(';');
+      let v=t[h];if(h==='tags')v=(t.tags||[]).join(';');if(h==='annotations')v=(t.annotations||[]).map(n=>n.text).join(';');
       return'"'+String(v||'').replace(/"/g,'""')+'"'
     }).join(',')).join('\n');
     mime='text/csv';ext='csv'
   }else if(format==='md'){
-    content='# Do-able Tasks\n\n'+tasks.map(t=>`## ${t.title}\n\n- **Status:** ${t.status}\n- **Priority:** ${t.priority||'medium'}\n- **Due:** ${t.due_date||'none'}\n- **Category:** ${t.category||'none'}\n- **Tags:** ${(t.tags||[]).join(', ')||'none'}\n${t.description?'- **Description:** '+t.description+'\n':''}${(t.notes||[]).length?'- **Notes:**\n'+t.notes.map(n=>`  - ${n.text}`).join('\n'):''}`).join('\n');
+    content='# Do-able Tasks\n\n'+tasks.map(t=>`## ${t.title}\n\n- **Status:** ${t.status}\n- **Priority:** ${t.priority||'medium'}\n- **Due:** ${t.due_date||'none'}\n- **Category:** ${t.category||'none'}\n- **Tags:** ${(t.tags||[]).join(', ')||'none'}\n${t.description?'- **Description:** '+t.description+'\n':''}${(t.annotations||[]).length?'- **Annotations:**\n'+t.annotations.map(n=>`  - ${n.text}`).join('\n'):''}`).join('\n');
     mime='text/markdown';ext='md'
   }
   const blob=new Blob([content],{type:mime});
@@ -1954,20 +2221,114 @@ function exportData(format){
   a.download='doable-tasks.'+ext;a.click();URL.revokeObjectURL(a.href);
   toast(`Exported as ${format.toUpperCase()}`,'success')
 }
-function getTemplates(){return JSON.parse(localStorage.getItem('do_templates')||'[]')}
-function saveTemplates(t){localStorage.setItem('do_templates',JSON.stringify(t))}
+function parseCSV(text){
+  const rows=[];let row=[];let field='';let inQuotes=false;let i=0;
+  while(i<text.length){
+    const c=text[i];
+    if(inQuotes){
+      if(c==='"'){if(text[i+1]==='"'){field+='"';i+=2;continue}inQuotes=false;i++;continue}
+      field+=c;i++;continue
+    }
+    if(c==='"'){inQuotes=true;i++;continue}
+    if(c===','){row.push(field);field='';i++;continue}
+    if(c==='\n'){row.push(field);rows.push(row);row=[];field='';i++;continue}
+    if(c==='\r'){i++;continue}
+    field+=c;i++
+  }
+  if(field||row.length){row.push(field);rows.push(row)}
+  return rows
+}
+function importCSV(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const rows=parseCSV(e.target.result);
+      if(rows.length<2){toast('CSV is empty or has no data rows','error');return}
+      const headers=rows[0].map(h=>h.trim());
+      const titleIdx=headers.indexOf('title');
+      if(titleIdx===-1){toast('CSV must have a "title" column','error');return}
+      const tasks=getTasks();
+      let imported=0;
+      for(let i=1;i<rows.length;i++){
+        const r=rows[i];
+        if(!r.length||(r.length===1&&!r[0].trim()))continue;
+        const title=(r[titleIdx]||'').trim();
+        if(!title)continue;
+        const getCol=(name)=>{const idx=headers.indexOf(name);return idx>=0?(r[idx]||'').trim():''};
+        const tagsStr=getCol('tags');
+        const annStr=getCol('annotations');
+        const statusVal=getCol('status');
+        const statusMap={'started':'in_progress','not_started':'not_started','in_progress':'in_progress','done':'done','cancelled':'cancelled'};
+        const t={
+          id:uid(),title,
+          description:getCol('description'),
+          status:statusMap[statusVal]||'not_started',
+          priority:getCol('priority')||'medium',
+          due_date:getCol('due_date'),
+          start_date:getCol('start_date'),
+          time:getCol('time')||'',
+          category:getCol('category'),
+          tags:tagsStr?tagsStr.split(';').map(s=>s.trim()).filter(Boolean):[],
+          recur:getCol('recur')||null,
+          series_id:null,
+          depends_on:[],
+          annotations:annStr?annStr.split(';').map(s=>({id:uid(),text:s.trim(),created_at:nowISO()})).filter(a=>a.text):[],
+          files:[],
+          parent_id:null,
+          created_at:nowISO(),
+          updated_at:nowISO(),
+          deleted_at:null
+        };
+        tasks.push(t);
+        logActivity(t.id,'created',t.title);
+        imported++
+      }
+      if(!imported){toast('No valid tasks found in CSV','error');return}
+      saveTasks(tasks);
+      toast(`Imported ${imported} task${imported!==1?'s':''}`,'success');
+      renderCurrentPage()
+    }catch(err){toast('Failed to import CSV: '+err.message,'error')}
+    event.target.value=''
+  };
+  reader.readAsText(file)
+}
+async function saveTemplates(t){
+  lsSet('templates',t);
+  try{await _api.post('/sync/full',{tasks:getTasks(),notes:getNotes(),config:getConfig(),templates:t,series:getSeries()})}catch(e){}
+}
+function getSeries(){return lsGet('series',[])}
+async function saveSeries(s){
+  lsSet('series',s);
+  try{await _api.post('/sync/full',{tasks:getTasks(),notes:getNotes(),config:getConfig(),templates:getTemplates(),series:s})}catch(e){}
+}
+function ensureSeriesForTask(t){
+  if(t.recur&&!t.series_id){
+    const series=getSeries();
+    const ns={id:uid(),title:t.title,description:t.description||'',priority:t.priority||'medium',category:t.category||'',tags:[...(t.tags||[])],recur:t.recur,start_date:t.start_date||null,time:t.time||null,files:JSON.parse(JSON.stringify(t.files||[])),active:true,created_at:nowISO(),updated_at:nowISO()};
+    series.push(ns);saveSeries(series);
+    t.series_id=ns.id
+  }
+}
 function clearAllData(){
   if(!confirm('This will permanently delete ALL data. Are you sure?'))return;
-  if(!confirm('Really? All tasks, notes, activity — everything?'))return;
+  if(!confirm('Really? All tasks, notes, annotations, activity — everything?'))return;
   Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>localStorage.removeItem(k));
-  if(_api.ready){_api.post('/sync/full',{tasks:[],notes:[],config:{}}).catch(()=>{})}
+  if(_api.ready){_api.post('/sync/full',{tasks:[],notes:[],config:{},templates:[],series:[]}).catch(()=>{})}
   toast('All data cleared','info');renderCurrentPage()
 }
 
 // --- Modal ---
+let _modalPrevFocus=null;
+function _modalFocusable(){
+  return Array.from(document.getElementById('modalContent').querySelectorAll('button,input,select,textarea,a[href],[tabindex]:not([tabindex="-1"])')).filter(el=>el.offsetParent!==null&&!el.disabled)
+}
 function showModal(html){
   document.getElementById('modalContent').innerHTML=html;
   document.getElementById('modalOverlay').style.display='';
+  _modalPrevFocus=document.activeElement;
+  const f=_modalFocusable();
+  if(f.length)setTimeout(()=>f[0].focus(),0);
   if(frogEnabled){
     const el=document.getElementById('frogCharacter');
     const overlay=document.getElementById('modalOverlay');
@@ -1980,6 +2341,8 @@ function showModal(html){
 }
 function closeModal(){
   document.getElementById('modalOverlay').style.display='none';
+  if(_modalPrevFocus&&_modalPrevFocus.focus)_modalPrevFocus.focus();
+  _modalPrevFocus=null;
   if(frogEnabled){
     const el=document.getElementById('frogCharacter');
     el.classList.remove('frog-modal-peek');
@@ -1988,6 +2351,18 @@ function closeModal(){
     setFrogState('idle')
   }
 }
+document.addEventListener('keydown',e=>{
+  const ov=document.getElementById('modalOverlay');
+  if(!ov||ov.style.display==='none')return;
+  if(e.key==='Escape'){closeModal();return}
+  if(e.key==='Tab'){
+    const f=_modalFocusable();
+    if(!f.length)return;
+    const first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  }
+});
 
 // --- Toast ---
 function toast(msg,type='info'){
@@ -2024,27 +2399,27 @@ function getSampleTasks(){
   const lastMth=new Date();lastMth.setMonth(lastMth.getMonth()-1);const lastMthStr=lastMth.toISOString();
   const _sample=true;
   return [
-    {id:s.welcome,title:'Welcome to Do-able!',description:'This is your first task. Edit, tag, annotate, or mark it done to explore the app.',status:'done',priority:'medium',due_date:yestStr,category:'Getting Started',tags:['welcome','tutorial'],_sample,notes:[{id:sid(),text:'Checked the detail page — nice layout.',timestamp:nowISO()}],created_at:d2agoStr,updated_at:nowISO(),deleted_at:null},
-    {id:s.homepage,title:'Design homepage mockup',description:'Create wireframes for the landing page refresh. Include hero, feature grid, testimonial carousel.',status:'started',priority:'high',due_date:futStr,category:'Design',tags:['design','frontend','mockup'],_sample,notes:[{id:sid(),text:'Draft v1 shared in Figma',timestamp:nowISO()},{id:sid(),text:'Client wants more whitespace',timestamp:nowISO()}],created_at:lastWkStr+'T09:00:00',updated_at:nowISO(),deleted_at:null},
-    {id:s.loginBug,title:'Fix login bug (Safari 403)',description:'Safari users get a 403 on /auth/login. Cookie SameSite issue suspected.',status:'not_started',priority:'high',due_date:todayStr(),category:'Development',tags:['bug','urgent','backend','security'],_sample,notes:[{id:sid(),text:'Reproduced in Safari 18 on macOS; Chrome + Firefox unaffected.',timestamp:nowISO()},{id:sid(),text:'Root cause: SameSite=None missing Secure flag on dev cert',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.weeklyReview,title:'Weekly review notes',description:'Prepare agenda for Friday team sync. Discuss sprint progress and blockers.',status:'not_started',priority:'medium',due_date:futStr,category:'Meetings',tags:['recurring','team','sync'],_sample,recur:'weekly',notes:[],created_at:lastWkStr+'T14:00:00',updated_at:nowISO(),deleted_at:null},
-    {id:s.depReport,title:'Deprecated draft report',description:'Q1 analysis draft — superseded by the final version.',status:'done',priority:'low',due_date:'',category:'Reports',tags:['old','archive'],_sample,notes:[],created_at:lastMthStr,updated_at:lastMthStr,deleted_at:d2agoStr},
-    {id:s.deploy,title:'Deploy v2 to staging',description:'Push the current feature branch to staging for QA. Needs mockup sign-off first.',status:'not_started',priority:'high',due_date:futStr,category:'Development',tags:['deploy','devops'],_sample,depends_on:[s.homepage],notes:[{id:sid(),text:'Coordinated with DevOps — they are ready for Friday',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.morningJog,title:'Morning jog',description:'30 min run before breakfast. Loop around the park.',status:'done',priority:'medium',due_date:yestStr,start_date:yestStr,time:'06:30',category:'Health',tags:['exercise','routine'],_sample,recur:'daily',notes:[{id:sid(),text:'5.2 km in 28 min — new PR!',timestamp:nowISO()}],created_at:lastWkStr+'T06:30:00',updated_at:nowISO(),deleted_at:null},
-    {id:s.deepRead,title:'Read "Deep Work"',description:'Finish chapters 5-7 this week. Take notes on the four deep work philosophies.',status:'started',priority:'low',due_date:nextWkStr,category:'Personal',tags:['reading','learning','focus'],_sample,notes:[{id:sid(),text:'Ch5: Monastic vs Bimodal — I lean bimodal',timestamp:nowISO()}],created_at:lastWkStr+'T20:00:00',updated_at:nowISO(),deleted_at:null},
-    {id:s.budget,title:'Quarterly budget review',description:'Review Q2 spending against plan. Flag any line items over 10% of budget.',status:'not_started',priority:'high',due_date:nextWkStr,category:'Finance',tags:['budget','planning','review'],_sample,notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.apiDocs,title:'Write API docs',description:'Document the new REST endpoints for the team. Include request/response examples.',status:'done',priority:'medium',due_date:lastWkStr,category:'Development',tags:['docs','api','backend'],_sample,notes:[{id:sid(),text:'Published to internal wiki — link in #dev channel',timestamp:nowISO()}],created_at:lastMthStr,updated_at:lastWkStr+'T17:30:00',deleted_at:null},
-    {id:s.errorHandling,title:'Update error handling middleware',description:'Add global try-catch wrapper for async route handlers. Return consistent error JSON shape.',status:'not_started',priority:'medium',due_date:futStr,category:'Development',tags:['backend','refactor'],_sample,depends_on:[s.loginBug],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.authRefactor,title:'Refactor auth middleware',description:'Extract JWT validation into reusable middleware. Add rate limiting.',status:'not_started',priority:'medium',due_date:nextWkStr,category:'Development',tags:['backend','security','refactor'],_sample,depends_on:[s.errorHandling],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.teamMetrics,title:'Compile team metrics',description:'Gather velocity, burndown, and cycle time data for the monthly stakeholder deck.',status:'not_started',priority:'medium',due_date:futStr,category:'Reports',tags:['metrics','team','analysis'],_sample,recur:'monthly',depends_on:[s.weeklyReview],notes:[{id:sid(),text:'Jira dashboard already configured — just need to export',timestamp:nowISO()}],created_at:lastWkStr+'T11:00:00',updated_at:nowISO(),deleted_at:null},
-    {id:s.blogPost,title:'Write blog post on accessibility',description:'Draft a post about WCAG 2.2 compliance — what changed and how to audit.',status:'started',priority:'low',due_date:nextWkStr,category:'Content',tags:['writing','blog','a11y'],_sample,notes:[{id:sid(),text:'Outline approved by marketing. Target: 1500 words.',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.grocery,title:'Grocery shopping',description:'Weekly run: veggies, eggs, milk, bread, oats.',status:'not_started',priority:'low',due_date:todayStr(),category:'Personal',tags:['errand','routine'],_sample,recur:'weekly',notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.meditate,title:'Evening meditation',description:'10 min guided meditation using Headspace.',status:'done',priority:'medium',due_date:yestStr,start_date:yestStr,time:'21:00',category:'Health',tags:['routine','mindfulness'],_sample,recur:'daily',notes:[{id:sid(),text:'Session 45/90 on Headspace — focus pack',timestamp:nowISO()}],created_at:yestStr+'T21:00:00',updated_at:nowISO(),deleted_at:null},
-    {id:s.garden,title:'Plant spring vegetables',description:'Prepare raised beds and sow seeds for tomatoes, peppers, basil.',status:'not_started',priority:'low',due_date:futStr,category:'Personal',tags:['garden','outdoor'],_sample,notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.invoice,title:'Send Q2 invoices',description:'Generate and send invoices for Q2 consulting work. Follow up on overdue payments.',status:'not_started',priority:'high',due_date:futStr,category:'Finance',tags:['billing','client'],_sample,depends_on:[s.budget],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.portfolio,title:'Update portfolio site',description:'Add new projects and case studies. Update tech stack section with recent work.',status:'started',priority:'medium',due_date:nextWkStr,start_date:futStr,category:'Design',tags:['design','frontend','portfolio'],_sample,notes:[{id:sid(),text:'Decided on Astro + Tailwind stack',timestamp:nowISO()}],created_at:lastWkStr+'T15:00:00',updated_at:nowISO(),deleted_at:null},
-    {id:s.standup,title:'Daily standup',description:'Team sync — updates, blockers, priorities.',status:'not_started',priority:'medium',due_date:todayStr(),start_date:todayStr(),time:'09:00',category:'Meetings',tags:['recurring','team'],_sample,recur:'daily',notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
-    {id:s.podcast,title:'Record podcast episode',description:'Episode on "Building in public" — prep talking points and invite co-host.',status:'not_started',priority:'medium',due_date:nextWkStr,category:'Content',tags:['writing','podcast'],_sample,depends_on:[s.blogPost],notes:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null}
+    {id:s.welcome,title:'Welcome to Do-able!',description:'This is your first task. Edit, tag, annotate, or mark it done to explore the app.',status:'done',priority:'medium',due_date:yestStr,category:'Getting Started',tags:['welcome','tutorial'],_sample,annotations:[{id:sid(),text:'Checked the detail page — nice layout.',timestamp:nowISO()}],created_at:d2agoStr,updated_at:nowISO(),deleted_at:null},
+    {id:s.homepage,title:'Design homepage mockup',description:'Create wireframes for the landing page refresh. Include hero, feature grid, testimonial carousel.',status:'in_progress',priority:'high',due_date:futStr,category:'Design',tags:['design','frontend','mockup'],_sample,annotations:[{id:sid(),text:'Draft v1 shared in Figma',timestamp:nowISO()},{id:sid(),text:'Client wants more whitespace',timestamp:nowISO()}],created_at:lastWkStr+'T09:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.loginBug,title:'Fix login bug (Safari 403)',description:'Safari users get a 403 on /auth/login. Cookie SameSite issue suspected.',status:'not_started',priority:'high',due_date:todayStr(),category:'Development',tags:['bug','urgent','backend','security'],_sample,annotations:[{id:sid(),text:'Reproduced in Safari 18 on macOS; Chrome + Firefox unaffected.',timestamp:nowISO()},{id:sid(),text:'Root cause: SameSite=None missing Secure flag on dev cert',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.weeklyReview,title:'Weekly review notes',description:'Prepare agenda for Friday team sync. Discuss sprint progress and blockers.',status:'not_started',priority:'medium',due_date:futStr,category:'Meetings',tags:['recurring','team','sync'],_sample,recur:'weekly',annotations:[],created_at:lastWkStr+'T14:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.depReport,title:'Deprecated draft report',description:'Q1 analysis draft — superseded by the final version.',status:'done',priority:'low',due_date:'',category:'Reports',tags:['old','archive'],_sample,annotations:[],created_at:lastMthStr,updated_at:lastMthStr,deleted_at:d2agoStr},
+    {id:s.deploy,title:'Deploy v2 to staging',description:'Push the current feature branch to staging for QA. Needs mockup sign-off first.',status:'not_started',priority:'high',due_date:futStr,category:'Development',tags:['deploy','devops'],_sample,depends_on:[s.homepage],annotations:[{id:sid(),text:'Coordinated with DevOps — they are ready for Friday',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.morningJog,title:'Morning jog',description:'30 min run before breakfast. Loop around the park.',status:'done',priority:'medium',due_date:yestStr,start_date:yestStr,time:'06:30',category:'Health',tags:['exercise','routine'],_sample,recur:'daily',annotations:[{id:sid(),text:'5.2 km in 28 min — new PR!',timestamp:nowISO()}],created_at:lastWkStr+'T06:30:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.deepRead,title:'Read "Deep Work"',description:'Finish chapters 5-7 this week. Take notes on the four deep work philosophies.',status:'in_progress',priority:'low',due_date:nextWkStr,category:'Personal',tags:['reading','learning','focus'],_sample,annotations:[{id:sid(),text:'Ch5: Monastic vs Bimodal — I lean bimodal',timestamp:nowISO()}],created_at:lastWkStr+'T20:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.budget,title:'Quarterly budget review',description:'Review Q2 spending against plan. Flag any line items over 10% of budget.',status:'not_started',priority:'high',due_date:nextWkStr,category:'Finance',tags:['budget','planning','review'],_sample,annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.apiDocs,title:'Write API docs',description:'Document the new REST endpoints for the team. Include request/response examples.',status:'done',priority:'medium',due_date:lastWkStr,category:'Development',tags:['docs','api','backend'],_sample,annotations:[{id:sid(),text:'Published to internal wiki — link in #dev channel',timestamp:nowISO()}],created_at:lastMthStr,updated_at:lastWkStr+'T17:30:00',deleted_at:null},
+    {id:s.errorHandling,title:'Update error handling middleware',description:'Add global try-catch wrapper for async route handlers. Return consistent error JSON shape.',status:'not_started',priority:'medium',due_date:futStr,category:'Development',tags:['backend','refactor'],_sample,depends_on:[s.loginBug],annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.authRefactor,title:'Refactor auth middleware',description:'Extract JWT validation into reusable middleware. Add rate limiting.',status:'not_started',priority:'medium',due_date:nextWkStr,category:'Development',tags:['backend','security','refactor'],_sample,depends_on:[s.errorHandling],annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.teamMetrics,title:'Compile team metrics',description:'Gather velocity, burndown, and cycle time data for the monthly stakeholder deck.',status:'not_started',priority:'medium',due_date:futStr,category:'Reports',tags:['metrics','team','analysis'],_sample,recur:'monthly',depends_on:[s.weeklyReview],annotations:[{id:sid(),text:'Jira dashboard already configured — just need to export',timestamp:nowISO()}],created_at:lastWkStr+'T11:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.blogPost,title:'Write blog post on accessibility',description:'Draft a post about WCAG 2.2 compliance — what changed and how to audit.',status:'in_progress',priority:'low',due_date:nextWkStr,category:'Content',tags:['writing','blog','a11y'],_sample,annotations:[{id:sid(),text:'Outline approved by marketing. Target: 1500 words.',timestamp:nowISO()}],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.grocery,title:'Grocery shopping',description:'Weekly run: veggies, eggs, milk, bread, oats.',status:'not_started',priority:'low',due_date:todayStr(),category:'Personal',tags:['errand','routine'],_sample,recur:'weekly',annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.meditate,title:'Evening meditation',description:'10 min guided meditation using Headspace.',status:'done',priority:'medium',due_date:yestStr,start_date:yestStr,time:'21:00',category:'Health',tags:['routine','mindfulness'],_sample,recur:'daily',annotations:[{id:sid(),text:'Session 45/90 on Headspace — focus pack',timestamp:nowISO()}],created_at:yestStr+'T21:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.garden,title:'Plant spring vegetables',description:'Prepare raised beds and sow seeds for tomatoes, peppers, basil.',status:'not_started',priority:'low',due_date:futStr,category:'Personal',tags:['garden','outdoor'],_sample,annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.invoice,title:'Send Q2 invoices',description:'Generate and send invoices for Q2 consulting work. Follow up on overdue payments.',status:'not_started',priority:'high',due_date:futStr,category:'Finance',tags:['billing','client'],_sample,depends_on:[s.budget],annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.portfolio,title:'Update portfolio site',description:'Add new projects and case studies. Update tech stack section with recent work.',status:'in_progress',priority:'medium',due_date:nextWkStr,start_date:futStr,category:'Design',tags:['design','frontend','portfolio'],_sample,annotations:[{id:sid(),text:'Decided on Astro + Tailwind stack',timestamp:nowISO()}],created_at:lastWkStr+'T15:00:00',updated_at:nowISO(),deleted_at:null},
+    {id:s.standup,title:'Daily standup',description:'Team sync — updates, blockers, priorities.',status:'not_started',priority:'medium',due_date:todayStr(),start_date:todayStr(),time:'09:00',category:'Meetings',tags:['recurring','team'],_sample,recur:'daily',annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null},
+    {id:s.podcast,title:'Record podcast episode',description:'Episode on "Building in public" — prep talking points and invite co-host.',status:'not_started',priority:'medium',due_date:nextWkStr,category:'Content',tags:['writing','podcast'],_sample,depends_on:[s.blogPost],annotations:[],created_at:nowISO(),updated_at:nowISO(),deleted_at:null}
   ]
 }
 function loadSampleData(quiet){
@@ -2164,8 +2539,8 @@ function checkDueTasks(){
   if(!('Notification'in window)||Notification.permission!=='granted')return;
   const tasks=getTasks().filter(t=>!t.deleted_at);
   const today=todayStr();
-  const dueToday=tasks.filter(t=>t.due_date===today&&t.status!=='done');
-  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done');
+  const dueToday=tasks.filter(t=>t.due_date===today&&t.status!=='done'&&t.status!=='cancelled');
+  const overdue=tasks.filter(t=>t.due_date&&t.due_date<today&&t.status!=='done'&&t.status!=='cancelled');
   if(dueToday.length){
     new Notification('Do-able',{body:`${dueToday.length} task${dueToday.length>1?'s are':' is'} due today`,icon:'/icon.svg'})
   }
@@ -2173,6 +2548,43 @@ function checkDueTasks(){
     new Notification('Do-able',{body:`${overdue.length} overdue task${overdue.length>1?'s':''}!`,icon:'/icon.svg'})
   }
 }
+
+// --- Onboarding ---
+function showOnboarding(){
+  const html=`<div style="text-align:center;margin-bottom:16px">
+    <h2 style="font-family:var(--font-serif);font-size:22px;margin-bottom:8px">Welcome to Do-able</h2>
+    <p class="text-dim text-sm">A local-first task manager for people who want rich features without the cloud.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+    <button class="btn btn-primary" onclick="onboardingChoice('samples')">Try sample tasks</button>
+    <button class="btn btn-secondary" onclick="onboardingChoice('import')">Import from CSV</button>
+    <button class="btn btn-ghost" onclick="onboardingChoice('empty')">Start empty</button>
+  </div>
+  <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px">
+    <div class="settings-label" style="margin-bottom:8px">Quick tour</div>
+    <div style="font-size:13px;line-height:1.8">
+      <div><strong>Kanban</strong> — drag tasks between categories</div>
+      <div><strong>Calendar</strong> — time-based planning with drag-to-reschedule</div>
+      <div><strong>Focus goals</strong> — pick up to 3 tasks for today</div>
+      <div><strong>Eisenhower Matrix</strong> — triage by urgency and importance</div>
+      <div><strong>Templates</strong> — save reusable task molds</div>
+      <div><strong>Recurring series</strong> — automate repeating tasks</div>
+    </div>
+  </div>
+  <div style="background:var(--bg);border-radius:var(--radius);padding:12px;margin-bottom:16px">
+    <div class="text-sm">Personalize in <strong>Settings</strong> — categories, tags, theme, and more.</div>
+  </div>
+  <div style="text-align:center">
+    <button class="btn btn-primary" onclick="dismissOnboarding()">Get started</button>
+  </div>`;
+  showModal(html)
+}
+function onboardingChoice(choice){
+  if(choice==='samples'){loadSampleData(true);loadSampleNotes();renderCurrentPage();dismissOnboarding()}
+  else if(choice==='import'){dismissOnboarding();document.getElementById('csvFileInput').click()}
+  else{dismissOnboarding()}
+}
+function dismissOnboarding(){lsSet('onboarding_seen',true);closeModal()}
 
 // --- Init ---
 async function init(){
@@ -2182,13 +2594,15 @@ async function init(){
   applyTheme(cfg.theme);
   if(cfg.frog_enabled)startFrog();
   const tasks=getTasks();
-  if(!tasks.length){loadSampleData(true);loadSampleNotes()}
+  if(!lsGet('onboarding_seen',false)){showOnboarding()}
   const focus=getFocus();const today=todayStr();
   Object.keys(focus).forEach(d=>{if(d!==today)delete focus[d]});
   saveFocus(focus);
   requestNotifPermission();
   setTimeout(checkDueTasks,1000);
-  renderCurrentPage()
+  renderCurrentPage();
+  const lo=document.getElementById('loadingOverlay');
+  if(lo)lo.remove()
 }
 
 init();

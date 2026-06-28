@@ -12,3 +12,6 @@ __pycache__/
 
 # Specific files
 todo-prompt.txt
+
+# Layers design audit (local only)
+layers/

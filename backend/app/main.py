@@ -22,7 +22,9 @@ from app.routes import (
     scratch,
     search,
     sync,
+    task_series,
     tasks,
+    templates,
 )
 from app.services.config_service import get_all_config, set_config_value
 from app.services.scratch_service import create_note
@@ -76,6 +78,8 @@ app.include_router(sync.router)
 app.include_router(dashboard.router)
 app.include_router(focus.router)
 app.include_router(scratch.router)
+app.include_router(templates.router)
+app.include_router(task_series.router)
 app.include_router(bin.router)
 app.include_router(activity.router)
 app.include_router(config.router)

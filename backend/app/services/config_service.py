@@ -24,6 +24,7 @@ async def get_all_config(db: AsyncSession) -> dict:
         "date_mode": config["date_mode"],
         "notifications": config["notifications"] == "true",
         "per_page": int(config["per_page"]),
+        "category_colors": config.get("category_colors", "{}"),
     }
 
 

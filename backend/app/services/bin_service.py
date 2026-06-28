@@ -3,12 +3,12 @@ from datetime import datetime, timezone
 from sqlalchemy import delete as sa_delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import ActivityLog, Task
-from app.services.task_service import task_to_dict
+from app.models import ActivityLog, Task, TaskDep
+from app.services.task_service import task_to_dict, _LOAD_OPTS
 
 
 async def list_binned_tasks(db: AsyncSession, page: int = 1, per_page: int = 25) -> dict:
-    query = select(Task).where(Task.deleted_at.isnot(None)).order_by(Task.deleted_at.desc())
+    query = select(Task).where(Task.deleted_at.isnot(None)).order_by(Task.deleted_at.desc()).options(*_LOAD_OPTS)
     count_q = select(Task.id).where(Task.deleted_at.isnot(None))
     count_result = await db.execute(count_q)
     total = len(count_result.all())
@@ -32,10 +32,36 @@ async def restore_task(db: AsyncSession, task_id: int) -> bool:
     return True
 
 
+async def hard_delete_task(db: AsyncSession, task_id: int) -> bool:
+    result = await db.execute(
+        select(Task).where(Task.id == task_id, Task.deleted_at.isnot(None))
+    )
+    task = result.scalar_one_or_none()
+    if not task:
+        return False
+    now = datetime.now(timezone.utc).isoformat()
+    dep_result = await db.execute(
+        select(TaskDep).where(TaskDep.depends_on == task_id)
+    )
+    for dep in dep_result.scalars().all():
+        db.add(ActivityLog(task_id=dep.task_id, action="dependency_removed", details=task.title, timestamp=now))
+        await db.delete(dep)
+    db.add(ActivityLog(task_id=task_id, action="deleted", details="permanent", timestamp=now))
+    await db.delete(task)
+    await db.commit()
+    return True
+
+
 async def empty_bin(db: AsyncSession) -> bool:
     now = datetime.now(timezone.utc).isoformat()
     result = await db.execute(select(Task).where(Task.deleted_at.isnot(None)))
-    for task in result.scalars().all():
+    binned = result.scalars().all()
+    for task in binned:
+        dep_result = await db.execute(
+            select(TaskDep).where(TaskDep.depends_on == task.id)
+        )
+        for dep in dep_result.scalars().all():
+            db.add(ActivityLog(task_id=dep.task_id, action="dependency_removed", details=task.title, timestamp=now))
         db.add(ActivityLog(task_id=task.id, action="deleted", details="permanent", timestamp=now))
     await db.execute(sa_delete(Task).where(Task.deleted_at.isnot(None)))
     await db.commit()

@@ -72,12 +72,12 @@ async def test_mark_undone(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_add_note(client: AsyncClient):
-    create = await client.post("/api/tasks", json={"title": "Noted task"})
+async def test_add_annotation(client: AsyncClient):
+    create = await client.post("/api/tasks", json={"title": "Annotated task"})
     tid = create.json()["id"]
-    resp = await client.post(f"/api/tasks/{tid}/note", json={"text": "A note"})
+    resp = await client.post(f"/api/tasks/{tid}/annotation", json={"text": "An annotation"})
     assert resp.status_code == 201
-    assert resp.json()["text"] == "A note"
+    assert resp.json()["text"] == "An annotation"
 
 
 @pytest.mark.asyncio
@@ -97,3 +97,48 @@ async def test_recurring_task(client: AsyncClient):
     assert resp.json()["task"]["status"] == "done"
     assert resp.json()["recurrence"] is not None
     assert resp.json()["recurrence"]["due_date"] == "2026-06-22"
+
+
+@pytest.mark.asyncio
+async def test_cancel_task(client: AsyncClient):
+    create = await client.post("/api/tasks", json={"title": "Cancel me"})
+    tid = create.json()["id"]
+    resp = await client.put(f"/api/tasks/{tid}", json={"status": "cancelled"})
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "cancelled"
+
+
+@pytest.mark.asyncio
+async def test_in_progress_status(client: AsyncClient):
+    create = await client.post("/api/tasks", json={"title": "Working on it"})
+    tid = create.json()["id"]
+    resp = await client.put(f"/api/tasks/{tid}", json={"status": "in_progress"})
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "in_progress"
+
+
+@pytest.mark.asyncio
+async def test_hard_delete_logs_on_dependents(client: AsyncClient):
+    dep_create = await client.post("/api/tasks", json={"title": "Foundation"})
+    dep_id = dep_create.json()["id"]
+    dep_create2 = await client.post("/api/tasks", json={"title": "Dependent", "depends_on": [dep_id]})
+    dependent_id = dep_create2.json()["id"]
+    await client.delete(f"/api/tasks/{dep_id}")
+    resp = await client.delete(f"/api/bin/{dep_id}")
+    assert resp.status_code == 204
+    bin_resp = await client.get("/api/bin")
+    assert all(t["id"] != dep_id for t in bin_resp.json()["tasks"])
+    act_resp = await client.get(f"/api/activity?task_id={dependent_id}&action=dependency_removed")
+    actions = act_resp.json()["entries"]
+    assert len(actions) >= 1
+    assert actions[0]["details"] == "Foundation"
+
+
+@pytest.mark.asyncio
+async def test_config_category_colors(client: AsyncClient):
+    resp = await client.put("/api/config", json={"category_colors": '{"Work":"#5e81ac"}'})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["category_colors"] == '{"Work":"#5e81ac"}'
+    get_resp = await client.get("/api/config")
+    assert get_resp.json()["category_colors"] == '{"Work":"#5e81ac"}'

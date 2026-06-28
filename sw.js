@@ -1,4 +1,4 @@
-const CACHE = 'doable-v1';
+const CACHE = 'doable-v2';
 const ASSETS = [
   '/',
   '/site.webmanifest',
@@ -12,7 +12,12 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(self.clients.claim());
+  e.waitUntil(
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    ])
+  );
 });
 
 self.addEventListener('fetch', e => {

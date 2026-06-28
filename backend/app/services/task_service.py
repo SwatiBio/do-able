@@ -7,7 +7,7 @@ from sqlalchemy import select, delete as sa_delete, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import ActivityLog, Note, Tag, Task, TaskDep, TaskField
+from app.models import ActivityLog, Annotation, Tag, Task, TaskDep, TaskField
 
 
 def parse_relative_date(text: str) -> Optional[str]:
@@ -78,11 +78,12 @@ def task_to_dict(task: Task) -> dict:
         "fields": fields_dict,
         "recur": task.recur,
         "depends_on": [{"id": d.depends_on_task.id, "title": d.depends_on_task.title} for d in task.deps if d.depends_on_task],
-        "notes": [{"id": n.id, "text": n.text, "timestamp": n.timestamp} for n in task.notes],
+        "annotations": [{"id": n.id, "text": n.text, "timestamp": n.timestamp} for n in task.annotations],
         "created_at": task.created_at,
         "updated_at": task.updated_at,
         "deleted_at": task.deleted_at,
         "parent_id": task.parent_id,
+        "series_id": task.series_id,
         "files": json.loads(fields_dict.get("files", "[]")),
         "sample": fields_dict.get("_sample") == "true",
     }
@@ -101,6 +102,7 @@ async def create_task(db: AsyncSession, data: dict) -> Task:
         time=data.get("time"),
         category=data.get("category", ""),
         recur=data.get("recur"),
+        series_id=data.get("series_id"),
         parent_id=data.get("parent_id"),
         created_at=now,
         updated_at=now,
@@ -123,8 +125,8 @@ async def create_task(db: AsyncSession, data: dict) -> Task:
     if data.get("_sample"):
         db.add(TaskField(task_id=task.id, key="_sample", value="true"))
 
-    if data.get("note"):
-        db.add(Note(task_id=task.id, text=data["note"], timestamp=now))
+    if data.get("annotation"):
+        db.add(Annotation(task_id=task.id, text=data["annotation"], timestamp=now))
 
     db.add(ActivityLog(task_id=task.id, action="created", timestamp=now))
     await db.commit()
@@ -136,7 +138,7 @@ _LOAD_OPTS = [
     selectinload(Task.tags),
     selectinload(Task.fields),
     selectinload(Task.deps).selectinload(TaskDep.depends_on_task),
-    selectinload(Task.notes),
+    selectinload(Task.annotations),
 ]
 
 
@@ -153,7 +155,7 @@ async def update_task(db: AsyncSession, task_id: int, data: dict) -> Optional[Ta
         return None
 
     now = datetime.now(timezone.utc).isoformat()
-    simple_fields = {"title", "description", "priority", "status", "category", "recur", "start_date", "time", "parent_id"}
+    simple_fields = {"title", "description", "priority", "status", "category", "recur", "series_id", "start_date", "time", "parent_id"}
 
     for key, val in data.items():
         if key in simple_fields and val is not None:
@@ -176,8 +178,8 @@ async def update_task(db: AsyncSession, task_id: int, data: dict) -> Optional[Ta
         for dep_id in data["depends_on"]:
             db.add(TaskDep(task_id=task_id, depends_on=dep_id))
 
-    if data.get("note"):
-        db.add(Note(task_id=task_id, text=data["note"], timestamp=now))
+    if data.get("annotation"):
+        db.add(Annotation(task_id=task_id, text=data["annotation"], timestamp=now))
 
     task.updated_at = now
     db.add(ActivityLog(task_id=task_id, action="updated", timestamp=now))
@@ -246,17 +248,17 @@ async def mark_undone(db: AsyncSession, task_id: int) -> Optional[Task]:
     return task
 
 
-async def add_note(db: AsyncSession, task_id: int, text: str) -> Optional[Note]:
+async def add_annotation(db: AsyncSession, task_id: int, text: str) -> Optional[Annotation]:
     task = await get_task(db, task_id)
     if not task:
         return None
     now = datetime.now(timezone.utc).isoformat()
-    note = Note(task_id=task_id, text=text, timestamp=now)
-    db.add(note)
+    annotation = Annotation(task_id=task_id, text=text, timestamp=now)
+    db.add(annotation)
     task.updated_at = now
     await db.commit()
-    await db.refresh(note)
-    return note
+    await db.refresh(annotation)
+    return annotation
 
 
 async def list_tasks(
@@ -289,7 +291,7 @@ async def list_tasks(
 
     if due_today:
         query = query.where(Task.due_date == today_str)
-    overdue_statuses = ["not_started", "started"]
+    overdue_statuses = ["not_started", "in_progress"]
     if overdue:
         query = query.where(Task.due_date.isnot(None), Task.due_date < today_str, Task.status.in_(overdue_statuses))
 

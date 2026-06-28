@@ -16,11 +16,12 @@ async def get_dashboard(db: AsyncSession) -> dict[str, Any]:
 
     total = len(all_tasks)
     not_started = sum(1 for t in all_tasks if t.status == "not_started")
-    started = sum(1 for t in all_tasks if t.status == "started")
+    in_progress = sum(1 for t in all_tasks if t.status == "in_progress")
     done = sum(1 for t in all_tasks if t.status == "done")
-    counts = {"total": total, "not_started": not_started, "started": started, "done": done}
+    cancelled = sum(1 for t in all_tasks if t.status == "cancelled")
+    counts = {"total": total, "not_started": not_started, "in_progress": in_progress, "done": done, "cancelled": cancelled}
 
-    active_statuses = ["not_started", "started"]
+    active_statuses = ["not_started", "in_progress"]
     overdue = sum(
         1
         for t in all_tasks

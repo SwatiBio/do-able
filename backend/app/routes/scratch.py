@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas import ScratchNoteCreate, ScratchNoteUpdate
+from app.schemas import NoteCreate, NoteUpdate
 from app.services import scratch_service
 
 router = APIRouter(prefix="/api/notes", tags=["scratch"])
@@ -18,7 +18,7 @@ async def list_notes(
 
 
 @router.post("", status_code=201)
-async def create_note(data: ScratchNoteCreate, db: AsyncSession = Depends(get_db)):
+async def create_note(data: NoteCreate, db: AsyncSession = Depends(get_db)):
     note = await scratch_service.create_note(db, data.text, data.pinned)
     return {
         "id": note.id,
@@ -30,7 +30,7 @@ async def create_note(data: ScratchNoteCreate, db: AsyncSession = Depends(get_db
 
 
 @router.put("/{note_id}")
-async def update_note(note_id: int, data: ScratchNoteUpdate, db: AsyncSession = Depends(get_db)):
+async def update_note(note_id: int, data: NoteUpdate, db: AsyncSession = Depends(get_db)):
     note = await scratch_service.update_note(db, note_id, text=data.text, pinned=data.pinned)
     if not note:
         raise HTTPException(404, "Note not found")

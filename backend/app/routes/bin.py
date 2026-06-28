@@ -24,6 +24,13 @@ async def restore_task(task_id: int, db: AsyncSession = Depends(get_db)):
     return {"ok": True}
 
 
+@router.delete("/{task_id}", status_code=204)
+async def hard_delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
+    ok = await bin_service.hard_delete_task(db, task_id)
+    if not ok:
+        raise HTTPException(404, "Task not found in bin")
+
+
 @router.delete("", status_code=204)
 async def empty_bin(db: AsyncSession = Depends(get_db)):
     await bin_service.empty_bin(db)

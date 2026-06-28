@@ -4,12 +4,12 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import ScratchNote
+from app.models import Note
 
 
 async def list_notes(db: AsyncSession, page: int = 1, per_page: int = 25) -> dict:
-    query = select(ScratchNote).order_by(ScratchNote.pinned.desc(), ScratchNote.updated_at.desc())
-    count_q = select(ScratchNote.id)
+    query = select(Note).order_by(Note.pinned.desc(), Note.updated_at.desc())
+    count_q = select(Note.id)
     count_result = await db.execute(count_q)
     total = len(count_result.all())
     query = query.offset((page - 1) * per_page).limit(per_page)
@@ -27,17 +27,17 @@ async def list_notes(db: AsyncSession, page: int = 1, per_page: int = 25) -> dic
     return {"notes": notes, "total": total, "page": page, "per_page": per_page, "pages": pages}
 
 
-async def create_note(db: AsyncSession, text: str, pinned: bool = False) -> ScratchNote:
+async def create_note(db: AsyncSession, text: str, pinned: bool = False) -> Note:
     now = datetime.now(timezone.utc).isoformat()
-    note = ScratchNote(text=text, pinned=int(pinned), created_at=now, updated_at=now)
+    note = Note(text=text, pinned=int(pinned), created_at=now, updated_at=now)
     db.add(note)
     await db.commit()
     await db.refresh(note)
     return note
 
 
-async def update_note(db: AsyncSession, note_id: int, text: Optional[str] = None, pinned: Optional[bool] = None) -> Optional[ScratchNote]:
-    result = await db.execute(select(ScratchNote).where(ScratchNote.id == note_id))
+async def update_note(db: AsyncSession, note_id: int, text: Optional[str] = None, pinned: Optional[bool] = None) -> Optional[Note]:
+    result = await db.execute(select(Note).where(Note.id == note_id))
     note = result.scalar_one_or_none()
     if not note:
         return None
@@ -53,7 +53,7 @@ async def update_note(db: AsyncSession, note_id: int, text: Optional[str] = None
 
 
 async def delete_note(db: AsyncSession, note_id: int) -> bool:
-    result = await db.execute(select(ScratchNote).where(ScratchNote.id == note_id))
+    result = await db.execute(select(Note).where(Note.id == note_id))
     note = result.scalar_one_or_none()
     if not note:
         return False

@@ -1,9 +1,27 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, Text, text
+from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, Text, text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
+
+
+class TaskSeries(Base):
+    __tablename__ = "task_series"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String, nullable=False)
+    description = Column(Text, default="")
+    priority = Column(String, default="medium")
+    category = Column(String, default="")
+    tags = Column(Text, default="[]")
+    recur = Column(String, nullable=False)
+    start_date = Column(String, nullable=True)
+    time = Column(String, nullable=True)
+    files = Column(Text, default="[]")
+    active = Column(Integer, default=1)
+    created_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
 
 
 class Task(Base):
@@ -19,6 +37,7 @@ class Task(Base):
     time = Column(String, nullable=True)
     category = Column(String, default="")
     recur = Column(String, nullable=True)
+    series_id = Column(Integer, ForeignKey("task_series.id", ondelete="SET NULL"), nullable=True)
     parent_id = Column(Integer, ForeignKey("tasks.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
     updated_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
@@ -29,7 +48,7 @@ class Task(Base):
     fields = relationship("TaskField", back_populates="task", cascade="all, delete-orphan")
     deps = relationship("TaskDep", back_populates="task", cascade="all, delete-orphan", foreign_keys="[TaskDep.task_id]")
     depended_by = relationship("TaskDep", back_populates="depends_on_task", foreign_keys="[TaskDep.depends_on]")
-    notes = relationship("Note", back_populates="task", cascade="all, delete-orphan")
+    annotations = relationship("Annotation", back_populates="task", cascade="all, delete-orphan")
 
 
 class Tag(Base):
@@ -63,15 +82,15 @@ class TaskDep(Base):
     depends_on_task = relationship("Task", back_populates="depended_by", foreign_keys=[depends_on])
 
 
-class Note(Base):
-    __tablename__ = "notes"
+class Annotation(Base):
+    __tablename__ = "annotations"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     task_id = Column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False)
     text = Column(String, nullable=False)
     timestamp = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
 
-    task = relationship("Task", back_populates="notes")
+    task = relationship("Task", back_populates="annotations")
 
 
 class ActivityLog(Base):
@@ -91,12 +110,27 @@ class Config(Base):
     value = Column(String, nullable=False)
 
 
-class ScratchNote(Base):
-    __tablename__ = "scratch_notes"
+class Note(Base):
+    __tablename__ = "notes"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     text = Column(String, nullable=False)
     pinned = Column(Integer, default=0)
+    created_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class Template(Base):
+    __tablename__ = "templates"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(Text, default="")
+    priority = Column(String, default="medium")
+    category = Column(String, default="")
+    tags = Column(Text, default="[]")
+    recur = Column(String, nullable=True)
     created_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
     updated_at = Column(String, nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
 

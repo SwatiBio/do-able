@@ -23,16 +23,19 @@ Array of task objects. Each task:
   "category": "personal",
   "tags": ["errands"],
   "recur": null,
+  "series_id": null,
   "depends_on": [],
   "parent_id": null,
   "files": [],
-  "notes": [],
+  "annotations": [],
   "created_at": "2026-06-21T10:00:00.000Z",
   "updated_at": "2026-06-21T10:00:00.000Z",
   "deleted_at": null,
   "_sample": true
 }
 ```
+
+Status values: `not_started`, `in_progress`, `done`, `cancelled`
 
 ### doable_activity
 
@@ -48,7 +51,7 @@ Array of activity entries (newest first). Max 500 entries, capped to 10 days.
 }
 ```
 
-Actions: created, completed, deleted, restored, updated.
+Actions: created, started, completed, cancelled, deleted, restored, updated, dependency_removed, rescheduled, recurred, series_stopped.
 
 ### doable_config
 
@@ -57,9 +60,12 @@ Actions: created, completed, deleted, restored, updated.
   "theme": "nord-dark",
   "date_mode": "smart",
   "per_page": 25,
-  "frog_enabled": false
+  "frog_enabled": false,
+  "category_colors": "{\"Work\":\"#5e81ac\",\"Personal\":\"#a3be8c\"}"
 }
 ```
+
+`category_colors` is a JSON string mapping category names to hex colors. Managed via Settings → Categories. Used for colored dots/borders in task list, Kanban, and task detail.
 
 ### doable_notes
 
@@ -72,6 +78,7 @@ Array of scratch pad notes.
   "pinned": true,
   "created_at": "2026-06-21T10:00:00.000Z",
   "updated_at": "2026-06-21T10:00:00.000Z"
+
 }
 ```
 
@@ -93,9 +100,9 @@ Array of visible column keys in list view.
 ["priority", "status", "due", "tags", "category"]
 ```
 
-### do_templates
+### doable_templates
 
-Array of saved task templates.
+Array of saved task templates. Synced to backend `/api/templates` and included in `/api/sync/full`.
 
 ```json
 [
@@ -107,6 +114,30 @@ Array of saved task templates.
     "category": "work",
     "tags": ["reports"],
     "recur": "weekly"
+  }
+]
+```
+
+### doable_series
+
+Array of recurring task series. Synced to backend `/api/series` and included in `/api/sync/full`. Each series is a mold for recurring task instances.
+
+```json
+[
+  {
+    "id": "1",
+    "title": "Daily standup",
+    "description": "Team sync — updates, blockers, priorities.",
+    "priority": "medium",
+    "category": "Meetings",
+    "tags": ["team"],
+    "recur": "daily",
+    "start_date": null,
+    "time": "09:00",
+    "files": [],
+    "active": true,
+    "created_at": "2026-06-28T10:00:00",
+    "updated_at": "2026-06-28T10:00:00"
   }
 ]
 ```
@@ -128,7 +159,13 @@ All defined globally in doable.html.
 | getFocus() | Returns focus goals map |
 | saveFocus(focus) | Saves focus goals and syncs to API |
 | getTemplates() | Returns saved templates from localStorage |
-| saveTemplates(t) | Saves templates to localStorage |
+| saveTemplates(t) | Saves templates to localStorage and syncs to API |
+| getSeries() | Returns recurring task series from localStorage |
+| saveSeries(s) | Saves series to localStorage and syncs to API |
+| ensureSeriesForTask(t) | Auto-creates a series when recur is set on a task |
+| getCategoryColors() | Returns category→hex color map from config |
+| saveCategoryColor(cat, color) | Sets/clears a category color in config |
+| categoryDot(cat) | Returns HTML for a colored dot, or empty string |
 | logActivity(taskId, action, details) | Adds an activity entry |
 | quickAddTask() | Creates a task from the quick-add input (parses natural language) |
 | toggleTaskDone(id, checked) | Toggles completion, fires confetti, handles recurrence |
@@ -137,6 +174,12 @@ All defined globally in doable.html.
 | createBackup() | Downloads all data as JSON |
 | restoreBackup(event) | Restores data from a JSON file |
 | exportData(format) | Exports tasks as JSON, CSV, or Markdown |
+| importCSV(event) | Imports tasks from a CSV file (requires "title" column; supports status, priority, due_date, category, tags, annotations, description, recur, start_date, time) |
+| showOnboarding() | Shows first-run onboarding modal (sample tasks, CSV import, or start empty) |
+| dismissOnboarding() | Sets onboarding_seen flag and closes modal |
+| renderDashWeekProgress() | Renders weekly completion summary with trend vs last week |
+| renderDashStreak() | Renders daily completion streak (consecutive days with completed tasks) |
+| showFocusMode() | Opens focus modal — aggregates focus goals, overdue, due today, and roulette into one distraction-free view |
 | navigateTo(page) | Switches between pages |
 | cycleTheme() | Cycles through Nord Dark, Nord Light, System |
 | fireConfetti() | Triggers confetti animation |
@@ -151,8 +194,8 @@ All defined globally in doable.html.
 
 | Function | What it does |
 |----------|-------------|
-| _initApi() | Loads tasks, config, notes, focus from the API on startup |
-| _syncFull() | Bulk syncs tasks/notes/config to POST /api/sync/full |
+| _initApi() | Loads tasks, config, notes, focus, templates, series from the API on startup |
+| _syncFull() | Bulk syncs tasks/notes/config/templates/series to POST /api/sync/full |
 
 ## Backend REST API
 
@@ -169,14 +212,14 @@ Base URL: http://localhost:8000
 | DELETE | /api/tasks/{id} | Soft-delete a task |
 | POST | /api/tasks/{id}/done | Mark done (triggers recurrence) |
 | POST | /api/tasks/{id}/undone | Reopen a done task |
-| POST | /api/tasks/{id}/note | Add an annotation |
+| POST | /api/tasks/{id}/annotation | Add an annotation |
 
 ### Config and Focus
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | /api/config | Get config |
-| PUT | /api/config | Update config |
+| GET | /api/config | Get config (theme, date_mode, per_page, category_colors) |
+| PUT | /api/config | Update config (theme, date_mode, per_page, category_colors) |
 | GET | /api/focus | Get focus goals |
 | PUT | /api/focus | Update focus goals |
 
@@ -189,11 +232,30 @@ Base URL: http://localhost:8000
 | PUT | /api/notes/{id} | Update a note |
 | DELETE | /api/notes/{id} | Delete a note |
 
+### Templates
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/templates | List all templates |
+| POST | /api/templates | Create a template |
+| PUT | /api/templates/{id} | Update a template |
+| DELETE | /api/templates/{id} | Delete a template |
+
+### Recurring Series
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/series | List all series |
+| POST | /api/series | Create a series |
+| PUT | /api/series/{id} | Update a series |
+| POST | /api/series/{id}/stop | Stop a series (set active=false) |
+| DELETE | /api/series/{id} | Delete a series |
+
 ### Sync
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | /api/sync/full | Bulk import tasks, notes, config. Body: {tasks, notes, config}. Returns {id_map, tasks, notes} for ID remapping. |
+| POST | /api/sync/full | Bulk import tasks, notes, config, templates, series. Body: {tasks, notes, config, templates, series}. Returns {id_map, series_id_map} for ID remapping. |
 
 ### Dashboard and Search
 
@@ -216,6 +278,7 @@ Base URL: http://localhost:8000
 |--------|------|-------------|
 | GET | /api/bin | List deleted tasks |
 | POST | /api/bin/{id}/restore | Restore a deleted task |
+| DELETE | /api/bin/{id} | Permanently delete a single task (logs on dependents) |
 | DELETE | /api/bin | Empty the bin |
 
 ### Activity and Export
@@ -248,9 +311,9 @@ All reads are synchronous localStorage operations. Every write updates localStor
 | Time blocking | Click an hour slot in calendar week view to assign a task's time |
 | My Day | Dashboard section grouping overdue, due-today, and focus goals |
 | Smart reminders | Browser Notification API for due and overdue tasks |
-| Recurrence | On completion, auto-creates the next instance with an incremented due date |
-| Soft-delete | deleted_at timestamp, hidden from main views, visible in Bin |
-| Dependencies | depends_on array with incompletion warnings and "blocks N tasks" indicator |
+| Recurrence | On completion, auto-creates the next instance from the task's series (preserving files, time, and dependencies) |
+| Soft-delete | deleted_at timestamp, hidden from main views, visible in Bin. Pre-delete warning when task has subtasks or dependents |
+| Dependencies | depends_on array with incompletion warnings and "blocks N tasks" indicator. On permanent deletion of a dependency, log entry on dependent task |
 | Focus goals | Per-date map, max 3 per day, auto-clears daily, confetti when all done |
 | Heatmap | GitHub-style 53-week contribution grid colored by completion density |
 | Eisenhower Matrix | Four quadrants based on priority and due date proximity |

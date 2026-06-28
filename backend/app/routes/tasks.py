@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas import NoteCreate, TaskCreate, TaskOut, TaskUpdate
+from app.schemas import AnnotationCreate, TaskCreate, TaskOut, TaskUpdate
 from app.services import task_service
 from app.services.backup_service import auto_backup
 
@@ -85,9 +85,9 @@ async def mark_undone(task_id: int, db: AsyncSession = Depends(get_db)):
     return task_service.task_to_dict(task)
 
 
-@router.post("/{task_id}/note", status_code=201)
-async def add_note(task_id: int, data: NoteCreate, db: AsyncSession = Depends(get_db)):
-    note = await task_service.add_note(db, task_id, data.text)
-    if not note:
+@router.post("/{task_id}/annotation", status_code=201)
+async def add_annotation(task_id: int, data: AnnotationCreate, db: AsyncSession = Depends(get_db)):
+    annotation = await task_service.add_annotation(db, task_id, data.text)
+    if not annotation:
         raise HTTPException(404, "Task not found")
-    return {"id": note.id, "text": note.text, "timestamp": note.timestamp}
+    return {"id": annotation.id, "text": annotation.text, "timestamp": annotation.timestamp}

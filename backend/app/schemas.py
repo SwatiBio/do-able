@@ -16,11 +16,12 @@ class TaskCreate(BaseModel):
     tags: list[str] = []
     fields: dict[str, str] = {}
     recur: Optional[str] = None
+    series_id: Optional[int] = None
     depends_on: list[int] = []
     depends_on_str: list[str] = []
-    notes: list[dict] = []
+    annotations: list[dict] = []
     files: list[dict] = []
-    note: Optional[str] = None
+    annotation: Optional[str] = None
     parent_id: Optional[int] = None
 
 
@@ -36,12 +37,13 @@ class TaskUpdate(BaseModel):
     tags: Optional[list[str]] = None
     fields: Optional[dict[str, str]] = None
     recur: Optional[str] = None
+    series_id: Optional[int] = None
     depends_on: Optional[list[int]] = None
-    note: Optional[str] = None
+    annotation: Optional[str] = None
     parent_id: Optional[int] = None
 
 
-class NoteOut(BaseModel):
+class AnnotationOut(BaseModel):
     id: int
     text: str
     timestamp: str
@@ -68,8 +70,9 @@ class TaskOut(BaseModel):
     fields: dict[str, str] = {}
     recur: Optional[str] = None
     depends_on: list[DepOut] = []
-    notes: list[NoteOut] = []
+    annotations: list[AnnotationOut] = []
     parent_id: Optional[int] = None
+    series_id: Optional[int] = None
     files: list[dict] = []
     sample: bool = Field(False, alias="_sample")
     created_at: str
@@ -86,7 +89,7 @@ class TaskListResponse(BaseModel):
     pages: int
 
 
-class NoteCreate(BaseModel):
+class AnnotationCreate(BaseModel):
     text: str
 
 
@@ -129,6 +132,7 @@ class ConfigResponse(BaseModel):
     date_mode: str = "smart"
     notifications: bool = True
     per_page: int = 25
+    category_colors: str = "{}"
 
 
 class ConfigUpdate(BaseModel):
@@ -136,6 +140,7 @@ class ConfigUpdate(BaseModel):
     date_mode: Optional[str] = None
     notifications: Optional[bool] = None
     per_page: Optional[int] = None
+    category_colors: Optional[str] = None
 
 
 class BackupOut(BaseModel):
@@ -156,17 +161,17 @@ class FocusUpdate(BaseModel):
     task_ids: list[int]
 
 
-class ScratchNoteCreate(BaseModel):
+class NoteCreate(BaseModel):
     text: str
     pinned: bool = False
 
 
-class ScratchNoteUpdate(BaseModel):
+class NoteUpdate(BaseModel):
     text: Optional[str] = None
     pinned: Optional[bool] = None
 
 
-class ScratchNoteOut(BaseModel):
+class NoteOut(BaseModel):
     id: int
     text: str
     pinned: bool
@@ -175,7 +180,7 @@ class ScratchNoteOut(BaseModel):
 
 
 class PaginatedNotes(BaseModel):
-    notes: list[ScratchNoteOut]
+    notes: list[NoteOut]
     total: int
     page: int
     per_page: int
@@ -185,3 +190,78 @@ class PaginatedNotes(BaseModel):
 class DoneResponse(BaseModel):
     task: TaskOut
     recurrence: Optional[TaskOut] = None
+
+
+class TemplateCreate(BaseModel):
+    name: str
+    title: str
+    description: str = ""
+    priority: str = "medium"
+    category: str = ""
+    tags: list[str] = []
+    recur: Optional[str] = None
+
+
+class TemplateUpdate(BaseModel):
+    name: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[list[str]] = None
+    recur: Optional[str] = None
+
+
+class TemplateOut(BaseModel):
+    id: int
+    name: str
+    title: str
+    description: str
+    priority: str
+    category: str
+    tags: list[str] = []
+    recur: Optional[str] = None
+    created_at: str
+    updated_at: str
+
+
+class TaskSeriesCreate(BaseModel):
+    title: str
+    description: str = ""
+    priority: str = "medium"
+    category: str = ""
+    tags: list[str] = []
+    recur: str
+    start_date: Optional[str] = None
+    time: Optional[str] = None
+    files: list[dict] = []
+    active: bool = True
+
+
+class TaskSeriesUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[list[str]] = None
+    recur: Optional[str] = None
+    start_date: Optional[str] = None
+    time: Optional[str] = None
+    files: Optional[list[dict]] = None
+    active: Optional[bool] = None
+
+
+class TaskSeriesOut(BaseModel):
+    id: int
+    title: str
+    description: str
+    priority: str
+    category: str
+    tags: list[str] = []
+    recur: str
+    start_date: Optional[str] = None
+    time: Optional[str] = None
+    files: list[dict] = []
+    active: bool
+    created_at: str
+    updated_at: str
