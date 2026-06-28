@@ -25,7 +25,7 @@ If the server is offline, the frontend keeps working from localStorage. When con
 
 The sidebar uses an "orbital ring" design: a 44px circular button fixed at the bottom-left corner of the screen. Clicking it slides open a 200px navigation panel from the left with a backdrop overlay. On mobile the ring shrinks and the sidebar takes the full width.
 
-The topbar is 52px tall with a global search input on the left and a theme-cycle button on the right.
+The topbar is 52px tall. Left to right: global search input, centered page title (`#topbarTitle`), command palette trigger (⌘K / Ctrl+K), focus-mode button, theme-cycle button, offline badge.
 
 ## Pages
 
@@ -87,6 +87,27 @@ Collapsible accordion sections:
 
 Modal shown on first visit (before `onboarding_seen` flag is set). Offers three choices: try sample tasks, import from CSV, or start empty. Includes a quick tour of key features (Kanban, Calendar, Focus Goals, Eisenhower, Templates, Recurring Series) and a prompt to personalize in Settings.
 
+## Command Palette & Keyboard Shortcuts
+
+A command palette (Ctrl/Cmd+K) provides fuzzy-search access to navigation, view switches, and actions. It opens as a centered modal dialog with a combobox input, grouped listbox (Navigation / Task views / Actions), and a footer hint bar (↑↓ navigate / ↵ select / Esc close). Selection highlights with the accent color; hints show the direct shortcut for each command where one exists.
+
+A shortcuts help modal (Ctrl/Cmd+/) lists all bindings grouped by category.
+
+### Global shortcuts
+
+| Binding | Action |
+|---------|--------|
+| Ctrl/Cmd+K | Toggle command palette |
+| Ctrl/Cmd+/ | Show keyboard shortcuts help |
+| Ctrl/Cmd+↵ | New task (focuses the quick-add input on the Tasks page) |
+| Ctrl/Cmd+⇧F | Focus mode |
+| Ctrl/Cmd+⇧L | Toggle sidebar |
+| Ctrl/Cmd+⇧1–5 | Navigate to Dashboard / Tasks / Bin / Activity / Settings |
+
+### In-palette keys
+
+↑↓ navigate, ↵ select, Esc close, Tab trapped.
+
 ## Theme
 
 Nord palette via CSS custom properties, toggled by a `data-theme` attribute on the HTML element.
@@ -125,7 +146,7 @@ The app is a Progressive Web App. It has a service worker (`sw.js`) that caches 
 ## Accessibility
 
 - **ARIA labels** on all icon-only buttons (sidebar ring, theme toggle, view toggles). Landmark roles on sidebar (`navigation`) and topbar (`banner`). Modal has `role="dialog"` with `aria-modal` and `aria-labelledby`. Toast container has `aria-live="polite"`.
-- **Keyboard navigation**: `:focus-visible` outline (2px accent color) shows for keyboard users, suppressed for mouse clicks. Sidebar ring is keyboard-activatable (Enter/Space).
+- **Keyboard navigation**: `:focus-visible` outline (2px accent color) shows for keyboard users, suppressed for mouse clicks. Sidebar ring is keyboard-activatable (Enter/Space). Global shortcuts (Ctrl/Cmd+K palette, Ctrl/Cmd+/ help, Ctrl/Cmd+↵ new task, Ctrl/Cmd+⇧F focus, Ctrl/Cmd+⇧L sidebar, Ctrl/Cmd+⇧1–5 page nav) are active when no overlay is open. The command palette uses `role="dialog"` / `role="combobox"` / `role="listbox"` / `role="option"` with `aria-selected` and `aria-activedescendant` for screen-reader support.
 - **Modal focus trap**: Tab and Shift+Tab cycle within the modal. Focus is saved on open and restored on close. Escape key closes the modal.
 - **Offline indicator**: pulsing orange "Offline" badge in the topbar when backend is unreachable. All writes fall back to localStorage and sync on reconnection.
 - **Loading state**: spinner overlay shown on initial page load until data fetch completes.

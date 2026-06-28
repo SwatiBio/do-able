@@ -9,12 +9,14 @@ do-able/
   site.webmanifest         PWA manifest with app name, icons, colors
   icon.svg                 App icon for PWA and notifications
   README.md                Getting started guide
-  design.md                Design specification
-  api.md                   API reference (localStorage + REST)
-  directory-structure.md   This file
-  TRACKER.md               Build progress tracker
   LICENSE                  MIT license
   .gitignore               Ignored files
+  docs/
+    api.md                 API reference (localStorage + REST)
+    conceptual-model.md    Objects, states, relationships, architecture decisions
+    design.md              Design specification
+    directory-structure.md This file
+    TRACKER.md             Build progress tracker
   backend/
     pyproject.toml         Project metadata
     requirements.txt       Python dependencies (fastapi, uvicorn, sqlalchemy, aiosqlite)

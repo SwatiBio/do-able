@@ -114,6 +114,17 @@
 | Category management | done |
 | Template management | done |
 
+## Command Palette & Keyboard Shortcuts
+
+| Feature | Status |
+|---------|--------|
+| Command palette (Ctrl/Cmd+K, fuzzy search, grouped results) | done |
+| Shortcuts help modal (Ctrl/Cmd+/) | done |
+| Global shortcuts (Ctrl/Cmd+↵ new task, ⇧F focus, ⇧L sidebar, ⇧1-5 nav) | done |
+| In-palette keyboard nav (↑↓ ↵ Esc, Tab trap) | done |
+| Palette trigger button in topbar (⌘K / Ctrl+K) | done |
+| ARIA roles (dialog/combobox/listbox/option) | done |
+
 ## Layer 3: Polish
 
 | Step | Status |
