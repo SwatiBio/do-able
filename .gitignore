@@ -6,6 +6,8 @@ backup-frontend/
 __pycache__/
 *.pyc
 *.egg-info/
+.venv/
+.pytest_cache/
 
 # SQLite database
 .todo/
@@ -15,3 +17,9 @@ todo-prompt.txt
 
 # Layers design audit (local only)
 layers/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.env
