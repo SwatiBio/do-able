@@ -4,12 +4,12 @@ A task manager that runs in your browser with an optional Python backend for per
 
 ## How it works
 
-Do-able has two parts:
+Two parts:
 
-1. **Frontend** (`doable.html`): A single HTML file with all CSS and JavaScript inside it. No build step, no dependencies. Just open it in a browser.
-2. **Backend** (`backend/`): A FastAPI server that saves your data to a SQLite database. This means your tasks survive even if you clear your browser data.
+1. **Frontend** (`doable.html`): A single HTML file with all CSS and JavaScript inside. No build step, no dependencies. Open it in a browser and it works.
+2. **Backend** (`backend/`): A FastAPI server that saves your data to SQLite. Your tasks survive even if you clear your browser data.
 
-By default the app reads from your browser's localStorage (instant) and writes to both localStorage and the backend server (in the background). If the server is down, the app still works fine from localStorage alone.
+The app reads from localStorage (instant) and writes to both localStorage and the backend (in the background). If the server is down, the app keeps working from localStorage alone.
 
 ## Clone and run
 
@@ -17,33 +17,22 @@ By default the app reads from your browser's localStorage (instant) and writes t
 
 - Python 3.10 or newer
 - Git
-- A web browser (Chrome, Firefox, Edge, Safari all work)
+- A web browser
 
 ### Steps
 
 ```bash
-# Clone the repo
 git clone https://github.com/SwatiBio/do-able.git
-cd do-able
+cd do-able/backend
 
-# Go into the backend folder
-cd backend
-
-# Create a virtual environment
 python -m venv .venv
 
 # Activate it
-# Windows PowerShell:
-.venv\Scripts\Activate.ps1
-# Windows Git Bash:
-source .venv/Scripts/activate
-# Mac/Linux:
-source .venv/bin/activate
+.venv\Scripts\Activate.ps1        # Windows PowerShell
+source .venv/Scripts/activate     # Windows Git Bash
+source .venv/bin/activate        # Mac/Linux
 
-# Install dependencies
 pip install -r requirements.txt
-
-# Start the server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -53,7 +42,7 @@ On Windows you can also double-click `start.bat` from the project root. It start
 
 ### First run
 
-The first time you open the app, it loads 20 sample tasks and 4 scratch notes so you can see how things work. You can remove them from Settings > Data > Remove Samples.
+The first time you open the app, an onboarding modal asks how you want to start: try sample tasks, import from CSV, or start empty. You can remove samples later from Settings > Data > Remove Samples.
 
 A SQLite database gets created automatically at `backend/.todo/todo.db`. No setup needed.
 
@@ -75,78 +64,57 @@ The app is a PWA, so once added to your home screen it runs in its own window wi
 
 ### Views
 
-- **Dashboard** with scratch notes, daily focus goals, overdue and due-today lists, priority and category bar charts, a heatmap grid showing task completion over 53 weeks, a My Day section, and a task roulette that picks a random incomplete task
-- **Task List** with sortable columns, two-step sort (pick field then direction), filters (status, priority, category, due date range), column visibility toggle, and pagination
-- **Kanban** grouped by category with drag-and-drop to reassign
-- **Calendar** with month and week views, multi-day bars, recurring task previews, drag-and-drop reschedule, jump-to-date picker, today pulse animation, and overdue glow on past-due days. Week view supports time blocking where you click an hour slot to assign a task to that time
-- **Eisenhower Matrix** with four quadrants (Do First, Schedule, Delegate, Eliminate) based on priority and due date urgency
-- **Task Detail** as a full-page editor with inline editing for every field
+- **Dashboard** with scratch notes, daily focus goals, overdue and due-today lists, weekly completion summary with trend, daily streak, My Day section, heatmap grid, and task roulette
+- **Task List** with sortable columns, two-step sort, filters, column toggle, pagination. Shows dependency count and blocks-N indicator per task
+- **Kanban** grouped by category with colored headers, drag-and-drop to reassign, cards showing deps, tags, annotations, and blocks count
+- **Calendar** with month and week views, multi-day bars, recurring task previews, drag-and-drop reschedule, jump-to-date, and time blocking in week view
+- **Eisenhower Matrix** with four quadrants based on priority and due date urgency. A hint banner appears when you have more than 15 active tasks
+- **Task Detail** as a full-page editor with recent activity panel, inline editing for every field, subtasks, dependencies, annotations, attachments, and recurrence
 
 ### Task management
 
-- Natural language quick-add: type "Buy milk tomorrow high" and it parses the due date and priority automatically
-- Subtasks with parent/child relationships and fold/unfold toggle in the list view
-- Task templates: save any task as a template, apply it from the quick-add area or the detail page
+- Natural language quick-add: type "Buy milk tomorrow high" and it parses the due date and priority
+- Subtasks with parent/child relationships and fold/unfold toggle
+- Task templates: save any task as a template, apply from quick-add or detail page. Templates sync to the backend
+- Recurring tasks (daily, weekly, monthly) with series support: stop, edit, and automatic instance creation that preserves files, time, and dependencies
+- Dependencies between tasks with incompletion warnings and blocks-N indicators in list and kanban views
 - Attachments: upload up to 5 files (2 MB each) per task, stored as base64
-- Dependencies between tasks with incompletion warnings
-- Recurring tasks (daily, weekly, monthly) that auto-create the next instance on completion
-- Annotations/notes timeline on each task
-- Soft-delete with a Bin for restoring deleted tasks
+- Annotations timeline on each task
+- Soft-delete with a Bin for restoring or permanently deleting. Pre-delete warnings for subtasks and dependents
+- Task states: not started, in progress, done, cancelled
 
 ### Smart features
 
-- My Day: a daily planner on the dashboard showing overdue, due-today, and focus goals
+- Focus mode: a distraction-free modal that aggregates your focus goals, overdue, due-today, and a random task picker into one screen
+- My Day: daily planner showing overdue, due-today, and focus goals
 - Heatmap grid: GitHub-style contribution calendar showing your completion density
-- Task roulette: press a button to pick a random incomplete task
+- Daily streak: consecutive days with at least one completed task
+- Weekly progress: completion count with trend vs last week
+- Task roulette: pick a random incomplete task
 - Smart reminders: browser notifications for due and overdue tasks (opt-in via Settings)
 - Global search across task titles and descriptions
+- CSV import: bring tasks from any CSV file with a "title" column
+
+### Accessibility
+
+- ARIA labels on icon-only buttons, landmark roles on navigation and banner
+- Keyboard navigation with focus-visible outlines
+- Modal focus trap with Tab cycling and Escape to close
+- Offline indicator badge when backend is unreachable
+- Loading state on initial page load
 
 ### Extras
 
-- Frog companion: an interactive SVG frog with 7 states (idle, sleep, stretch, walk, happy, peek, perch) that auto-cycles and reacts to your actions
+- First-run onboarding with three start options (samples, CSV import, or empty)
+- Frog companion: an interactive SVG frog with 7 states that auto-cycles and reacts to your actions
 - Confetti on task completion
 - Nord color theme (dark, light, and system-aware modes)
+- Category colors with per-category color pickers in Settings
 - Tufte-inspired design: no decorative illustrations, no shadows, no gradients
 - PWA support: installable on desktop and mobile, works offline
 - Export tasks as JSON, CSV, or Markdown
 - Backup and restore via JSON files
-- Activity log tracking all changes
-
-## Project structure
-
-```
-do-able/
-  doable.html           The entire frontend (2200+ lines)
-  start.bat             Starts the server and opens the browser (Windows)
-  stop.bat              Kills the server (Windows)
-  sw.js                 Service worker for PWA offline caching
-  site.webmanifest      PWA manifest (app name, icons, colors)
-  icon.svg              App icon for PWA and notifications
-  backend/
-    requirements.txt    Python dependencies
-    app/
-      main.py           FastAPI entry point and route registration
-      database.py       SQLAlchemy async engine setup
-      models.py         Database models (Task, Tag, Note, Config, etc.)
-      schemas.py        Pydantic validation schemas
-      routes/           API endpoint handlers (12 modules)
-      services/         Business logic (10 modules)
-    tests/              Backend tests
-```
-
-## API
-
-The backend exposes 28 REST endpoints under `/api/`. See `api.md` for the full reference.
-
-Main endpoints:
-
-- `GET /` serves the frontend HTML
-- `/api/tasks` for CRUD operations on tasks
-- `/api/sync/full` for bulk importing data from the frontend
-- `/api/config`, `/api/focus`, `/api/notes` for settings and scratch data
-- `/api/dashboard` for analytics
-- `/api/search` for full-text search
-- `/api/backups`, `/api/bin`, `/api/activity`, `/api/export` for everything else
+- Activity log tracking 11 event types: created, started, completed, cancelled, deleted, restored, updated, dependency removed, rescheduled, recurred, series stopped
 
 ## License
 
