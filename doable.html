@@ -488,8 +488,15 @@ textarea{resize:vertical;min-height:80px}
 
       <!-- Dashboard -->
       <div class="page active" id="page-dashboard">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <button class="btn btn-primary btn-sm" onclick="navigateTo('tasks')">+ Add Task</button>
+        <div class="quick-add" style="margin-bottom:10px">
+          <input type="text" id="dashQuickAdd" placeholder='Add a task... "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')dashQuickAddTask()">
+          <button class="btn btn-primary btn-sm" onclick="dashQuickAddTask()">Add</button>
+          <span class="nl-info" title='Natural language tips:
+  "Buy milk tomorrow high" → due tomorrow, high priority
+  "Meeting next monday medium" → due next Mon, medium priority
+  "Read article" → no due, medium priority
+  "Submit report today low" → due today, low priority
+  Keywords: high/medium/low, today/tomorrow/next week/next mon/tue/wed/thu/fri/sat/sun, MM/DD or MM-DD dates'>ⓘ</span>
         </div>
         <div class="bento-grid" id="dashTop">
             <div class="dash-card">
@@ -1791,10 +1798,8 @@ function renderCurrentView(){
 }
 
 // --- Quick Add ---
-function quickAddTask(){
-  const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
-  let text=inp.value.trim();
-  const tasks=getTasks();const t={id:uid(),title:'',description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+function parseQuickAdd(text){
+  const t={priority:'medium',due_date:''};
   const pl={'high':'high','medium':'medium','low':'low'};
   const words=text.split(/\s+/);const keep=[];
   for(let i=0;i<words.length;i++){
@@ -1813,7 +1818,20 @@ function quickAddTask(){
   const datePat=/^(\d{1,2})[\/-](\d{1,2})$/;
   const filtered=keep.filter(w=>{const m=w.match(datePat);if(m){const d=new Date();d.setMonth(parseInt(m[1])-1);d.setDate(parseInt(m[2]));if(d.getFullYear()<2000)d.setFullYear(new Date().getFullYear());t.due_date=d.toISOString().slice(0,10);return false}return true});
   t.title=filtered.join(' ')||text;
+  return t
+}
+function buildTask(p){
+  return {id:uid(),title:p.title,description:'',status:'not_started',priority:p.priority,due_date:p.due_date,start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null}
+}
+function quickAddTask(){
+  const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
+  const tasks=getTasks();const t=buildTask(parseQuickAdd(inp.value.trim()));
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);inp.value='';renderCurrentView();renderTaskQuote()
+}
+function dashQuickAddTask(){
+  const inp=document.getElementById('dashQuickAdd');if(!inp||!inp.value.trim())return;
+  const tasks=getTasks();const t=buildTask(parseQuickAdd(inp.value.trim()));
+  tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);inp.value='';renderDashboard();toast('Task added','success')
 }
 
 // --- Task Detail ---
@@ -2741,7 +2759,7 @@ const _paletteCommands=[
   {label:'Tasks: Kanban view',hint:'',run:()=>{navigateTo('tasks');switchTaskView('kanban')},group:'Task views'},
   {label:'Tasks: Calendar view',hint:'',run:()=>{navigateTo('tasks');switchTaskView('calendar')},group:'Task views'},
   {label:'Tasks: Eisenhower view',hint:'',run:()=>{navigateTo('tasks');switchTaskView('eisenhower')},group:'Task views'},
-  {label:'New task',hint:_m+_e,run:()=>{navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0)},group:'Actions'},
+  {label:'New task',hint:_m+_e,run:()=>{if(currentPage==='dashboard'){const i=document.getElementById('dashQuickAdd');if(i)i.focus()}else{navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0)}},group:'Actions'},
   {label:'Focus mode',hint:_m+_s+'F',run:()=>showFocusMode(),group:'Actions'},
   {label:'Task roulette',hint:'',run:()=>{if(document.getElementById('modalOverlay').style.display!=='none')closeModal();pickRandomTask();navigateTo('dashboard')},group:'Actions'},
   {label:'Toggle theme',hint:'',run:()=>cycleTheme(),group:'Actions'},
@@ -2790,7 +2808,7 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(_isOverlayOpen())return;
-  if(mod&&e.code==='Enter'){if(_inField())return;e.preventDefault();navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0);return}
+  if(mod&&e.code==='Enter'){if(_inField())return;e.preventDefault();if(currentPage==='dashboard'){const i=document.getElementById('dashQuickAdd');if(i)i.focus();return}navigateTo('tasks');setTimeout(()=>{const i=document.getElementById('quickAddInput');if(i)i.focus()},0);return}
   if(mod&&e.shiftKey&&e.code==='KeyF'){e.preventDefault();showFocusMode();return}
   if(mod&&e.shiftKey&&e.code==='KeyL'){e.preventDefault();toggleSidebar();return}
   if(mod&&e.shiftKey&&/^Digit[1-5]$/.test(e.code)){e.preventDefault();const pages=['dashboard','tasks','bin','log','settings'];navigateTo(pages[+e.code.slice(5)-1]);return}

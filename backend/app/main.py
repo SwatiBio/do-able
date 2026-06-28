@@ -89,7 +89,7 @@ app.include_router(export.router)
 
 @app.get("/")
 async def serve_frontend():
-    return FileResponse(PROJECT_DIR / "doable.html")
+    return FileResponse(PROJECT_DIR / "index.html")
 
 @app.get("/sw.js")
 async def serve_sw():
