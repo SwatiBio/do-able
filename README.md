@@ -62,61 +62,20 @@ The app is a PWA, so once added to your home screen it runs in its own window wi
 
 ## Features
 
-- **Home page** (Win95-inspired desktop) shown on first load: a retro dialog box with natural-language quick-add, advanced task form, priority buttons, clock widget, desktop icons, and context menu. Theme-aware. "Go to Main App" navigates to Dashboard.
-
 ### Views
-
-- **Dashboard** with scratch notes, daily focus goals, overdue and due-today lists, weekly completion summary with trend, daily streak, My Day section, heatmap grid, and task roulette
-- **Task List** with sortable columns, two-step sort, filters, column toggle, pagination. Shows dependency count and blocks-N indicator per task
-- **Kanban** grouped by category with colored headers, drag-and-drop to reassign, cards showing deps, tags, annotations, and blocks count
-- **Calendar** with month and week views, multi-day bars, recurring task previews, drag-and-drop reschedule, jump-to-date, and time blocking in week view
-- **Eisenhower Matrix** with four quadrants based on priority and due date urgency. A hint banner appears when you have more than 15 active tasks
-- **Task Detail** as a full-page editor with recent activity panel, inline editing for every field, subtasks, dependencies, annotations, attachments, and recurrence
+Dashboard, Task List (sortable/filterable), Kanban (drag-drop by category), Calendar (month/week with recurring previews), Eisenhower Matrix, full-page Task Detail with subtasks/deps/annotations.
 
 ### Task management
+Natural language quick-add, subtasks, recurrence (daily/weekly/monthly), dependencies, templates, attachments (5×2 MB), annotations timeline, soft-delete with Bin, tags, categories, status states.
 
-- Natural language quick-add: type "Buy milk tomorrow high" and it parses the due date and priority
-- Subtasks with parent/child relationships and fold/unfold toggle
-- Task templates: save any task as a template, apply from quick-add or detail page. Templates sync to the backend
-- Recurring tasks (daily, weekly, monthly) with series support: stop, edit, and automatic instance creation that preserves files, time, and dependencies
-- Dependencies between tasks with incompletion warnings and blocks-N indicators in list and kanban views
-- Attachments: upload up to 5 files (2 MB each) per task, stored as base64
-- Annotations timeline on each task
-- Soft-delete with a Bin for restoring or permanently deleting. Pre-delete warnings for subtasks and dependents
-- Task states: not started, in progress, done, cancelled
-
-### Smart features
-
-- Focus mode: a distraction-free modal that aggregates your focus goals, overdue, due-today, and a random task picker into one screen
-- My Day: daily planner showing overdue, due-today, and focus goals
-- Heatmap grid: GitHub-style contribution calendar showing your completion density
-- Daily streak: consecutive days with at least one completed task
-- Weekly progress: completion count with trend vs last week
-- Task roulette: pick a random incomplete task
-- Smart reminders: browser notifications for due and overdue tasks (opt-in via Settings)
-- Global search across task titles and descriptions
-- CSV import: bring tasks from any CSV file with a "title" column
+### Smart
+Focus mode, My Day planner, heatmap grid, daily streak, weekly progress, task roulette, smart reminders (opt-in), global search, CSV import.
 
 ### Accessibility
-
-- ARIA labels on icon-only buttons, landmark roles on navigation and banner
-- Keyboard navigation with focus-visible outlines
-- Modal focus trap with Tab cycling and Escape to close
-- Offline indicator badge when backend is unreachable
-- Loading state on initial page load
+ARIA labels, keyboard navigation, modal focus trap, offline indicator, loading states.
 
 ### Extras
-
-- First-run onboarding with three start options (samples, CSV import, or empty)
-- Frog companion: an interactive SVG frog with 7 states that auto-cycles and reacts to your actions
-- Confetti on task completion
-- Nord color theme (dark, light, and system-aware modes)
-- Category colors with per-category color pickers in Settings
-- Tufte-inspired design: no decorative illustrations, no shadows, no gradients
-- PWA support: installable on desktop and mobile, works offline
-- Export tasks as JSON, CSV, or Markdown
-- Backup and restore via JSON files
-- Activity log tracking 11 event types: created, started, completed, cancelled, deleted, restored, updated, dependency removed, rescheduled, recurred, series stopped
+Onboarding wizard, frog companion, confetti, Nord themes (dark/light/system), Tufte-inspired design (no shadows/gradients), PWA installable offline, export (JSON/CSV/MD), backup/restore, activity log (11 event types).
 
 ## License
 
