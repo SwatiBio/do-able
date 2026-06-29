@@ -38,15 +38,15 @@ function toggleSortMenu(btn){
 }
 function renderSortMenu(btn){
   let pop=document.getElementById('sortPopover');
-  if(!pop){pop=document.createElement('div');pop.id='sortPopover';pop.className='sort-popover';document.body.appendChild(pop)}
+  if(!pop){pop=document.createElement('div');pop.id='sortPopover';pop.className='win-popover';document.body.appendChild(pop)}
   const rect=btn.getBoundingClientRect();
   pop.style.position='fixed';
   pop.style.top=(rect.bottom+4)+'px';pop.style.left=rect.left+'px';
   if(sortMenuStep==='fields'){
-    pop.innerHTML=Object.entries(sortFieldMeta).map(([k,v])=>`<div class="sort-menu-item" onclick="event.stopPropagation();sortMenuField='${k}';sortMenuStep='dir';renderSortMenu(document.querySelector('.sort-btn'))"><span>${v.label}</span><span class="sub-arrow">›</span></div>`).join('')
+    pop.innerHTML=Object.entries(sortFieldMeta).map(([k,v])=>`<div class="win-menu-item" onclick="event.stopPropagation();sortMenuField='${k}';sortMenuStep='dir';renderSortMenu(document.querySelector('.sort-btn'))"><span>${v.label}</span><span class="sub-arrow">›</span></div>`).join('')
   }else{
     const m=sortFieldMeta[sortMenuField];
-    pop.innerHTML=`<div class="sort-menu-item" onclick="closeSortMenu();addSort('${sortMenuField}','asc')">${m.asc}</div><div class="sort-menu-item" onclick="closeSortMenu();addSort('${sortMenuField}','desc')">${m.desc}</div>`
+    pop.innerHTML=`<div class="win-menu-item" onclick="closeSortMenu();addSort('${sortMenuField}','asc')">${m.asc}</div><div class="win-menu-item" onclick="closeSortMenu();addSort('${sortMenuField}','desc')">${m.desc}</div>`
   }
 }
 function closeSortMenu(){
@@ -63,22 +63,22 @@ function removeSort(idx){
 }
 function renderSortBar(){
   const bar=document.getElementById('sortBar');if(!bar)return;
-  let html=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="sort-wrapper"><button class="btn btn-ghost sort-btn" onclick="toggleSortMenu(this)" style="padding:6px 16px;font-size:13px">+ Sort</button></div><div class="sort-wrapper"><button class="btn btn-ghost filter-btn" onclick="toggleFilterMenu(this)" style="padding:6px 16px;font-size:13px">Columns</button></div>`;
+  let html=`<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><div class="sort-wrapper"><button class="btn-win sort-btn" onclick="toggleSortMenu(this)" style="min-width:50px;height:22px;padding:0 10px;font-size:11px">+ Sort</button></div><div class="sort-wrapper"><button class="btn-win filter-btn" onclick="toggleFilterMenu(this)" style="min-width:60px;height:22px;padding:0 10px;font-size:11px">Columns</button></div>`;
   taskSorts.forEach((s,i)=>{
     const m=sortFieldMeta[s.field];
     html+=`<span class="sort-chip">${m?m.label:s.field}: ${s.dir==='asc'?m?m.asc:'↑':m?m.desc:'↓'}<span class="chip-remove" onclick="removeSort(${i})">✕</span></span>`
   });
-  if(taskFilter.series!=='all'){const s=getSeries().find(x=>x.id===taskFilter.series);html+=`<span class="sort-chip" style="background:var(--purple);color:var(--bg)">Series: ${escHtml(s?s.title:taskFilter.series)}<span class="chip-remove" onclick="taskFilter.series='all';renderSortBar();renderCurrentView()">✕</span></span>`}
+  if(taskFilter.series!=='all'){const s=getSeries().find(x=>x.id===taskFilter.series);html+=`<span class="sort-chip" style="background:#000080;color:#fff">Series: ${escHtml(s?s.title:taskFilter.series)}<span class="chip-remove" onclick="taskFilter.series='all';renderSortBar();renderCurrentView()">✕</span></span>`}
   html+='</div>';
   bar.innerHTML=html
 }
 // Close sort popover on outside click
 document.addEventListener('click',function(e){
-  if(sortMenuOpen&&!e.target.closest('.sort-popover')&&!e.target.closest('.sort-btn')){
+  if(sortMenuOpen&&!e.target.closest('.win-popover')&&!e.target.closest('.sort-btn')){
     sortMenuOpen=false;const p=document.getElementById('sortPopover');
     if(p)p.remove()
   }
-  if(filterMenuOpen&&!e.target.closest('.filter-popover')&&!e.target.closest('.filter-btn')){
+  if(filterMenuOpen&&!e.target.closest('.win-popover')&&!e.target.closest('.filter-btn')){
     filterMenuOpen=false;const p=document.getElementById('filterPopover');if(p)p.remove()
   }
 });
@@ -113,11 +113,11 @@ function toggleFilterMenu(btn){
 }
 function renderFilterMenu(btn){
   let pop=document.getElementById('filterPopover');
-  if(!pop){pop=document.createElement('div');pop.id='filterPopover';pop.className='filter-popover';document.body.appendChild(pop)}
+  if(!pop){pop=document.createElement('div');pop.id='filterPopover';pop.className='win-popover';document.body.appendChild(pop)}
   const rect=btn.getBoundingClientRect();
   pop.style.position='fixed';
   pop.style.top=(rect.bottom+4)+'px';pop.style.left=rect.left+'px';
-  pop.innerHTML=columnOptions.map(c=>`<label class="filter-menu-item" onclick="event.stopPropagation()"><input type="checkbox" ${taskColumns.includes(c.key)?'checked':''} onchange="toggleColumn('${c.key}')"><span>${c.label}</span></label>`).join('')
+  pop.innerHTML=columnOptions.map(c=>`<label class="win-menu-item" onclick="event.stopPropagation()"><input type="checkbox" ${taskColumns.includes(c.key)?'checked':''} onchange="toggleColumn('${c.key}')"><span>${c.label}</span></label>`).join('')
 }
 function toggleColumn(key){
   if(taskColumns.includes(key))taskColumns=taskColumns.filter(k=>k!==key);
@@ -131,7 +131,7 @@ function renderKanban(){
   const tasks=getFilteredTasks();
   let cats=[...new Set(tasks.map(t=>t.category).filter(Boolean))].sort();
   if(!cats.length){
-    document.getElementById('taskKanbanView').innerHTML='<div class="empty-state"><p>No categories yet.</p><p class="text-dim text-sm">Add a category to a task to see it organized here.</p></div>';
+    document.getElementById('taskKanbanView').innerHTML='<div class="win-window"><div class="win-titlebar"><span class="win-title">Kanban</span></div><div class="win-body"><div class="empty-state"><p>No categories yet.</p><p style="color:#555;font-family:Pixelify Sans">Add a category to a task to see it organized here.</p></div></div></div>';
     return
   }
   const uncategorized=tasks.filter(t=>!t.category);
@@ -141,7 +141,7 @@ function renderKanban(){
   const showDeps=taskColumns.includes('dependencies');
   const showRecur=taskColumns.includes('recur');
   const grouped=cats.map(cat=>({name:cat==='__none__'?'Uncategorized':cat,key:cat,tasks:cat==='__none__'?uncategorized:tasks.filter(t=>t.category===cat)}));
-  document.getElementById('taskKanbanView').innerHTML=`<div class="kanban-board">${grouped.map(g=>`<div class="kanban-column" data-category="${escHtml(g.key)}"><div class="kanban-col-header">${categoryDot(g.name)}${escHtml(g.name)} (${g.tasks.length})</div>${g.tasks.map(t=>{
+  document.getElementById('taskKanbanView').innerHTML=`<div class="kanban-board">${grouped.map(g=>`<div class="win-window" data-category="${escHtml(g.key)}"><div class="win-titlebar"><span class="win-title">${categoryDot(g.name)}${escHtml(g.name)} (${g.tasks.length})</span></div><div class="win-body">${g.tasks.map(t=>{
     let meta=[];
     if(t.due_date)meta.push('<span>'+fmtDate(t.due_date)+'</span>');
     if(showTags&&(t.tags||[]).length)meta.push(t.tags.map(tag=>escHtml(tag)).join(', '));
@@ -151,7 +151,7 @@ function renderKanban(){
     if(showRecur&&t.recur)meta.push(escHtml(t.recur));
     const catColor=getCategoryColors()[g.name];
     return`<div class="kanban-card" ${catColor?`style="border-left:3px solid ${catColor}"`:''} draggable="true" ondragstart="onDragStart(event,'${t.id}')" onclick="showTaskDetail('${t.id}')"><div class="kanban-card-row"><span class="priority-dot ${t.priority||'medium'}"></span><span class="kanban-card-title">${escHtml(t.title)}</span></div>${meta.length?'<div class="kanban-card-row text-dim text-sm">'+meta.join(' · ')+'</div>':''}</div>`
-  }).join('')}<div class="kanban-drop-zone" ondrop="onDropKanban(event,'${g.key}')" ondragover="event.preventDefault();event.target.classList.add('drag-over')" ondragleave="event.target.classList.remove('drag-over')">Drop here</div></div>`).join('')}</div>`
+  }).join('')}<div class="kanban-drop-zone" ondrop="onDropKanban(event,'${g.key}')" ondragover="event.preventDefault();event.target.classList.add('drag-over')" ondragleave="event.target.classList.remove('drag-over')">Drop here</div></div></div>`).join('')}</div>`
 }
 let dragId=null;
 function onDragStart(e,id){dragId=id;e.dataTransfer.effectAllowed='move'}
@@ -175,9 +175,9 @@ function renderCalendar(){
 
   const previewTasks=getCalPreviews(tasks);
 
-  let html='<div class="calendar-desc">View tasks on a timeline. <strong>Month</strong> for overview, <strong>Week</strong> for hourly time-blocking. Drag tasks between days to reschedule.</div>';
+  let html='<div class="win-window"><div class="win-titlebar"><span class="win-title">Calendar</span></div><div class="win-body"><div class="calendar-desc">View tasks on a timeline. <strong>Month</strong> for overview, <strong>Week</strong> for hourly time-blocking. Drag tasks between days to reschedule.</div>';
   html+=`<div class="calendar-controls">
-    <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">←</button>`;
+    <button class="btn-win" onclick="calNav(-1)">←</button>`;
   if(calViewMode==='month'){
     html+=`<span style="font-weight:600;min-width:160px;text-align:center">${monthNames[m]} ${y}</span>`;
   }else{
@@ -186,12 +186,12 @@ function renderCalendar(){
     const fmt=d=>d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
     html+=`<span style="font-weight:600;min-width:200px;text-align:center">${fmt(mon)} – ${fmt(sun)}</span>`;
   }
-  html+=`<button class="btn btn-ghost btn-sm" onclick="calNav(1)">→</button>
-    <button class="btn btn-secondary btn-sm" onclick="calGoToday()">Today</button>
+  html+=`<button class="btn-win" onclick="calNav(1)">→</button>
+    <button class="btn-win" onclick="calGoToday()">Today</button>
     <div style="flex:1"></div>
-    <button class="btn btn-sm ${calViewMode==='month'?'btn-primary':'btn-ghost'}" onclick="calViewMode='month';renderCalendar()">Month</button>
-    <button class="btn btn-sm ${calViewMode==='week'?'btn-primary':'btn-ghost'}" onclick="calViewMode='week';calViewDate=getMonday(calViewDate);renderCalendar()">Week</button>
-    <input type="date" id="calJumpDate" onchange="calJumpTo(this.value)" style="width:140px;font-size:12px;padding:4px 8px" title="Jump to date">
+    <button class="btn-win${calViewMode==='month'?' active':''}" onclick="calViewMode='month';renderCalendar()">Month</button>
+    <button class="btn-win${calViewMode==='week'?' active':''}" onclick="calViewMode='week';calViewDate=getMonday(calViewDate);renderCalendar()">Week</button>
+    <input type="date" id="calJumpDate" class="win-input" onchange="calJumpTo(this.value)" style="width:160px" title="Jump to date">
   </div>`;
 
   if(tasks.length===0&&previewTasks.length===0){
@@ -201,7 +201,7 @@ function renderCalendar(){
   }else{
     html+=renderMonthView(tasks,previewTasks,m,y,today);
   }
-  container.innerHTML=html
+  container.innerHTML=html+'</div></div>'
 }
 
 function getMonday(d){
@@ -358,8 +358,8 @@ function renderEisenhower(){
     else if(!isImportant(t)&&isUrgent(t))quads.delegate.push(t);
     else quads.eliminate.push(t)
   });
-  const card=(ts,label,color)=>`<div class="eisenhower-quad" style="border-top:3px solid ${color}"><div class="eisenhower-quad-header" style="color:${color}">${label} <span class="text-dim" style="font-weight:400">(${ts.length})</span></div>${ts.length?ts.map(t=>`<div class="eisenhower-task" onclick="showTaskDetail('${t.id}')"><span class="priority-dot ${t.priority}"></span><span>${escHtml(t.title)}</span>${t.due_date?`<span class="text-dim" style="font-size:10px;margin-left:auto">${fmtDate(t.due_date)}</span>`:''}</div>`).join(''):'<div class="text-dim text-sm" style="padding:8px 0">No tasks</div>'}</div>`;
-  document.getElementById('taskEisenhowerView').innerHTML=`<div class="text-dim text-sm" style="margin-bottom:12px;font-style:italic">Tasks sorted by urgency (due ≤3 days) and importance (high/medium priority).</div><div class="eisenhower-matrix"><div class="eisenhower-col"><div class="eisenhower-label" style="text-align:right;padding-right:8px;color:var(--text-dim);font-size:11px">Urgent</div>${card(quads.doFirst,'Do First','var(--red)')}</div><div class="eisenhower-col"><div class="eisenhower-label" style="padding-left:8px;color:var(--text-dim);font-size:11px">Not Urgent</div>${card(quads.schedule,'Schedule','var(--accent)')}</div><div class="eisenhower-col"><div class="eisenhower-label" style="text-align:right;padding-right:8px;color:var(--text-dim);font-size:11px">Not Important</div>${card(quads.delegate,'Delegate','var(--orange)')}</div><div class="eisenhower-col"><div class="eisenhower-label" style="padding-left:8px;color:var(--text-dim);font-size:11px">Not Important</div>${card(quads.eliminate,'Eliminate','var(--green)')}</div></div>`
+  const card=(ts,label,color)=>`<div class="win-window"><div class="win-titlebar" style="background:${color}"><span class="win-title">${label} (${ts.length})</span></div><div class="win-body" style="padding:6px 8px">${ts.length?ts.map(t=>`<div class="eisenhower-task" onclick="showTaskDetail('${t.id}')"><span class="priority-dot ${t.priority}"></span><span>${escHtml(t.title)}</span>${t.due_date?`<span style="font-size:9px;color:#555;margin-left:auto">${fmtDate(t.due_date)}</span>`:''}</div>`).join(''):'<div style="padding:8px 0;color:#555;font-size:11px;text-align:center">No tasks</div>'}</div></div>`;
+  document.getElementById('taskEisenhowerView').innerHTML=`<div class="eisenhower-grid"><div class="eisenhower-col">${card(quads.doFirst,'Do First','var(--red)')}</div><div class="eisenhower-col">${card(quads.schedule,'Schedule','var(--accent)')}</div><div class="eisenhower-col">${card(quads.delegate,'Delegate','var(--orange)')}</div><div class="eisenhower-col">${card(quads.eliminate,'Eliminate','var(--green)')}</div></div>`
 }
 
 function populateTaskFilters(){} // no-op: filter dropdowns removed
@@ -469,8 +469,12 @@ let detailSnapshot=null;
 
 function showTaskDetail(id){
   if(currentPage==='task-detail'&&detailDirty&&id!==detailTaskId){
-    if(!confirm('You have unsaved changes. Leave without saving?'))return
+    showConfirmDialog("Unsaved Changes","You have unsaved changes. Leave without saving?",function(){doShowTaskDetail(id)});
+    return
   }
+  doShowTaskDetail(id)
+}
+function doShowTaskDetail(id){
   detailTaskId=id;
   previousPage=currentPage;
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
@@ -500,7 +504,7 @@ function renderTaskDetailPage(){
       </div>
       <div class="detail-field">
         <label>Description</label>
-        <textarea id="detailDesc" rows="3">${escHtml(t.description||'')}</textarea>
+        <textarea id="detailDesc" class="win-input" rows="3">${escHtml(t.description||'')}</textarea>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="detail-field">
@@ -560,7 +564,7 @@ function renderTaskDetailPage(){
         <div style="display:flex;gap:4px">
           <input id="detailDepInput" list="depSuggestions" placeholder="Search tasks..." autocomplete="off" onkeydown="if(event.key==='Enter')addDetailDep()">
           <datalist id="depSuggestions">${tasks.filter(x=>x.id!==t.id&&!x.deleted_at).map(x=>`<option value="${escHtml(x.title)}">`).join('')}</datalist>
-          <button class="btn btn-primary btn-sm" onclick="addDetailDep()">Add</button>
+          <button class="btn-win" onclick="addDetailDep()">Add</button>
         </div>
       </div>
       <div class="detail-field">
@@ -580,16 +584,16 @@ function renderTaskDetailPage(){
       <div class="detail-field">
         <label>Subtasks</label>
         <div id="detailSubtasks">${tasks.filter(x=>x.parent_id===t.id&&!x.deleted_at).map(st=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><input type="checkbox" ${st.status==='done'?'checked':''} onchange="toggleSubtaskStatus('${st.id}',this.checked)" style="width:14px;height:14px"><span style="font-size:13px;cursor:pointer;text-decoration:${(st.status==='done'||st.status==='cancelled')?'line-through':'none'}" onclick="showTaskDetail('${st.id}')">${escHtml(st.title)}</span><span class="tag-remove" onclick="deleteTask('${st.id}')" style="cursor:pointer;margin-left:auto">✕</span></div>`).join('')||'<div class="text-dim text-sm" style="padding:4px 0">No subtasks</div>'}</div>
-        <div style="display:flex;gap:4px;margin-top:4px"><input id="detailSubtaskInput" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addDetailSubtask()"><button class="btn btn-primary btn-sm" onclick="addDetailSubtask()">Add</button></div>
+        <div style="display:flex;gap:4px;margin-top:4px"><input id="detailSubtaskInput" placeholder="Add subtask..." onkeydown="if(event.key==='Enter')addDetailSubtask()"><button class="btn-win" onclick="addDetailSubtask()">Add</button></div>
       </div>
       <div class="detail-field">
         <label class="text-dim">Created ${fmtDateTime(t.created_at)} · Updated ${fmtDateTime(t.updated_at)}</label>
       </div>
       <div style="display:flex;gap:8px;justify-content:space-between">
-        <button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}');navigateTo(previousPage)">Delete</button>
+        <button class="btn-win" onclick="deleteTask('${t.id}');navigateTo(previousPage)">Delete</button>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary btn-sm" onclick="saveTemplateFromDetail()">Save as Template</button>
-          <button class="btn btn-primary" onclick="saveDetailTask('${t.id}')">Save</button>
+          <button class="btn-win" onclick="saveTemplateFromDetail()">Save as Template</button>
+          <button class="btn-win btn-primary" onclick="saveDetailTask('${t.id}')">Save</button>
         </div>
       </div>
     </div>
@@ -751,8 +755,9 @@ function applyTemplate(name){
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);renderCurrentView()
 }
 function deleteTemplate(name){
-  if(!confirm('Delete template "'+name+'"?'))return;
-  saveTemplates(getTemplates().filter(t=>t.name!==name));toast('Template deleted','success');renderSettings()
+  showConfirmDialog("Delete Template",'Delete template "'+name+'"?',function(){
+    saveTemplates(getTemplates().filter(t=>t.name!==name));toast('Template deleted','success');renderSettings()
+  })
 }
 // --- Delete / Bin ---
 function deleteTask(id){
@@ -764,11 +769,16 @@ function deleteTask(id){
     let msg='Move "'+t.title+'" to bin?';
     if(subtasks.length)msg+='\n\nThis task has '+subtasks.length+' subtask'+(subtasks.length>1?'s':'')+'. They will become top-level tasks.';
     if(dependents.length)msg+='\n\n'+dependents.length+' task'+(dependents.length>1?'s depend':' depends')+' on this. The dependency will be removed.';
-    if(!confirm(msg))return;
+    showConfirmDialog("Delete Task",msg,function(){_doDeleteTask(tasks,id,t.title)});
+    return
   }
-  _cleanupDeletedTaskReferences(tasks,id,t.title);
+  _doDeleteTask(tasks,id,t.title)
+}
+function _doDeleteTask(tasks,id,title){
+  _cleanupDeletedTaskReferences(tasks,id,title);
+  const t=tasks.find(x=>x.id===id);if(!t)return;
   t.deleted_at=nowISO();t.updated_at=nowISO();saveTasks(tasks);
-  logActivity(id,'deleted',t.title);toast('Task moved to bin','info');renderCurrentPage()
+  logActivity(id,'deleted',title);toast('Task moved to bin','info');renderCurrentPage()
 }
 function _cleanupDeletedTaskReferences(tasks,id,title){
   tasks.forEach(x=>{
@@ -782,15 +792,16 @@ function _cleanupDeletedTaskReferences(tasks,id,title){
 function deleteTaskPermanently(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
   if(!t)return;
-  if(!confirm('Permanently delete "'+t.title+'"? This cannot be undone.'))return;
-  _cleanupDeletedTaskReferences(tasks,id,t.title);
-  saveTasks(tasks.filter(x=>x.id!==id));
-  toast('Task permanently deleted','info');renderBin()
+  showConfirmDialog("Delete Permanently",'Permanently delete "'+t.title+'"? This cannot be undone.',function(){
+    _cleanupDeletedTaskReferences(tasks,id,t.title);
+    saveTasks(tasks.filter(x=>x.id!==id));
+    toast('Task permanently deleted','info');renderBin()
+  })
 }
 function renderBin(){
   const tasks=getTasks().filter(t=>t.deleted_at);
   document.getElementById('binEmpty').style.display=tasks.length?'none':'';
-  document.getElementById('binBody').innerHTML=tasks.map(t=>`<tr><td><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a></td><td class="text-sm text-dim">${fmtDateTime(t.deleted_at)}</td><td class="text-sm">${t.status}</td><td style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="restoreTask('${t.id}')">Restore</button><button class="btn btn-danger btn-sm" onclick="deleteTaskPermanently('${t.id}')">Delete</button></td></tr>`).join('')
+  document.getElementById('binBody').innerHTML=tasks.map(t=>`<tr><td><a href="#" onclick="showTaskDetail('${t.id}');return false" class="task-title">${escHtml(t.title)}</a></td><td class="text-sm text-dim">${fmtDateTime(t.deleted_at)}</td><td class="text-sm">${t.status}</td><td style="display:flex;gap:4px"><button class="btn-win" onclick="restoreTask('${t.id}')">Restore</button><button class="btn-win" onclick="deleteTaskPermanently('${t.id}')">Delete</button></td></tr>`).join('')
 }
 function restoreTask(id){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
@@ -798,11 +809,12 @@ function restoreTask(id){
   logActivity(id,'restored',t.title);toast('Task restored','success');renderBin()
 }
 function emptyBin(){
-  if(!confirm('Permanently delete all binned tasks?'))return;
-  const tasks=getTasks();
-  tasks.filter(t=>t.deleted_at).forEach(t=>{_cleanupDeletedTaskReferences(tasks,t.id,t.title)});
-  saveTasks(tasks.filter(t=>!t.deleted_at));
-  toast('Bin emptied','info');renderBin()
+  showConfirmDialog("Empty Bin","Permanently delete all binned tasks?",function(){
+    const tasks=getTasks();
+    tasks.filter(t=>t.deleted_at).forEach(t=>{_cleanupDeletedTaskReferences(tasks,t.id,t.title)});
+    saveTasks(tasks.filter(t=>!t.deleted_at));
+    toast('Bin emptied','info');renderBin()
+  })
 }
 
 // --- Focus (Dashboard) ---
@@ -843,7 +855,7 @@ function renderActivityLog(){
   const start=(logPage-1)*perPage;const pageEntries=entries.slice(start,start+perPage);
   const colors={created:'var(--green)',completed:'var(--accent)',deleted:'var(--red)',restored:'var(--orange)',updated:'var(--yellow)',dependency_removed:'var(--purple)',rescheduled:'#81a1c1',started:'#8fbcbb',cancelled:'#5e81ac',recurred:'#7b88a1',series_stopped:'#4c566a'};
   document.getElementById('logList').innerHTML=pageEntries.length?pageEntries.map(e=>`<div class="activity-log-entry"><span class="activity-dot" style="background:${colors[e.action]||'var(--text-dim)'}"></span><span class="text-sm" style="flex:1">${escHtml(e.action)}${e.details?': '+escHtml(e.details):''}</span><span class="text-dim text-sm">${fmtDateTime(e.timestamp)}</span></div>`).join(''):'<div class="empty-state"><p>No activity yet.</p><p class="text-dim text-sm">Your actions will appear here as you add, complete, and organize tasks.</p></div>';
-  document.getElementById('logPagination').innerHTML=totalPages>1?`<button class="btn btn-ghost btn-sm" onclick="logPage=Math.max(1,logPage-1);renderActivityLog()" ${logPage<=1?'disabled':''}>Prev</button><span>Page ${logPage} of ${totalPages}</span><button class="btn btn-ghost btn-sm" onclick="logPage=Math.min(${totalPages},logPage+1);renderActivityLog()" ${logPage>=totalPages?'disabled':''}>Next</button>`:''
+  document.getElementById('logPagination').innerHTML=totalPages>1?`<button class="btn-win" onclick="logPage=Math.max(1,logPage-1);renderActivityLog()" ${logPage<=1?'disabled':''}>Prev</button><span style="color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;font-size:11px">Page ${logPage} of ${totalPages}</span><button class="btn-win" onclick="logPage=Math.min(${totalPages},logPage+1);renderActivityLog()" ${logPage>=totalPages?'disabled':''}>Next</button>`:''
 }
 
 // --- Settings ---
@@ -874,7 +886,7 @@ function renderSettingsCategories(){
     const count=tasks.filter(t=>t.category===cat&&!t.deleted_at).length;
     const colors=getCategoryColors();
     const c=colors[cat]||'';
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px"><input type="color" value="${c||'#5e81ac'}" oninput="saveCategoryColor('${escHtml(cat)}',this.value)" title="Category color" style="width:24px;height:24px;border:none;border-radius:4px;background:none;cursor:pointer;padding:0;opacity:${c?'1':'0.3'}" onfocus="this.style.opacity='1'"><strong>${escHtml(cat)}</strong> <span class="text-dim text-sm">(${count} task${count!==1?'s':''})</span></span><div style="display:flex;gap:4px">${c?`<button class="btn btn-secondary btn-sm" onclick="saveCategoryColor('${escHtml(cat)}','');renderSettingsCategories()" title="Clear color">Clear</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteCategory('${escHtml(cat)}')">Delete</button></div></div>`
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px"><input type="color" value="${c||'#5e81ac'}" oninput="saveCategoryColor('${escHtml(cat)}',this.value)" title="Category color" style="width:24px;height:24px;border:none;border-radius:4px;background:none;cursor:pointer;padding:0;opacity:${c?'1':'0.3'}" onfocus="this.style.opacity='1'"><strong>${escHtml(cat)}</strong> <span class="text-dim text-sm">(${count} task${count!==1?'s':''})</span></span><div style="display:flex;gap:4px">${c?`<button class="btn-win" onclick="saveCategoryColor('${escHtml(cat)}','');renderSettingsCategories()" title="Clear color">Clear</button>`:''}<button class="btn-win" onclick="deleteCategory('${escHtml(cat)}')">Delete</button></div></div>`
   }).join('')
 }
 function renderSettingsTemplates(){
@@ -884,7 +896,7 @@ function renderSettingsTemplates(){
   if(!templates.length){
     el.innerHTML='<div class="text-dim text-sm" style="padding:8px 0">No saved templates yet.</div>';return
   }
-  el.innerHTML=templates.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(t.name)}</strong></span><button class="btn btn-danger btn-sm" onclick="deleteTemplate('${escHtml(t.name)}')">Delete</button></div>`).join('')
+  el.innerHTML=templates.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(t.name)}</strong></span><button class="btn-win" onclick="deleteTemplate('${escHtml(t.name)}')">Delete</button></div>`).join('')
 }
 function renderSettingsSeries(){
   const el=document.getElementById('settingsSeriesList');
@@ -893,7 +905,7 @@ function renderSettingsSeries(){
   if(!series.length){
     el.innerHTML='<div class="text-dim text-sm" style="padding:8px 0">No recurring series yet.</div>';return
   }
-  el.innerHTML=series.map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(s.title)}</strong> <span class="text-dim text-sm">(${escHtml(s.recur)})${s.active?'':' <span style="color:var(--text-dim)">stopped</span>'}</span></span><div style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="editSeries('${s.id}')">Edit</button>${s.active?`<button class="btn btn-secondary btn-sm" onclick="stopSeries('${s.id}')">Stop</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteSeries('${s.id}')">Delete</button></div></div>`).join('')
+  el.innerHTML=series.map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span><strong>${escHtml(s.title)}</strong> <span class="text-dim text-sm">(${escHtml(s.recur)})${s.active?'':' <span style="color:var(--text-dim)">stopped</span>'}</span></span><div style="display:flex;gap:4px"><button class="btn-win" onclick="editSeries('${s.id}')">Edit</button>${s.active?`<button class="btn-win" onclick="stopSeries('${s.id}')">Stop</button>`:''}<button class="btn-win" onclick="deleteSeries('${s.id}')">Delete</button></div></div>`).join('')
 }
 function editSeries(id){
   const series=getSeries();const s=series.find(x=>x.id===id);
@@ -911,20 +923,22 @@ function stopSeries(id){
   saveSeries(series);logActivity(null,'series_stopped',s.title);toast('Series stopped. No more new instances','info');renderSettingsSeries()
 }
 function deleteSeries(id){
-  if(!confirm('Delete this series? Existing tasks keep their data but new instances will not be created from this series.'))return;
-  const series=getSeries().filter(s=>s.id!==id);
-  saveSeries(series);toast('Series deleted','success');renderSettingsSeries()
+  showConfirmDialog("Delete Series","Delete this series? Existing tasks keep their data but new instances will not be created from this series.",function(){
+    saveSeries(getSeries().filter(s=>s.id!==id));
+    toast('Series deleted','success');renderSettingsSeries()
+  })
 }
 function deleteCategory(cat){
-  if(!confirm(`Delete category "${cat}"? Tasks will become uncategorized.`))return;
-  const tasks=getTasks();
-  tasks.forEach(t=>{if(t.category===cat)t.category=''});
-  saveTasks(tasks);
-  saveCategoryColor(cat,'');
-  logActivity(null,'updated',`Deleted category: ${cat}`);
-  toast('Category deleted','success');
-  renderSettingsCategories();
-  renderCurrentView()
+  showConfirmDialog("Delete Category",`Delete category "${cat}"? Tasks will become uncategorized.`,function(){
+    const tasks=getTasks();
+    tasks.forEach(t=>{if(t.category===cat)t.category=''});
+    saveTasks(tasks);
+    saveCategoryColor(cat,'');
+    logActivity(null,'updated',`Deleted category: ${cat}`);
+    toast('Category deleted','success');
+    renderSettingsCategories();
+    renderCurrentView()
+  })
 }
 function updateConfig(key,val){
   const cfg=getConfig();cfg[key]=val;saveConfig(cfg);
@@ -1053,9 +1067,11 @@ function stopSeriesForTask(seriesId,taskId){
   renderTaskDetailPage()
 }
 function clearAllData(){
-  if(!confirm('This will permanently delete ALL data. Are you sure?'))return;
-  if(!confirm('Really? All tasks, notes, annotations, activity, everything?'))return;
-  Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>localStorage.removeItem(k));
-  if(_api.ready){_api.del('/all').catch(()=>{})}
-  toast('All data cleared','info');renderCurrentPage()
+  showConfirmDialog("Clear All Data","This will permanently delete ALL data. Are you sure?",function(){
+    showConfirmDialog("Clear All Data","Really? All tasks, notes, annotations, activity, everything?",function(){
+      Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>localStorage.removeItem(k));
+      if(_api.ready){_api.del('/all').catch(()=>{})}
+      toast('All data cleared','info');renderCurrentPage()
+    })
+  })
 }

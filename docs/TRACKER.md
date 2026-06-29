@@ -220,3 +220,26 @@
 | Active/focus/disabled interaction states | done |
 | Heatmap explicit color tokens (--hm-l0 through --hm-l4) | done |
 | Empty-state personality (Bin, Activity, Tasks, Kanban, Calendar) | done |
+
+## Phase 3 — Win95 Everywhere
+
+| Feature | Status |
+|---------|--------|
+| CSS foundation: Un-scoped Win95 classes from #page-home → app-wide (.win-window, .win-titlebar, .win-close, .btn-win, .win-input, .win-checkbox, .win-popover, .win-statusbar, .ctx-menu) | done |
+| App shell chrome: sidebar as Win95 window (Q6), topbar as blue gradient titlebar (Q7), 3-segment status bar (Q5) | done |
+| Full Win95 scrollbars (16px, beveled track/thumb, arrow buttons) (Q10) | done |
+| Image buttons → .btn-win across all JS rendering (26 sites) | done |
+| Native confirm() calls → Win95 showConfirmDialog() modal (10 sites) | done |
+| Toast → Win95 tooltip style (#ffffe1, 1px black border) (Q16) | done |
+| Sort/filter popovers → .win-popover with .win-menu-item (Q17) | done |
+| Dashboard cards windowed (My Day, This Week, Focus Goals, Roulette, Streak, Scratch, Activity Map) (Q4) | done |
+| Tasks page: .win-window with titlebar + view-toggle, beveled table, Win95 quick-add toolbar | done |
+| Bin, Activity Log, Settings, Task Detail: each wrapped in .win-window | done |
+| Settings accordions: .win-titlebar as toggle button | done |
+| Kanban columns → per-column .win-window with colored titlebars | done |
+| Calendar → Win95 calendar widget (silver grid, inset days, #000080 today blue, Pixelify headers) (Q15) | done |
+| Eisenhower Matrix → per-quadrant .win-window with color-tinted titlebars | done |
+| Command palette → Win95 Run dialog (Q19) | done |
+| Mobile pass: simplified Win95 chrome at <768px (1px bevels, thin scrollbars, drawer sidebar) (Q20) | done |
+| Dark theme adaptation via --win-fg, --win-bg, --win-bg-cell, --win-bg-header, --win-border-light/dark CSS vars | done |
+| Home page desktop (gradient, scanlines, clock, icons, context menu, status bar) stays scoped and unchanged | done |

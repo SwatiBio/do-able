@@ -215,12 +215,95 @@ FastAPI async server with SQLAlchemy 2.0 and SQLite (via aiosqlite).
 
 The root route (`GET /`) serves `index.html` as a static file (JS loaded from `src/`).
 
-## Tufte principles
+## Tufte principles (work surface)
 
 1. Show the data. First-run onboarding is the only modal exception — it serves new-user orientation, not decoration.
-2. Maximize the data-ink ratio. No decorative illustrations, no shadows, no gradients.
+2. Maximize the data-ink ratio. No decorative illustrations, no shadows, no gradients on the work surface.
 3. Erase non-data-ink. No box borders on cards, space-only separation.
 4. Graphical integrity. Bar charts start at zero, no truncated axes.
 5. Small multiples. CSS bar charts running vertically.
 6. Layering and separation. Three-tier text hierarchy (text, dim, faint).
 7. Word-data integration. Labels on data, no separate legends.
+
+## Win95 Design System (Phase 3)
+
+The app wraps the Tufte work surface in a nostalgic Windows 95 shell. Every view, dialog, and interaction chrome is styled after Win95, controlled by CSS custom properties that adapt to Nord dark/light themes.
+
+### Principle: chrome vs content
+
+Win95 aesthetic applies to the **UI scaffolding** (titlebars, buttons, panels, popovers, menus, scrollbars, status bar, sidebar, topbar). Content surfaces (task text, table cells, log entries, chart data) use Tufte's calm typography and Nord colors — the Win95 chrome frames the data without compromising readability.
+
+### Visual language
+
+- **Silver surfaces** (`#c0c0c0` light, `#3b4252` dark): all `.win-window`, `.dialog`, `.win-body` backgrounds
+- **Beveled borders**: 2px solid with light top/left and dark bottom/right (`#fff #808080 #808080 #fff`). Outset for raised elements, inset for sunken
+- **Blue gradient titlebars**: 24px height, 90deg gradient from `--win-title-bar` to darkened mix. White/light text in Pixelify Sans
+- **Close buttons**: 18×16px, outset bevel, × character
+- **Pixelify Sans** for all chrome text (titlebars, button labels, nav items, status bar, section headers)
+- **System sans-serif** for content text (task titles, descriptions, table cells)
+
+### Component pattern: `.win-window`
+
+Every panelized section across all views follows this structure:
+
+```html
+<div class="win-window">
+  <div class="win-titlebar">
+    <span class="win-title">Section Title</span>
+    <button class="win-close">×</button>
+  </div>
+  <div class="win-body">
+    <!-- content -->
+  </div>
+</div>
+```
+
+- `.win-window` — silver background, beveled border (outset top/left, inset bottom/right), 2px outset frame
+- `.win-titlebar` — 24px, blue gradient, Pixelify Sans, white text, flex layout
+- `.win-close` — 18×16px, 2px outset, centered ×
+- `.win-body` — padding 6-8px, inherits parent color (black on silver in light, off-white on dark in `.layout`)
+
+### Form controls
+
+- `.btn-win` — 2px outset bevel, `#c0c0c0`/var(--win-bg) background, Pixelify Sans 11-12px. `:active` → inset. `.btn-win.btn-primary` — blue `#000080` background with white text
+- `.win-input` — 2px inset bevel (`#808080 #fff #fff #808080`), white/var(--win-bg-cell) background, focus blue border
+- `.win-checkbox` — 16×16px (13px on mobile), beveled border, checked state with `#000080` background and white checkmark. Applied to all task row checkboxes
+
+### App shell
+
+- **Sidebar** (Q6): Full `.win-window` with "Do-able" titlebar. Nav items flat with `#000080` hover. System tray at bottom with theme indicator
+- **Topbar** (Q7): Blue gradient titlebar across the top. Left: Home button (outset, `#000080` hover). Center: page title in white Pixelify. Right: action buttons (focus, theme, palette)
+- **Status bar** (Q5): 24px silver bar at bottom, inset top border. Three segments: page title + count, view/filter info, theme + frog toggle
+
+### Overlays
+
+- **Modals** (Q8): Standard `.win-window` overlays with titlebar + close + body + OK/Cancel buttons. Blue titlebar "Confirm Delete", "Edit Task", etc. Replaces all native `confirm()` calls
+- **Command palette** (Q19): "Run Command" dialog — `.win-window` with search input, sunken listview, OK/Cancel. Centered overlay
+- **Toasts** (Q16): Win95 tooltip style — `#ffffe1` background, 1px black border, Pixelify Sans. No frog SVG, no type colors
+- **Popovers** (Q17): `.win-popover` — flat silver, 2px beveled border, shadow. Items use `.win-menu-item` with `#000080` hover + sub-arrow
+
+### Per-view windowing
+
+| View | Windows | Notes |
+|------|---------|-------|
+| Dashboard | 7 windows | My Day, This Week, Focus Goals, Roulette, Streak, Scratch Pad, Activity Map |
+| Tasks | 1 window + beveled table | View toggle in titlebar (List/Kanban/Calendar/Eisenhower) |
+| Kanban | Per-column | Each column is a `.win-window` with colored titlebar |
+| Calendar | 1 window + widget controls | Silver grid, inset day cells, `#000080` today, Pixelify headers |
+| Eisenhower | Per-quadrant | 2×2 grid, each quadrant a `.win-window` with color-tinted titlebar |
+| Task Detail | 1 window | Titlebar "Task Detail" with back button |
+| Bin | 1 window | Titlebar with Empty Bin button |
+| Activity Log | 1 window | Filter select + paginated list |
+| Settings | Per-accordion | Each section is a `.win-window` with clickable titlebar toggle |
+
+### Scrollbars (Q10)
+
+Full Win95 style: 16px width, beveled track + thumb, arrow buttons at both ends (SVG chevron data URIs). Firefox falls back to flat silver via `scrollbar-color`.
+
+### Dark theme adaptation
+
+The Nord dark theme applies Win95 colors via scoped CSS: `html[data-theme="nord-dark"] .layout` override block sets `--win-fg:#d8dee9`, `--win-bg:#3b4252`, `--win-bg-cell:#434c5e`, etc. Home page (`#page-home`) hard-resets to classic Win95 silver/gray regardless of theme, keeping the desktop authentic.
+
+### Mobile (Q20)
+
+At <768px: 1px bevels (thinner), thin scrollbars (6px), sidebar as full-width drawer, tap targets ≥44px. Some chrome simplified: status bar hidden, titlebars compacted.

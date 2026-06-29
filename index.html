@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#88c0d0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,8 +18,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#2e3440;--bg-raised:#3b4252;--bg-hover:#434c5e;--bg-muted:#4c566a;--bg-overlay:#3b4252;--text:#d8dee9;--text-dim:#7b88a1;--text-faint:#434c5e;--accent:#88c0d0;--accent-tint:rgba(136,192,208,.08);--red:#bf616a;--orange:#d08770;--yellow:#ebcb8b;--green:#a3be8c;--purple:#b48ead;--border:#434c5e;--sidebar-w:200px;--topbar-h:52px;--radius:6px;--content-max:1100px;--font-serif:Georgia,'Times New Roman',serif;--font-mono:'SF Mono','Cascadia Code',Consolas,'Liberation Mono',monospace;--fs-xs:0.694rem;--fs-sm:0.833rem;--fs-base:1rem;--fs-md:1.2rem;--fs-lg:1.44rem;--fs-xl:1.728rem;--hm-l0:#4c566a;--hm-l1:#445764;--hm-l2:#5b7a88;--hm-l3:#719dac;--hm-l4:#88c0d0;--win-bg-top:#242933;--win-bg-bottom:#1c212a;--win-title-bar:#3b5998;--win-title-bar-text:#eceff4;--win-accent:#5e81ac;--win-accent-hover:#7298c4;--win-btn-primary-text:#eceff4;--win-clock-color:#88c0d0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;font-size:14px;line-height:1.5;letter-spacing:.01em;font-weight:450;color:var(--text);background:var(--bg)}
-:root[data-theme="nord-light"]{--bg:#eceff4;--bg-raised:#e5e9f0;--bg-hover:#d8dee9;--bg-muted:#e5e9f0;--bg-overlay:#ffffff;--text:#2e3440;--text-dim:#7b88a1;--text-faint:#d8dee9;--accent:#5e81ac;--accent-tint:rgba(94,129,172,.08);--red:#bf616a;--orange:#d08770;--yellow:#ebcb8b;--green:#a3be8c;--purple:#b48ead;--border:#d8dee9;--hm-l0:#e5e9f0;--hm-l1:#c8d3e2;--hm-l2:#a5b8d0;--hm-l3:#819cbe;--hm-l4:#5e81ac;--win-bg-top:#d8dee9;--win-bg-bottom:#c8ced9;--win-title-bar:#5e81ac;--win-title-bar-text:#ffffff;--win-accent:#5e81ac;--win-accent-hover:#4a72a0;--win-btn-primary-text:#ffffff;--win-clock-color:#5e81ac}
+:root{--bg:#2e3440;--bg-raised:#3b4252;--bg-hover:#434c5e;--bg-muted:#4c566a;--bg-overlay:#3b4252;--text:#d8dee9;--text-dim:#7b88a1;--text-faint:#434c5e;--accent:#88c0d0;--accent-tint:rgba(136,192,208,.08);--red:#bf616a;--orange:#d08770;--yellow:#ebcb8b;--green:#a3be8c;--purple:#b48ead;--border:#434c5e;--sidebar-w:200px;--topbar-h:52px;--radius:6px;--content-max:1100px;--font-serif:Georgia,'Times New Roman',serif;--font-mono:'SF Mono','Cascadia Code',Consolas,'Liberation Mono',monospace;--fs-xs:0.694rem;--fs-sm:0.833rem;--fs-base:1rem;--fs-md:1.2rem;--fs-lg:1.44rem;--fs-xl:1.728rem;--hm-l0:#4c566a;--hm-l1:#445764;--hm-l2:#5b7a88;--hm-l3:#719dac;--hm-l4:#88c0d0;--win-bg-top:#242933;--win-bg-bottom:#1c212a;--win-title-bar:#3b5998;--win-title-bar-text:#eceff4;--win-accent:#5e81ac;--win-accent-hover:#7298c4;--win-btn-primary-text:#eceff4;--win-clock-color:#88c0d0;--win-fg:#000;--win-bg:#c0c0c0;--win-bg-cell:#fff;--win-bg-header:#dfdfdf;--win-bg-hover:#d0d0d0;--win-cell-hover:#e8e8e8;--win-border-light:#fff;--win-border-dark:#808080;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;font-size:14px;line-height:1.5;letter-spacing:.01em;font-weight:450;color:var(--text);background:var(--bg)}
+:root[data-theme="nord-light"]{--bg:#eceff4;--bg-raised:#e5e9f0;--bg-hover:#d8dee9;--bg-muted:#e5e9f0;--bg-overlay:#ffffff;--text:#2e3440;--text-dim:#7b88a1;--text-faint:#d8dee9;--accent:#5e81ac;--accent-tint:rgba(94,129,172,.08);--red:#bf616a;--orange:#d08770;--yellow:#ebcb8b;--green:#a3be8c;--purple:#b48ead;--border:#d8dee9;--hm-l0:#e5e9f0;--hm-l1:#c8d3e2;--hm-l2:#a5b8d0;--hm-l3:#819cbe;--hm-l4:#5e81ac;--win-bg-top:#d8dee9;--win-bg-bottom:#c8ced9;--win-title-bar:#5e81ac;--win-title-bar-text:#ffffff;--win-accent:#5e81ac;--win-accent-hover:#4a72a0;--win-btn-primary-text:#ffffff;--win-clock-color:#5e81ac;--win-fg:#000;--win-bg:#c0c0c0;--win-bg-cell:#fff;--win-bg-header:#dfdfdf;--win-bg-hover:#d0d0d0;--win-cell-hover:#e8e8e8;--win-border-light:#fff;--win-border-dark:#808080}
 :root[data-theme="nord-light"] body{letter-spacing:0;font-weight:400}
 body{font-variant-numeric:tabular-nums;min-height:100vh;overflow:hidden}
 input,textarea,select,button{font:inherit;color:inherit}
@@ -24,15 +27,25 @@ a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 
 .layout{display:flex;height:100vh}
-/* Sidebar - orbital ring */
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transform:translateX(-100%);transition:transform .25s ease-out}
+html[data-theme="nord-dark"] .layout{--win-fg:#d8dee9;--win-bg:#3b4252;--win-bg-cell:#434c5e;--win-bg-header:#4c566a;--win-bg-hover:#4c566a;--win-cell-hover:#545d70;--win-border-light:#4c566a;--win-border-dark:#2e3440}
+#page-home{--win-fg:#000;--win-bg:#c0c0c0;--win-bg-cell:#fff;--win-bg-header:#dfdfdf;--win-bg-hover:#d0d0d0;--win-cell-hover:#e8e8e8;--win-border-light:#fff;--win-border-dark:#808080}
+/* Sidebar — Win95 window (Q6) */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);z-index:100;transform:translateX(-100%);transition:transform .25s ease-out;display:flex;flex-direction:column}
 .sidebar.open{transform:translateX(0)}
-.sidebar-header{display:flex;align-items:center;gap:8px;padding:14px 14px;border-bottom:1px solid var(--border);min-height:52px;font-size:16px;font-weight:600;color:var(--accent);white-space:nowrap;font-family:var(--font-serif)}
-.sidebar-nav{flex:1;padding:8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
-.nav-item{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:var(--radius);color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;border-left:2px solid transparent;user-select:none;font-size:13px}
-.nav-item:hover{background:var(--bg-raised);color:var(--text)}
-.nav-item.active{background:var(--bg-raised);color:var(--accent);border-left-color:var(--accent)}
-.nav-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sidebar-titlebar{display:flex;align-items:center;height:24px;padding:0 3px 0 6px;background:linear-gradient(90deg,var(--win-title-bar),color-mix(in srgb,var(--win-title-bar) 80%,#000));flex-shrink:0;cursor:default}
+.sidebar-titlebar .titlebar-icon{flex-shrink:0;margin-right:5px;color:var(--win-title-bar-text);opacity:.9}
+.sidebar-titlebar .sidebar-title{flex:1;font-size:12px;font-weight:700;color:var(--win-title-bar-text);letter-spacing:.02em;font-family:'Pixelify Sans','Courier New',monospace}
+.sidebar-titlebar .sidebar-close{width:18px;height:16px;padding:0;border:2px outset #c0c0c0;background:var(--win-bg);color:var(--win-fg);font-size:12px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Pixelify Sans','Courier New',monospace;flex-shrink:0}
+.sidebar-titlebar .sidebar-close:active{border-style:inset}
+.sidebar-titlebar .sidebar-close:hover{background:#d0d0d0}
+.sidebar-nav{flex:1;padding:4px;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:8px;padding:5px 8px;color:var(--win-fg);cursor:pointer;white-space:nowrap;user-select:none;font-size:12px;font-family:'Pixelify Sans','Courier New',monospace;font-weight:600;border:1px solid transparent}
+.nav-item:hover{background:#000080;color:#fff}
+.nav-item.active{background:#000080;color:#fff;border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark)}
+.nav-icon{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sidebar-tray{padding:4px;border-top:1px solid #808080;border-top-color:#808080 #fff #fff #808080;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.sidebar-tray .tray-item{display:flex;align-items:center;gap:4px;padding:2px 6px;border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);background:var(--win-bg);cursor:pointer;font-size:10px;font-family:'Pixelify Sans','Courier New',monospace;color:var(--win-fg);font-weight:600}
+.sidebar-tray .tray-item:active{border-style:inset}
 .sidebar-ring{position:fixed;left:16px;bottom:24px;width:44px;height:44px;border:2px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:101;transition:all .3s;background:var(--bg);box-shadow:0 2px 12px rgba(0,0,0,.25),0 0 8px rgba(136,192,208,.15)}
 .sidebar-ring:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,.35),0 0 16px rgba(136,192,208,.35)}
 .sidebar-ring.open{opacity:0;pointer-events:none}
@@ -40,22 +53,36 @@ a:hover{text-decoration:underline}
 .sidebar-ring.ring-hint{animation:ring-hint 2s ease-in-out 3}
 .sidebar-backdrop{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}
 .sidebar-backdrop.open{opacity:1;pointer-events:auto}
-.topbar{height:var(--topbar-h);display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;position:relative}
-.topbar-title{position:absolute;left:50%;transform:translateX(-50%);font-size:15px;font-weight:600;color:var(--text-dim);pointer-events:none;white-space:nowrap}
-.topbar-search{flex:1;max-width:400px;position:relative}
-.topbar-search input{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-raised);color:var(--text);outline:none;transition:border-color .15s}
-.topbar-search input::placeholder{color:var(--text-dim);opacity:.7}
-.topbar-search input:focus{border-color:var(--accent)}
-.topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
-.offline-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--orange);background:var(--bg-raised);padding:3px 8px;border-radius:var(--radius);border:1px solid var(--orange)}
-.offline-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
+/* Topbar — Win95 blue title bar (Q7) */
+.topbar{height:var(--topbar-h);display:flex;align-items:center;gap:4px;padding:0 4px;background:linear-gradient(90deg,var(--win-title-bar),color-mix(in srgb,var(--win-title-bar) 80%,#000));border-bottom:2px solid #000;flex-shrink:0;position:relative}
+.topbar-home{display:flex;align-items:center;justify-content:center;gap:4px;height:22px;padding:0 8px;border:2px outset #c0c0c0;background:var(--win-bg);color:var(--win-fg);cursor:pointer;font-family:'Pixelify Sans','Courier New',monospace;font-size:11px;font-weight:600;flex-shrink:0}
+.topbar-home:active{border-style:inset}
+.topbar-home:hover{background:#d0d0d0}
+.topbar-title{position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--win-title-bar-text);pointer-events:none;white-space:nowrap;font-family:'Pixelify Sans','Courier New',monospace;letter-spacing:.02em}
+.topbar-search{flex:1;max-width:300px;position:relative;margin-left:8px}
+.topbar-search input{width:100%;padding:3px 6px;border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);background:var(--win-bg-cell);color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;font-size:11px;outline:none}
+.topbar-search input:focus{border-color:#000080 #c0c0c0 #c0c0c0 #000080}
+.topbar-search input::placeholder{color:#999}
+.topbar-actions{display:flex;align-items:center;gap:4px;margin-left:auto}
+.topbar-actions .icon-btn{width:24px;height:22px;border:2px outset #c0c0c0;background:var(--win-bg);color:var(--win-fg);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:none}
+.topbar-actions .icon-btn:active{border-style:inset}
+.topbar-actions .icon-btn:hover{background:#d0d0d0}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;cursor:pointer;flex-shrink:0;border:none;background:transparent;color:var(--text-dim);border-radius:var(--radius);transition:color .15s,background .15s}
+.icon-btn:hover{color:var(--text);background:var(--bg-hover)}
+.offline-badge{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--orange);background:var(--win-bg);padding:1px 6px;border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);font-family:'Pixelify Sans','Courier New',monospace;font-weight:600}
+.offline-dot{width:5px;height:5px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.icon-btn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:transparent;color:var(--text-dim);cursor:pointer;border-radius:var(--radius);transition:color .15s,background .15s}
-.icon-btn:hover{color:var(--text);background:var(--bg-hover)}
+.palette-trigger{font-family:'Pixelify Sans','Courier New',monospace;font-size:10px;color:var(--win-fg);background:var(--win-bg);border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);padding:1px 6px;cursor:pointer;font-weight:600;height:22px;display:flex;align-items:center}
+.palette-trigger:hover{background:#d0d0d0}
 
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.main-content{flex:1;overflow-y:auto;padding:24px 32px;max-width:var(--content-max);margin:0 auto;width:100%}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg)}
+.main-content{flex:1;overflow-y:auto;padding:12px 16px 4px;max-width:var(--content-max);margin:0 auto;width:100%}
+/* App status bar — Win95 segmented (Q5) */
+.app-statusbar{height:24px;background:var(--win-bg);border-top:2px solid #fff;box-shadow:inset 0 1px 0 #808080;display:flex;align-items:center;justify-content:space-between;padding:0 4px;font-size:11px;gap:2px;flex-shrink:0}
+.app-statusbar .status-segment{display:flex;align-items:center;gap:4px;padding:0 6px;height:18px;border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);white-space:nowrap;overflow:hidden}
+.app-statusbar .status-segment .status-text{color:var(--win-fg);font-size:10px;letter-spacing:.02em;opacity:.85;font-family:'Pixelify Sans','Courier New',monospace}
+.app-statusbar .status-segment.right{margin-left:auto}
 
 .page{display:none}
 .page.active{display:block}
@@ -95,7 +122,6 @@ h3{font-family:var(--font-serif);text-wrap:balance}
 .btn-sm{padding:4px 10px;font-size:var(--fs-sm)}
 .btn:active:not(:disabled){transform:scale(.97)}
 .icon-btn:active{transform:scale(.92)}
-.roulette-btn:active{transform:scale(.97)}
 .nav-item:active{transform:scale(.98)}
 input:disabled,textarea:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 
@@ -109,10 +135,10 @@ input:disabled,textarea:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 .tag-pill .tag-remove{width:12px;height:12px;cursor:pointer;opacity:.6;transition:opacity .15s}
 .tag-pill .tag-remove:hover{opacity:1}
 
-.empty-state{text-align:center;padding:48px 24px;color:var(--text-dim)}
-.empty-state p{font-size:var(--fs-sm);line-height:1.6;max-width:340px;margin:0 auto}
+.empty-state{text-align:center;padding:32px 24px;background:var(--bg);border:2px inset #dfdfdf;margin:8px 0;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text)}
+.empty-state p{font-size:12px;line-height:1.6;max-width:340px;margin:0 auto;font-family:'Pixelify Sans','Courier New',monospace}
 .empty-state p+p{margin-top:6px}
-.empty-state-icon{width:48px;height:48px;margin:0 auto 12px;opacity:.3}
+.empty-state-icon{width:32px;height:32px;margin:0 auto 8px;opacity:.4;filter:grayscale(1)}
 
 input:where(:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]):not([type="reset"]):not([type="hidden"])),textarea,select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-raised);color:var(--text);outline:none;width:100%}
 select option,option,datalist option{background:var(--bg-raised);color:var(--text)}
@@ -125,11 +151,8 @@ textarea{resize:vertical;min-height:80px}
 /* Dashboard */
 .dash-bento{display:grid;grid-template-columns:2fr 1fr;gap:12px;align-items:start}
 .dash-col{display:flex;flex-direction:column;gap:10px}
-.dash-col .dash-card.dash-hero{min-height:100px;background:var(--accent-tint)}
 .dash-full{grid-column:1/-1}
 
-.dash-card{padding:14px;border-radius:8px;background:var(--bg)}
-.dash-col .dash-card{display:flex;flex-direction:column;border:1px solid var(--border)}
 .scratch-section{display:flex;flex-direction:column;flex:1}
 .scratch-input-area{display:flex;gap:8px;align-items:flex-start}
 #scratchList{flex:1}
@@ -169,8 +192,14 @@ textarea{resize:vertical;min-height:80px}
 #page-dashboard .section{margin-bottom:12px}
 #page-dashboard .dash-bento{gap:8px}
 #page-dashboard .dash-col{gap:6px}
-#page-dashboard .dash-card{padding:8px 10px}
-#page-dashboard .dash-hero{padding:10px 14px}
+#page-dashboard .win-window{box-shadow:3px 3px 0 -2px rgba(0,0,0,.1),6px 6px 16px -6px rgba(0,0,0,.25)}
+#page-dashboard .win-window .win-body{padding:6px 8px;overflow-y:auto}
+#page-dashboard .win-window .win-titlebar{height:20px}
+#page-dashboard .win-window .win-title{font-size:11px}
+#page-dashboard .quick-add{margin-bottom:0;display:flex;gap:6px;align-items:center;background:var(--win-bg);padding:4px 6px;border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark)}
+#page-dashboard .quick-add .win-input{height:22px;font-size:11px;padding:2px 5px}
+#page-dashboard .quick-add .nl-info{color:var(--win-fg);font-size:14px;cursor:help;flex-shrink:0}
+#page-dashboard .quick-add .nl-info:hover{color:#000080}
 #page-dashboard .scratch-input-area textarea{min-height:28px;font-size:12px;padding:4px 8px;resize:none}
 #page-dashboard .scratch-note{padding:6px 8px;font-size:12px}
 #page-dashboard .scratch-note-text{font-size:12px}
@@ -184,23 +213,13 @@ textarea{resize:vertical;min-height:80px}
 #page-dashboard .heatmap-cell{width:9px;height:9px}
 #page-dashboard .heatmap-legend{margin-top:2px}
 #page-dashboard .goal-selector select{font-size:12px;padding:3px 6px}
-#page-dashboard .roulette-btn{padding:4px 10px;font-size:12px}
 #page-dashboard .roulette-result{font-size:12px}
-/* Eisenhower Matrix */
-.eisenhower-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:300px}
-.eisenhower-card{background:var(--bg-raised);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:6px}
-.eisenhower-matrix{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0}
-.eisenhower-col{border:1px solid var(--border);display:flex;flex-direction:column}
-.eisenhower-label{height:24px;line-height:24px}
-.eisenhower-quad{flex:1;padding:12px}
-.eisenhower-quad-header{font-size:13px;font-weight:600;margin-bottom:8px;font-family:var(--font-serif)}
-.eisenhower-task{display:flex;align-items:center;gap:6px;padding:6px 6px;font-size:13px;cursor:pointer;border-radius:4px;transition:background .15s;border-bottom:1px solid var(--border)}
-.eisenhower-task:last-child{border-bottom:none}
-.eisenhower-task:hover{background:var(--bg-hover)}
-/* Task roulette */
+/* Eisenhower Matrix (Q4 — each quadrant = Win95 window) */
+.eisenhower-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-height:300px}
+.eisenhower-task{display:flex;align-items:center;gap:6px;padding:6px 6px;font-size:12px;cursor:pointer;background:var(--win-bg-cell);color:var(--win-fg);border:1px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);margin-bottom:2px;font-family:'Pixelify Sans','Courier New',monospace}
+.eisenhower-task:last-child{margin-bottom:0}
+.eisenhower-task:hover{background:var(--win-cell-hover)}
 .roulette-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.roulette-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-raised);color:var(--text);cursor:pointer;font-size:13px;transition:all .2s}
-.roulette-btn:hover{border-color:var(--accent);background:var(--bg-hover);color:var(--accent)}
 .roulette-result{font-size:13px;color:var(--accent);font-family:var(--font-serif);padding:4px 0}
 
 
@@ -219,82 +238,86 @@ textarea{resize:vertical;min-height:80px}
 .view-toggle{display:flex;gap:4px;margin-left:auto}
 .view-toggle .icon-btn.active{color:var(--accent);background:var(--bg-raised)}
 
-.task-table{width:100%;border-collapse:collapse}
-.task-table th{text-align:left;padding:8px 6px;font-size:12px;color:var(--text-dim);font-weight:600;white-space:nowrap}
-.task-table td{padding:6px;border-top:1px solid var(--border);vertical-align:middle}
-.task-table tr:first-child td{border-top:none}
-.task-table tr:hover td{background:var(--bg-raised)}
-.task-title{font-weight:500;cursor:pointer;color:var(--text);font-family:var(--font-serif)}
-.task-title:hover{color:var(--accent)}
-.task-row-done .task-title{color:var(--text-dim);text-decoration:line-through}
+.task-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--win-bg);border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark)}
+.task-table th{text-align:left;padding:4px 6px;font-size:11px;color:var(--win-fg);font-weight:600;white-space:nowrap;background:var(--win-bg-header);border-bottom:1px solid #808080;font-family:'Pixelify Sans','Courier New',monospace}
+.task-table td{padding:4px 6px;border-top:1px solid #fff;border-left:1px solid #fff;vertical-align:middle;background:var(--win-bg-cell);color:var(--win-fg);font-size:12px}
+.task-table td:first-child{border-left:none}
+.task-table tr:hover td{background:var(--win-cell-hover)}
+.task-table tr.task-row-done td{color:#999}
+.task-title{font-weight:500;cursor:pointer;color:var(--win-fg);text-decoration:none}
+.task-title:hover{color:#000080;text-decoration:underline}
+.task-row-done .task-title{color:#999;text-decoration:line-through}
+.task-table .badge{font-size:10px;padding:1px 6px;background:var(--win-bg-header);color:var(--win-fg)!important;border:1px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);border-radius:0}
+.task-table .tag-pill{font-size:10px;padding:1px 6px;background:var(--win-bg-header);color:var(--win-fg);border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);border-radius:0}
+.task-table .priority-dot{width:8px;height:8px;border:1px solid #808080}
 
 .quick-add{display:flex;gap:6px;margin-bottom:12px;align-items:center}
-.quick-add input{flex:1;padding:5px 10px;font-size:13px}
-.quick-add .nl-info{cursor:help;font-size:15px;color:var(--text-dim);flex-shrink:0;line-height:1}
-.quick-add .nl-info:hover{color:var(--accent)}
+.quick-add input{flex:1}
+.quick-add .nl-info{cursor:help;font-size:15px;color:var(--win-fg);flex-shrink:0;line-height:1}
+.quick-add .nl-info:hover{filter:brightness(1.2)}
 
 
 
-.pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 0;font-size:13px;color:var(--text-dim);font-family:var(--font-mono)}
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 0 4px;font-size:12px;color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace}
+.pagination button{height:22px;min-width:50px;padding:0 10px;border:2px outset #c0c0c0;background:var(--win-bg);color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;font-size:11px;font-weight:600;cursor:pointer}
+.pagination button:active{border-style:inset}
+.pagination button:hover{background:#d0d0d0}
+.pagination button:disabled{border-style:inset;opacity:.5;cursor:default;background:var(--win-bg-header)}
+.pagination span{margin:0 8px}
 
-/* Kanban */
-.kanban-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;min-height:400px}
-.kanban-column{background:var(--bg-raised);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:8px;min-height:200px}
-.kanban-col-header{font-size:13px;font-weight:600;color:var(--text-dim);padding-bottom:8px;border-bottom:1px solid var(--border)}
-.kanban-card{padding:12px 14px;background:var(--bg);border-radius:6px;cursor:grab;transition:box-shadow .15s;display:flex;flex-direction:column;gap:6px}
-.kanban-card:hover{box-shadow:0 1px 4px rgba(0,0,0,.2)}
+/* Kanban (Q4 — each column = Win95 window) */
+.kanban-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;min-height:400px}
+.kanban-card{padding:8px 10px;background:var(--win-bg-cell);color:var(--win-fg);border:1px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);cursor:grab;display:flex;flex-direction:column;gap:4px;margin-bottom:4px;font-family:'Pixelify Sans','Courier New',monospace;font-size:11px}
+.kanban-card:hover{background:var(--win-cell-hover)}
 .kanban-card.dragging{opacity:.5}
-.kanban-card-title{font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-serif)}
-.kanban-card-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);font-family:var(--font-mono)}
-.kanban-drop-zone{min-height:60px;border:2px dashed var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:12px;transition:border-color .15s,background .15s}
-.kanban-drop-zone.drag-over{border-color:var(--accent);background:var(--bg-hover)}
+.kanban-card-title{font-size:12px;font-weight:600;cursor:pointer;color:var(--win-fg)}
+.kanban-card-row{display:flex;align-items:center;gap:6px;font-size:10px;color:#555;font-family:'Space Mono','Courier New',monospace}
+.kanban-drop-zone{min-height:60px;border:2px dashed #808080;display:flex;align-items:center;justify-content:center;color:#808080;font-size:11px;font-family:'Pixelify Sans','Courier New',monospace;margin-top:4px}
+.kanban-drop-zone.drag-over{border-color:#000080;background:#e0e0ff}
 
-/* Calendar */
-.calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.calendar-day-header{padding:8px;text-align:center;font-size:11px;font-weight:600;color:var(--text-dim);background:var(--bg-raised);font-family:var(--font-mono)}
-.calendar-day{min-height:80px;padding:6px;background:var(--bg);cursor:pointer;transition:background .15s;position:relative}
-.calendar-day:hover{background:var(--bg-raised)}
-.calendar-day.other-month{opacity:.3}
-.calendar-day.today{background:var(--bg-hover)}
+/* Calendar — Win95 widget (Q15) */
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0;background:var(--win-bg);border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);overflow:hidden}
+.calendar-day-header{padding:4px;text-align:center;font-size:10px;font-weight:700;color:var(--win-fg);background:var(--win-bg-header);font-family:'Pixelify Sans','Courier New',monospace;border:1px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light)}
+.calendar-day{min-height:60px;padding:4px;background:var(--win-bg-cell);cursor:pointer;position:relative;border:1px solid #c0c0c0;color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;font-size:11px}
+.calendar-day:hover{background:var(--win-cell-hover)}
+.calendar-day.other-month{opacity:.4}
+.calendar-day.today{background:#000080;color:#fff}
+.calendar-day.today .calendar-day-num{color:#fff;font-weight:700}
 .calendar-day.has-tasks{cursor:pointer}
-.calendar-day-num{font-size:12px;color:var(--text-dim);margin-bottom:4px;font-family:var(--font-mono)}
-.calendar-day-dot{width:4px;height:4px;border-radius:50%;display:inline-block}
-.calendar-day-dots{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:4px}
-.calendar-day-tasks{display:none;position:absolute;top:100%;left:0;z-index:10;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius);padding:8px;min-width:200px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.calendar-day-num{font-size:11px;color:var(--win-fg);margin-bottom:2px;font-family:'Pixelify Sans','Courier New',monospace;font-weight:600}
+.calendar-day.today .calendar-day-num{color:#fff}
+.calendar-day-dot{width:4px;height:4px;display:inline-block;border:1px solid #808080}
+.calendar-day-dots{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:2px}
+.calendar-day-tasks{display:none;position:absolute;top:100%;left:0;z-index:10;background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);padding:6px;min-width:200px;box-shadow:6px 6px 0 -2px rgba(0,0,0,.15)}
 .calendar-day.expanded .calendar-day-tasks{display:block}
-.calendar-day-task{font-size:12px;padding:2px 0;cursor:pointer;color:var(--text);font-family:var(--font-mono)} 
-.calendar-day-task:hover{color:var(--accent)}
-.calendar-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.calendar-controls select{padding:4px 8px;font-size:12px;width:auto}
-.calendar-controls input[type="date"]{padding:4px 8px;font-size:12px;width:auto}
-.calendar-desc{font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.5}
-.calendar-week-grid{display:grid;grid-template-columns:auto repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;font-size:12px}
-.calendar-time-label{padding:4px 8px;font-size:11px;color:var(--text-dim);background:var(--bg);text-align:right;font-family:var(--font-mono);border-top:1px solid var(--border);min-height:40px;white-space:nowrap}
-.calendar-hour-slot{padding:2px 4px;font-size:11px;background:var(--bg);border-top:1px solid var(--border);cursor:pointer;transition:background .15s;min-height:40px;position:relative}
-.calendar-hour-slot:hover{background:var(--bg-raised)}
-.calendar-hour-slot.today-col{background:var(--bg-hover)}
-.calendar-day.today{border:2px solid var(--accent);animation:cal-today-pulse 2s ease-in-out infinite}
-.calendar-day.today .calendar-day-num{color:var(--accent);font-weight:700}
+.calendar-day-task{font-size:11px;padding:2px 4px;cursor:pointer;color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace}
+.calendar-day-task:hover{background:#000080;color:#fff}
+.calendar-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.calendar-desc{font-size:11px;color:#555;margin-bottom:8px;line-height:1.5;font-family:'Pixelify Sans','Courier New',monospace}
+.calendar-week-grid{display:grid;grid-template-columns:auto repeat(7,1fr);gap:0;background:var(--win-bg);border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);overflow:hidden;font-size:11px}
+.calendar-time-label{padding:2px 6px;font-size:10px;color:var(--win-fg);background:var(--win-bg-header);text-align:right;font-family:'Space Mono','Courier New',monospace;border:1px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);min-height:36px;white-space:nowrap}
+.calendar-hour-slot{padding:2px 4px;font-size:10px;background:var(--win-bg-cell);border:1px solid #c0c0c0;cursor:pointer;min-height:36px;position:relative;font-family:'Pixelify Sans','Courier New',monospace;color:var(--win-fg)}
+.calendar-hour-slot:hover{background:var(--win-cell-hover)}
+.calendar-hour-slot.today-col{background:#e0e0ff}
 .calendar-day.overdue{box-shadow:inset 0 0 0 1px var(--red)}
-.calendar-day.drag-over{background:rgba(136,192,208,.15)}
-.calendar-hour-slot.drag-over{background:rgba(136,192,208,.15)}
-.cal-multi-bar{position:absolute;top:2px;left:0;right:0;height:18px;border-radius:3px;font-size:9px;padding:0 4px;display:flex;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;z-index:2;opacity:.85}
-.cal-multi-bar:hover{opacity:1;z-index:3}
-.cal-preview-task{font-size:11px;padding:1px 4px;margin:1px 0;border-radius:2px;cursor:pointer}
-.calendar-day-task .task-time{font-family:var(--font-mono);opacity:.7;margin-right:2px;font-size:10px}
-@keyframes cal-today-pulse{0%,100%{box-shadow:0 0 0 0 rgba(136,192,208,.4)}50%{box-shadow:0 0 0 4px rgba(136,192,208,0)}}
-.calendar-hour-slot .calendar-day-task{font-size:10px;padding:1px 3px;margin:1px 0}
+.calendar-day.drag-over{background:#e0e0ff}
+.calendar-hour-slot.drag-over{background:#e0e0ff}
+.cal-multi-bar{position:absolute;top:2px;left:0;right:0;height:18px;font-size:9px;padding:0 4px;display:flex;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;z-index:2;background:var(--win-bg);border:1px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light)}
+.cal-multi-bar:hover{background:var(--win-bg-hover);z-index:3}
+.cal-preview-task{font-size:10px;padding:1px 4px;margin:1px 0;cursor:pointer;font-family:'Pixelify Sans','Courier New',monospace}
+.calendar-day-task .task-time{font-family:'Space Mono','Courier New',monospace;opacity:.7;margin-right:2px;font-size:9px}
+.calendar-hour-slot .calendar-day-task{font-size:9px;padding:1px 3px;margin:1px 0}
 
 /* Task Detail */
 .detail-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.detail-back{display:flex;align-items:center;gap:4px;color:var(--text-dim);cursor:pointer;border:none;background:none;font-size:13px;padding:4px 8px;border-radius:var(--radius)}
-.detail-back:hover{color:var(--text);background:var(--bg-raised)}
+.detail-back{display:flex;align-items:center;gap:4px;color:var(--win-fg);cursor:pointer;border:2px outset #c0c0c0;background:var(--win-bg);font-size:11px;padding:2px 8px;font-family:'Pixelify Sans','Courier New',monospace;font-weight:600}
+.detail-back:active{border-style:inset}
+.detail-back:hover{background:#d0d0d0}
 .detail-form{display:flex;flex-direction:column;gap:12px;max-width:700px}
 .detail-field{display:flex;flex-direction:column;gap:4px}
-.detail-field label{font-size:13px;font-weight:500;color:var(--text-dim)}
-.detail-title-input{font-size:20px;font-weight:600;border:none;background:transparent;padding:4px 0;width:100%;color:var(--text);font-family:var(--font-serif)}
-.detail-title-input:focus{outline:none;border-bottom:2px solid var(--accent)}
+.detail-field label{font-size:11px;font-weight:600;color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace}
+.detail-title-input{font-size:16px;font-weight:600;border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);background:var(--win-bg-cell);color:var(--win-fg);padding:4px 6px;width:100%;font-family:'Pixelify Sans','Courier New',monospace}
+.detail-title-input:focus{outline:none;border-color:#000080 #c0c0c0 #c0c0c0 #000080}
 
 /* Focus */
 .focus-counter{font-size:13px;color:var(--text-dim);margin-bottom:8px}
@@ -314,37 +337,39 @@ textarea{resize:vertical;min-height:80px}
 .confetti-piece{position:absolute;width:8px;height:8px;top:-10px;animation:confetti-fall 3s ease-out forwards}
 @keyframes confetti-fall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 
-/* Modal */
+/* Modal — Win95 dialog (Q8) */
 .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000}
-.modal{background:var(--bg-overlay);border-radius:var(--radius);padding:24px;min-width:320px;max-width:500px;max-height:80vh;overflow-y:auto}
-.modal-title{font-size:16px;font-weight:600;margin-bottom:12px;font-family:var(--font-serif)}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.modal{background:var(--bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);box-shadow:6px 6px 0 -2px rgba(0,0,0,.12),10px 10px 24px -6px rgba(0,0,0,.35);padding:0;min-width:300px;max-width:520px;max-height:80vh;overflow-y:auto;color:var(--text)}
+.modal>.win-titlebar{display:flex;align-items:center;height:24px;padding:0 3px 0 4px;background:linear-gradient(90deg,var(--win-title-bar),color-mix(in srgb,var(--win-title-bar) 80%,#000));cursor:default}
+.modal>.win-titlebar .win-title{flex:1;font-size:12px;font-weight:700;color:var(--win-title-bar-text);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Pixelify Sans','Courier New',monospace}
+.modal>.win-titlebar .win-close{width:18px;height:16px;padding:0;border:2px outset #c0c0c0;background:var(--win-bg);color:var(--win-fg);font-size:12px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Pixelify Sans','Courier New',monospace;flex-shrink:0;margin-left:4px}
+.modal>.win-titlebar .win-close:active{border-style:inset}
+.modal>.win-titlebar .win-close:hover{background:#d0d0d0}
+.modal .win-body{padding:16px 14px 14px;color:var(--text);font-family:'Pixelify Sans','Courier New',monospace}
+.modal .win-body p{font-size:13px;line-height:1.5;margin-bottom:16px}
+.modal .win-body .dialog-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:4px}
+.modal-title{font-size:12px;font-weight:700;letter-spacing:.02em;font-family:'Pixelify Sans','Courier New',monospace;margin-bottom:8px;color:var(--text)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 
-/* Toast */
-.toast-container{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:8px}
-.toast{padding:10px 16px;border-radius:var(--radius);color:#fff;font-size:13px;animation:toast-in .2s ease-out}
-.toast.success{background:var(--green);color:var(--bg)}
-.toast.error{background:var(--red)}
-.toast.info{background:var(--accent);color:var(--bg)}
-@keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* Toast — Win95 tooltip-style (Q16) */
+.toast-container{position:fixed;bottom:40px;right:16px;z-index:2000;display:flex;flex-direction:column;gap:6px}
+.toast{padding:8px 14px;color:var(--win-fg);font-size:12px;background:#ffffe1;border:1px solid #000;box-shadow:2px 2px 0 rgba(0,0,0,.15);font-family:'Pixelify Sans','Courier New',monospace;font-weight:500;max-width:300px;line-height:1.4}
+.toast .toast-rider{display:inline;gap:0}
+.toast .toast-rider svg{display:none}
+@keyframes toast-in{from{opacity:0}to{opacity:1}}
 
-/* Command palette */
-.palette-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:flex-start;justify-content:center;padding-top:12vh;z-index:1100;animation:overlay-in .12s ease-out}
-.palette{background:var(--bg-overlay);border-radius:var(--radius);width:min(560px,92vw);overflow:hidden;animation:palette-in .14s ease-out}
-@keyframes palette-in{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+/* Command palette — Win95 Run dialog (Q19) */
+.palette-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1100;animation:overlay-in .12s ease-out}
 @keyframes overlay-in{from{opacity:0}to{opacity:1}}
-.palette-input{width:100%;border:none;border-bottom:1px solid var(--border);background:transparent;padding:14px 16px;font-size:15px;color:var(--text);outline:none;box-sizing:border-box}
-.palette-input::placeholder{color:var(--text-dim)}
-.palette-list{max-height:360px;overflow-y:auto;padding:4px}
-.palette-group{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);padding:10px 14px 4px;font-weight:600}
-.palette-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-radius:4px;cursor:pointer;font-size:14px;color:var(--text)}
-.palette-item:hover{background:var(--bg-hover)}
-.palette-item.selected{background:var(--accent-tint);color:var(--accent)}
+.palette-list{max-height:280px;overflow-y:auto;border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);background:var(--win-bg-cell);padding:2px;margin-bottom:0}
+.palette-group{font-size:10px;font-weight:600;color:#999;padding:4px 6px 1px;letter-spacing:.02em;font-family:'Pixelify Sans','Courier New',monospace}
+.palette-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 6px;cursor:pointer;font-size:12px;color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;user-select:none;letter-spacing:.02em}
+.palette-item:hover{background:#000080;color:#fff}
+.palette-item.selected{background:#000080;color:#fff}
 .palette-label{flex:1}
-.palette-hint{font-family:var(--font-mono);font-size:11px;color:var(--text-dim)}
-.palette-item.selected .palette-hint{color:var(--accent)}
-.palette-empty{padding:20px 14px;color:var(--text-dim);font-size:13px;text-align:center}
-.palette-foot{display:flex;gap:18px;padding:8px 16px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--text-dim)}
+.palette-hint{font-family:'Space Mono','Courier New',monospace;font-size:10px;opacity:.7;color:var(--win-fg)}
+.palette-item.selected .palette-hint,.palette-item:hover .palette-hint{color:#fff}
+.palette-empty{padding:12px 6px;color:#999;font-size:12px;text-align:center;font-family:'Pixelify Sans','Courier New',monospace}
 .palette-trigger{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);background:transparent;border:1px solid var(--border);border-radius:4px;padding:2px 7px;cursor:pointer;transition:color .15s,border-color .15s;align-self:center}
 .palette-trigger:hover{color:var(--text);border-color:var(--accent)}
 
@@ -354,50 +379,63 @@ textarea{resize:vertical;min-height:80px}
 .shortcut-keys{font-family:var(--font-mono);font-size:12px;color:var(--text-dim)}
 
 /* Bin */
-.bin-table{width:100%;border-collapse:collapse}
-.bin-table th{text-align:left;padding:8px 6px;font-size:12px;color:var(--text-dim);font-weight:600}
-.bin-table td{padding:6px;border-top:1px solid var(--border);vertical-align:middle}
+.bin-table{width:100%;border-collapse:separate;background:var(--win-bg);border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark)}
+.bin-table th{text-align:left;padding:6px;font-size:11px;color:var(--win-fg);font-weight:600;background:var(--win-bg);font-family:'Pixelify Sans','Courier New',monospace}
+.bin-table td{padding:6px;border-top:1px solid #808080;vertical-align:middle;background:var(--win-bg-cell);color:var(--win-fg);font-size:12px}
+.bin-table tbody tr:hover td{background:var(--win-cell-hover)}
 
 /* Activity Log */
-.activity-log-list{display:flex;flex-direction:column;gap:4px}
-.activity-log-entry{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius);font-size:13px}
-.activity-log-entry:hover{background:var(--bg-raised)}
+.activity-log-list{display:flex;flex-direction:column;gap:2px}
+.activity-log-entry{display:flex;align-items:center;gap:10px;padding:4px 6px;font-size:12px;background:var(--win-bg-cell);color:var(--win-fg);border:1px solid #808080;border-color:#d4d4d4 #808080 #808080 #d4d4d4}
+.activity-log-entry:hover{background:var(--win-cell-hover)}
 
 /* Settings */
-.settings-section{margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.settings-section h2{margin:0;padding:14px 20px;font-size:14px;font-weight:600;cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);transition:background .15s}
-.settings-section h2:hover{background:var(--bg-raised)}
-.settings-section h2::after{content:'';width:7px;height:7px;border:solid var(--text-dim);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .2s;flex-shrink:0}
-.settings-section.collapsed h2::after{transform:rotate(-45deg)}
-.settings-section.collapsed .settings-body{display:none}
-.settings-body{padding:8px 20px 4px;background:var(--bg)}
-.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
-.settings-label{font-size:14px;font-weight:500}
-.settings-desc{font-size:11px;color:var(--text-dim);margin-top:2px;font-family:var(--font-mono)}
-.backup-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:var(--radius)}
-.backup-item:hover{background:var(--bg-raised)}
+/* Dashboard windows — bodies use Nord bg for JS-rendered var(--text) content */
+#page-dashboard .win-window>.win-body{background:var(--bg);color:var(--text)}
+.settings-section.win-window{margin-bottom:8px;box-shadow:none}
+.settings-section.win-window>.win-body{padding:6px 14px 10px;background:var(--bg);color:var(--text)}
+.settings-section.collapsed .win-body{display:none}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #808080}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:12px;font-weight:600;color:var(--text);font-family:'Pixelify Sans','Courier New',monospace}
+.settings-desc{font-size:10px;color:var(--text-dim);margin-top:2px}
+.backup-item{display:flex;align-items:center;justify-content:space-between;padding:8px;color:var(--text)}
+.backup-item:hover{background:var(--bg-hover)}
+.settings-section .settings-body select{width:auto}
+.settings-section .settings-body input[type="checkbox"]{accent-color:auto}
 
-/* Sort popover */
-.sort-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px;min-height:28px}
-.sort-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:4px;font-size:12px;background:var(--bg-hover);color:var(--text-dim);font-family:var(--font-mono)}
-.sort-chip .chip-remove{width:14px;height:14px;cursor:pointer;opacity:.5}
+/* Sort bar — Win95 */
+.sort-bar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;min-height:24px}
+.sort-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;font-size:11px;background:var(--win-bg);color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);cursor:default}
+.sort-chip .chip-remove{width:12px;height:12px;cursor:pointer;opacity:.6;margin-left:4px;font-size:10px;line-height:1}
 .sort-chip .chip-remove:hover{opacity:1}
-.sort-popover{position:fixed;z-index:100;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius);padding:4px;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-.sort-menu-item{padding:8px 14px;cursor:pointer;border-radius:4px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px}
-.sort-menu-item:hover{background:var(--bg-hover)}
-.sort-menu-item .sub-arrow{margin-left:auto;color:var(--text-dim);font-size:11px}
-.sort-menu-item.active{color:var(--accent)}
 .sort-wrapper{position:relative;display:inline-block}
-.filter-popover{position:fixed;z-index:100;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius);padding:8px;min-width:200px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-.filter-menu-item{padding:8px 14px;cursor:pointer;border-radius:4px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;user-select:none}
-.filter-menu-item:hover{background:var(--bg-hover)}
-.filter-menu-item input[type="checkbox"]{accent-color:var(--accent)}
+/* Win95 sort/filter popovers (Q17) */
+.win-popover{position:fixed;z-index:1100;background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);box-shadow:4px 4px 0 rgba(0,0,0,.15);padding:2px;min-width:160px;font-family:'Pixelify Sans','Courier New',monospace}
+.win-menu-item{display:flex;align-items:center;justify-content:space-between;padding:4px 20px 4px 8px;font-size:11px;font-weight:500;color:var(--win-fg);cursor:pointer;user-select:none;white-space:nowrap}
+.win-menu-item:hover{background:#000080;color:#fff}
+.win-menu-item .sub-arrow{font-size:8px;margin-left:24px;color:var(--win-fg)}
+.win-menu-item .chip-remove{cursor:pointer;font-size:10px;opacity:.6;margin-left:8px}
+.win-menu-item .chip-remove:hover{opacity:1}
+.win-menu-separator{height:1px;margin:2px 4px;background:#808080;border-bottom:1px solid #fff}
+/* Win95 filter checkbox inline */
+.win-menu-item input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:13px;height:13px;border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);background:var(--win-bg);cursor:pointer;display:inline-block;vertical-align:middle;position:relative;margin:0;flex-shrink:0}
+.win-menu-item input[type="checkbox"]:checked{background:#000080}
+.win-menu-item input[type="checkbox"]:checked::after{content:'';position:absolute;left:2px;top:0;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--bg-hover);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--bg-muted)}
+/* Win95 Scrollbars (Q10) */
+*{scrollbar-width:auto;scrollbar-color:var(--win-bg) var(--win-bg-header)}
+::-webkit-scrollbar{width:16px;height:16px}
+::-webkit-scrollbar-track{background:var(--win-bg-header);border:1px solid #808080}
+::-webkit-scrollbar-thumb{background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light)}
+::-webkit-scrollbar-thumb:hover{background:var(--win-bg-hover)}
+::-webkit-scrollbar-thumb:active{border-style:inset}
+::-webkit-scrollbar-button:single-button{background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);display:block;height:16px;width:16px;background-repeat:no-repeat;background-position:center}
+::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 7 4'%3E%3Cpath d='M0 4L3.5 0L7 4' fill='none' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E")}
+::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 7 4'%3E%3Cpath d='M0 0L3.5 4L7 0' fill='none' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E")}
+::-webkit-scrollbar-button:single-button:horizontal:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7' viewBox='0 0 4 7'%3E%3Cpath d='M4 0L0 3.5L4 7' fill='none' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E")}
+::-webkit-scrollbar-button:single-button:horizontal:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7' viewBox='0 0 4 7'%3E%3Cpath d='M0 0L4 3.5L0 7' fill='none' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E")}
+::-webkit-scrollbar-corner{background:var(--win-bg-header)}
 
 /* frog */
 .frog-character{position:fixed;bottom:auto;left:auto;z-index:9998;cursor:pointer;line-height:0;pointer-events:auto;transition:left 3.5s cubic-bezier(.4,.2,.2,.8),top 3.5s cubic-bezier(.4,.2,.2,.8)}
@@ -433,10 +471,46 @@ textarea{resize:vertical;min-height:80px}
 
 @media(max-width:768px){
   .dashboard-grid,.bento-grid{grid-template-columns:1fr}
-  .dash-card{padding:20px}
+  .dash-bento{grid-template-columns:1fr}
   .sidebar-ring{left:10px;bottom:16px;width:44px;height:44px}
-  .topbar{padding:0 12px}
-  .main-content{padding:16px}
+  .topbar{padding:0 4px;gap:2px}
+  .topbar .topbar-title{font-size:10px}
+  .topbar-search{max-width:120px}
+  .topbar-home{padding:0 4px;gap:2px}
+  .topbar-home span{display:none}
+  .main-content{padding:8px}
+  .win-window{border-width:1px;box-shadow:3px 3px 0 rgba(0,0,0,.08)}
+  .win-window::before{border-width:1px}
+  .win-titlebar,.dialog-titlebar{height:18px}
+  .win-titlebar .win-title{font-size:10px}
+  .win-close,.dialog-close{width:16px;height:14px;font-size:10px}
+  .win-body{padding:8px 6px 6px}
+  .btn-win{min-width:56px;height:22px;font-size:10px;padding:0 10px}
+  .sidebar{width:180px}
+  .sidebar-tray .tray-item{padding:4px 6px;min-height:28px}
+  .app-statusbar{height:20px;font-size:10px}
+  .app-statusbar .status-segment{height:14px;font-size:9px;padding:0 4px}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-button:single-button{display:none}
+  .task-table th,.task-table td{font-size:10px;padding:4px}
+  .quick-add{gap:4px;padding:4px 6px}
+  .quick-add input{font-size:11px}
+  .win-input{font-size:10px}
+  .view-toggle-btn{height:14px;min-width:14px;font-size:9px}
+  .win-checkbox{width:14px;height:14px}
+  .task-title{font-size:12px}
+  .calendar-day{min-height:0;padding:3px;font-size:10px}
+  .calendar-day-header{padding:4px;font-size:9px}
+  .calendar-day-num{font-size:10px}
+  .calendar-controls{gap:4px}
+  .calendar-controls select{font-size:10px;padding:2px 4px}
+  .kanban-board{grid-template-columns:1fr;gap:6px}
+  .eisenhower-task{font-size:11px;padding:4px}
+  .settings-section.win-window .win-body{padding:4px 8px 6px}
+  .settings-row{padding:10px 0;flex-wrap:wrap;gap:8px}
+  .settings-label{font-size:11px}
+  .detail-title-input{font-size:16px}
+  .detail-form{max-width:100%}
 }
 @media (prefers-reduced-motion: reduce){
   .frog-idle .frog-svg,.frog-walk .frog-svg,.frog-sleep .frog-svg,.frog-stretch .frog-svg,.frog-happy .frog-svg,.frog-perch .frog-svg,.frog-hopping .frog-svg{animation:none!important}
@@ -445,84 +519,105 @@ textarea{resize:vertical;min-height:80px}
   .cal-today-pulse{animation:none!important}
   .toast{animation:none!important}
   .sidebar-ring.ring-hint{animation:none!important}
-  .palette-overlay,.palette{animation:none!important}
+  .palette-overlay{animation:none!important}
 }
-/* Win95 home page */
-.home-active .sidebar,.home-active .sidebar-ring,.home-active .sidebar-backdrop,.home-active .topbar{display:none}
+/* Win95 shared window/dialog components (un-scoped from #page-home for app-wide use per Q4/Q8) */
+.win-window,.dialog{background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);box-shadow:6px 6px 0 -2px rgba(0,0,0,.12),10px 10px 24px -6px rgba(0,0,0,.35);position:relative;user-select:none;color:var(--win-fg)}
+.win-window::before,.dialog::before{content:'';position:absolute;inset:2px;border:1px solid #808080;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);pointer-events:none;z-index:0}
+.win-window>.win-body,.dialog>.dialog-body{padding:16px 14px 14px;position:relative;z-index:1}
+.dialog{min-width:380px;max-width:520px;width:90vw}
+.win-titlebar,.dialog-titlebar{display:flex;align-items:center;height:24px;padding:0 3px 0 4px;background:linear-gradient(90deg,var(--win-title-bar),color-mix(in srgb,var(--win-title-bar) 80%,#000));position:relative;z-index:1;transition:background .4s ease;cursor:default}
+.win-titlebar .titlebar-icon,.dialog-titlebar .titlebar-icon{flex-shrink:0;margin-right:5px;color:var(--win-title-bar-text);opacity:.9;transition:color .4s ease}
+.win-titlebar .win-title,.dialog-title{flex:1;font-size:12px;font-weight:700;color:var(--win-title-bar-text);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .4s ease}
+.win-close,.dialog-close{width:18px;height:16px;padding:0;border:2px outset #c0c0c0;background:var(--win-bg);color:var(--win-fg);font-size:12px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Pixelify Sans','Courier New',monospace;flex-shrink:0;margin-left:4px}
+.win-close:active,.dialog-close:active{border-style:inset}
+.win-close:hover,.dialog-close:hover{background:#d0d0d0}
+/* Win95 buttons (un-scoped) */
+.btn-win{display:inline-flex;align-items:center;justify-content:center;min-width:72px;height:26px;padding:0 16px;border:2px outset #c0c0c0;background:var(--win-bg);color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;font-size:12px;font-weight:600;cursor:pointer;user-select:none;letter-spacing:.02em}
+.btn-win:active,.btn-win.active{border-style:inset}
+.btn-win:disabled{opacity:.5;cursor:default;border-style:inset}
+.btn-win:hover:not(:disabled){background:#d0d0d0}
+.btn-win.btn-primary:disabled{opacity:.5}
+.btn-win.btn-primary{background:var(--win-accent);border-color:var(--win-accent-hover) #000 var(--win-accent-hover);color:var(--win-btn-primary-text);font-weight:700;transition:background .4s ease,border-color .4s ease,color .4s ease}
+.btn-win.btn-primary:active{border-style:inset}
+.btn-win.btn-primary:hover{background:var(--win-accent-hover);border-color:var(--win-accent-hover)}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;min-width:0;padding:0;border:2px outset #c0c0c0;background:var(--win-bg);cursor:pointer;color:var(--win-fg);flex-shrink:0}
+.btn-icon:active{border-style:inset}
+.btn-icon:hover{background:#d0d0d0}
+.btn-icon svg{display:block}
+/* View toggle small buttons in titlebar (Q7) */
+.view-toggle-btn{width:20px;height:16px;border:1px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);background:transparent;color:var(--win-fg);padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.view-toggle-btn:hover{background:rgba(255,255,255,.3)}
+.view-toggle-btn.active,.view-toggle-btn[data-active="true"]{border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);background:rgba(0,0,0,.15)}
+/* Win95 inputs (un-scoped) */
+.win-input{width:100%;border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);background:var(--win-bg-cell);color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;font-size:12px;padding:3px 5px;outline:none}
+.win-input:focus{border-color:#000080 #c0c0c0 #c0c0c0 #000080}
+.win-input::placeholder{color:#999;font-size:11px}
+textarea.win-input{resize:vertical;min-height:48px;line-height:1.4}
+select.win-input{appearance:auto;padding:2px 4px;background:var(--win-bg-cell)}
+/* Win95 priority buttons (un-scoped) */
+.prio-group{display:flex;gap:6px}
+.prio-btn{border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);background:var(--win-bg);color:var(--win-fg);font-family:'Pixelify Sans','Courier New',monospace;font-size:11px;font-weight:600;padding:3px 14px;cursor:pointer;letter-spacing:.02em}
+.prio-btn:active{border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark)}
+.prio-btn.active{border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);background:#a0a0a0;color:#fff;font-weight:700}
+.prio-btn:hover{background:#d0d0d0}
+.prio-btn.active:hover{background:#909090}
+.prio-btn[data-prio="high"].active{background:#bf616a;color:#fff;border-color:#8a3a3a #e8a0a0 #e8a0a0 #8a3a3a}
+.prio-btn[data-prio="medium"].active{background:#d08770;color:#fff;border-color:#a06040 #e8c0a0 #e8c0a0 #a06040}
+.prio-btn[data-prio="low"].active{background:#a3be8c;color:#fff;border-color:#6a8a50 #c8e0b0 #c8e0b0 #6a8a50}
+/* Win95 field helpers (un-scoped) */
+.field-row{margin-bottom:8px}
+.row-duo{display:flex;gap:10px}
+.field-half{flex:1;min-width:0}
+.field-label{display:block;font-size:11px;font-weight:600;color:var(--win-fg);margin-bottom:2px;letter-spacing:.02em}
+.dialog-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:4px}
+/* Win95 context menu (un-scoped) */
+.ctx-menu{display:none;position:fixed;z-index:100;background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);box-shadow:4px 4px 0 rgba(0,0,0,.15);padding:2px;min-width:180px;font-family:'Pixelify Sans','Courier New',monospace}
+.ctx-menu.open{display:block}
+.ctx-item{display:flex;align-items:center;justify-content:space-between;padding:4px 20px 4px 8px;font-size:11px;font-weight:500;color:var(--win-fg);cursor:pointer;user-select:none;white-space:nowrap}
+.ctx-item:hover{background:#000080;color:#fff}
+.ctx-arrow{font-size:8px;margin-left:24px}
+.ctx-separator{height:1px;margin:2px 4px;background:#808080;border-bottom:1px solid #fff}
+/* Win95 quick-add area (un-scoped from #page-home) */
+.quick-area{margin-bottom:10px}
+.quick-input{width:100%;margin-bottom:8px}
+.quick-buttons{display:flex;gap:6px;align-items:center}
+.btn-advanced{font-size:11px;min-width:0;height:22px;padding:0 10px;background:transparent;border:1px solid #808080;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);color:var(--win-fg);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:'Pixelify Sans','Courier New',monospace;font-weight:600}
+.btn-advanced:active{border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light)}
+.btn-advanced:hover{background:var(--win-bg-hover)}
+.btn-advanced .arrow{font-size:9px;transition:transform .2s ease;display:inline-block}
+.btn-advanced.open .arrow{transform:rotate(90deg)}
+.advanced-panel{margin-top:4px;margin-bottom:12px;padding-top:10px;border-top:1px solid #808080}
+.advanced-panel.closed{display:none}
+.btn-launch{display:inline-flex;align-items:center;justify-content:center;font-size:11px;min-width:0;height:22px;padding:0 10px;text-decoration:none;color:var(--win-fg);background:var(--win-bg);font-family:'Pixelify Sans','Courier New',monospace;font-weight:600;cursor:pointer;border:2px outset #c0c0c0}
+.btn-launch:active{border-style:inset}
+.btn-launch:hover{background:var(--win-bg-hover);text-decoration:none;color:var(--win-fg)}
+@media(max-width:640px){.dialog{min-width:0;width:92vw}.dialog-body{padding:12px 10px 10px}}
+@media(max-width:400px){.dialog{width:96vw}.dialog-title{font-size:11px}.btn-win{min-width:60px;height:24px;font-size:11px;padding:0 12px}}
+/* Win95 home page (desktop surface — home-only rules) */
+.home-active .sidebar,.home-active .sidebar-ring,.home-active .sidebar-backdrop,.home-active .topbar,.home-active .app-statusbar{display:none}
 .home-active .main-content{padding:0;max-width:none;overflow:hidden}
 #page-home{height:100%}
 #page-home .desktop{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:radial-gradient(ellipse at 50% 48%,transparent 50%,rgba(0,0,0,.18) 100%),linear-gradient(160deg,var(--win-bg-top),var(--win-bg-bottom));position:relative;transition:background .4s ease}
 #page-home .desktop::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:1}
-#page-home .clock-widget{position:fixed;right:16px;top:16px;background:#0a0a0a;border:2px solid;border-color:#808080 #fff #fff #808080;box-shadow:4px 4px 0 rgba(0,0,0,.15);z-index:5;user-select:none;border-radius:2px}
+#page-home .clock-widget{position:fixed;right:16px;top:16px;background:#0a0a0a;border:2px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);box-shadow:4px 4px 0 rgba(0,0,0,.15);z-index:5;user-select:none;border-radius:2px}
 #page-home .clock-body{display:flex;align-items:center;justify-content:center;padding:5px 14px;background:#111;border:1px solid #333}
 #page-home .clock-time{font-family:'Space Mono','Courier New',monospace;font-size:18px;font-weight:700;color:var(--win-clock-color);letter-spacing:.04em;line-height:1}
-#page-home .status-bar{position:fixed;bottom:0;left:0;right:0;height:28px;background:#c0c0c0;border-top:2px solid #fff;box-shadow:inset 0 1px 0 #808080;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:11px;z-index:10}
-#page-home .status-text{color:#000;font-size:11px;letter-spacing:.02em;opacity:.8}
-#page-home .dialog{background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:6px 6px 0 -2px rgba(0,0,0,.12),10px 10px 24px -6px rgba(0,0,0,.35);min-width:380px;max-width:520px;width:90vw;position:relative;user-select:none}
-#page-home .dialog::before{content:'';position:absolute;inset:2px;border:1px solid #808080;border-color:#808080 #fff #fff #808080;pointer-events:none;z-index:0}
-#page-home .dialog-titlebar{display:flex;align-items:center;height:24px;padding:0 3px 0 4px;background:linear-gradient(90deg,var(--win-title-bar),color-mix(in srgb,var(--win-title-bar) 80%,#000));position:relative;z-index:1;transition:background .4s ease;cursor:default}
-#page-home .titlebar-icon{flex-shrink:0;margin-right:5px;color:var(--win-title-bar-text);opacity:.9;transition:color .4s ease}
-#page-home .dialog-title{flex:1;font-size:12px;font-weight:700;color:var(--win-title-bar-text);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .4s ease}
-#page-home .dialog-close{width:18px;height:16px;padding:0;border:2px outset #c0c0c0;background:#c0c0c0;color:#000;font-size:12px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Pixelify Sans','Courier New',monospace;flex-shrink:0;margin-left:4px}
-#page-home .dialog-close:active{border-style:inset}
-#page-home .dialog-close:hover{background:#d0d0d0}
-#page-home .dialog-body{padding:16px 14px 14px;position:relative;z-index:1}
-#page-home .quick-area{margin-bottom:10px}
-#page-home .quick-input{width:100%;margin-bottom:8px}
-#page-home .btn-advanced{font-size:11px;min-width:0;height:22px;padding:0 10px;background:transparent;border:1px solid #808080;border-color:#808080 #fff #fff #808080;color:#000;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:'Pixelify Sans','Courier New',monospace;font-weight:600}
-#page-home .btn-advanced:active{border-color:#fff #808080 #808080 #fff}
-#page-home .btn-advanced:hover{background:#d5d5d5}
-#page-home .quick-buttons{display:flex;gap:6px;align-items:center}
-#page-home .btn-launch{display:inline-flex;align-items:center;justify-content:center;font-size:11px;min-width:0;height:22px;padding:0 10px;text-decoration:none;color:#000;background:#c0c0c0;font-family:'Pixelify Sans','Courier New',monospace;font-weight:600;cursor:pointer;border:2px outset #c0c0c0}
-#page-home .btn-launch:active{border-style:inset}
-#page-home .btn-launch:hover{background:#d0d0d0;text-decoration:none;color:#000}
-#page-home .btn-advanced .arrow{font-size:9px;transition:transform .2s ease;display:inline-block}
-#page-home .btn-advanced.open .arrow{transform:rotate(90deg)}
-#page-home .advanced-panel{margin-top:4px;margin-bottom:12px;padding-top:10px;border-top:1px solid #808080;border-top-color:#808080 #fff transparent transparent}
-#page-home .advanced-panel.closed{display:none}
-#page-home .field-row{margin-bottom:8px}
-#page-home .row-duo{display:flex;gap:10px}
-#page-home .field-half{flex:1;min-width:0}
-#page-home .field-label{display:block;font-size:11px;font-weight:600;color:#000;margin-bottom:2px;letter-spacing:.02em}
-#page-home .win-input{width:100%;border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;color:#000;font-family:'Pixelify Sans','Courier New',monospace;font-size:12px;padding:3px 5px;outline:none}
-#page-home .win-input:focus{border-color:#000080 #c0c0c0 #c0c0c0 #000080}
-#page-home .win-input::placeholder{color:#999;font-size:11px}
-#page-home textarea.win-input{resize:vertical;min-height:48px;line-height:1.4}
-#page-home select.win-input{appearance:auto;padding:2px 4px;background:#fff}
-#page-home .prio-group{display:flex;gap:6px}
-#page-home .prio-btn{border:2px solid;border-color:#fff #808080 #808080 #fff;background:#c0c0c0;color:#000;font-family:'Pixelify Sans','Courier New',monospace;font-size:11px;font-weight:600;padding:3px 14px;cursor:pointer;letter-spacing:.02em}
-#page-home .prio-btn:active{border-color:#808080 #fff #fff #808080}
-#page-home .prio-btn.active{border-color:#808080 #fff #fff #808080;background:#a0a0a0;color:#fff;font-weight:700}
-#page-home .prio-btn:hover{background:#d0d0d0}
-#page-home .prio-btn.active:hover{background:#909090}
-#page-home .prio-btn[data-prio="high"].active{background:#bf616a;color:#fff;border-color:#8a3a3a #e8a0a0 #e8a0a0 #8a3a3a}
-#page-home .prio-btn[data-prio="medium"].active{background:#d08770;color:#fff;border-color:#a06040 #e8c0a0 #e8c0a0 #a06040}
-#page-home .prio-btn[data-prio="low"].active{background:#a3be8c;color:#fff;border-color:#6a8a50 #c8e0b0 #c8e0b0 #6a8a50}
-#page-home .dialog-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:4px}
-#page-home .btn-win{display:inline-flex;align-items:center;justify-content:center;min-width:72px;height:26px;padding:0 16px;border:2px outset #c0c0c0;background:#c0c0c0;color:#000;font-family:'Pixelify Sans','Courier New',monospace;font-size:12px;font-weight:600;cursor:pointer;user-select:none;letter-spacing:.02em}
-#page-home .btn-win:active{border-style:inset}
-#page-home .btn-win:hover{background:#d0d0d0}
-#page-home .btn-primary{background:var(--win-accent);border-color:var(--win-accent-hover) #000 var(--win-accent-hover);color:var(--win-btn-primary-text);font-weight:700;transition:background .4s ease,border-color .4s ease,color .4s ease}
-#page-home .btn-primary:active{border-style:inset}
-#page-home .btn-primary:hover{background:var(--win-accent-hover);border-color:var(--win-accent-hover)}
-#page-home .btn-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;min-width:0;padding:0;border:2px outset #c0c0c0;background:#c0c0c0;cursor:pointer;color:#000;flex-shrink:0}
-#page-home .btn-icon:active{border-style:inset}
-#page-home .btn-icon:hover{background:#d0d0d0}
-#page-home .btn-icon svg{display:block}
+#page-home .status-bar{position:fixed;bottom:0;left:0;right:0;height:28px;background:var(--win-bg);border-top:2px solid #fff;box-shadow:inset 0 1px 0 #808080;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:11px;z-index:10}
 #page-home .desktop-icons{position:fixed;left:16px;top:8px;display:flex;flex-direction:column;gap:16px;z-index:2;pointer-events:none}
 #page-home .desk-icon{display:flex;flex-direction:column;align-items:center;gap:2px;width:72px;cursor:pointer;pointer-events:auto;padding:4px;border-radius:2px}
 #page-home .desk-icon:hover{background:rgba(255,255,255,.1);outline:1px dotted rgba(255,255,255,.25)}
 #page-home .desk-icon.selected{background:rgba(0,0,128,.25);outline:1px dotted rgba(255,255,255,.4)}
 #page-home .desk-icon-img{display:block;image-rendering:pixelated}
 #page-home .desk-icon-label{font-family:'Pixelify Sans','Courier New',monospace;font-size:11px;font-weight:600;color:#fff;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.8);line-height:1.2;max-width:68px;word-wrap:break-word}
-#page-home .ctx-menu{display:none;position:fixed;z-index:100;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 0 rgba(0,0,0,.15);padding:2px;min-width:180px;font-family:'Pixelify Sans','Courier New',monospace}
-#page-home .ctx-menu.open{display:block}
-#page-home .ctx-item{display:flex;align-items:center;justify-content:space-between;padding:4px 20px 4px 8px;font-size:11px;font-weight:500;color:#000;cursor:pointer;user-select:none;white-space:nowrap}
-#page-home .ctx-item:hover{background:#000080;color:#fff}
-#page-home .ctx-arrow{font-size:8px;margin-left:24px}
-#page-home .ctx-separator{height:1px;margin:2px 4px;background:#808080;border-bottom:1px solid #fff}
-@media(max-width:640px){#page-home .dialog{min-width:0;width:92vw}#page-home .dialog-body{padding:12px 10px 10px}}
-@media(max-width:400px){#page-home .dialog{width:96vw}#page-home .dialog-title{font-size:11px}#page-home .btn-win{min-width:60px;height:24px;font-size:11px;padding:0 12px}}
+.win-statusbar{height:24px;background:var(--win-bg);border-top:2px solid #fff;box-shadow:inset 0 1px 0 #808080;display:flex;align-items:center;justify-content:space-between;padding:0 4px;font-size:11px;font-family:'Pixelify Sans','Courier New',monospace;gap:4px}
+.win-statusbar .status-segment{display:flex;align-items:center;gap:4px;padding:0 6px;height:18px;border:1px solid;border-color:var(--win-border-dark) var(--win-border-light) var(--win-border-light) var(--win-border-dark);white-space:nowrap;overflow:hidden}
+.win-statusbar .status-text{color:var(--win-fg);font-size:11px;letter-spacing:.02em;opacity:.8}
+/* Win95 checkbox (un-scoped, 16px — Q12) */
+.win-checkbox{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);background:var(--win-bg);cursor:pointer;display:inline-block;vertical-align:middle;position:relative;margin:0;flex-shrink:0}
+.win-checkbox:checked{background:#000080}
+.win-checkbox:checked::after{content:'';position:absolute;left:3px;top:0;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.win-checkbox:active{border-style:inset}
 </style>
 </head>
 <body>
@@ -532,9 +627,10 @@ textarea{resize:vertical;min-height:80px}
   </div>
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
   <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
-    <div class="sidebar-header">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>Do-able</span>
+    <div class="sidebar-titlebar" id="sidebarTitlebar">
+      <svg class="titlebar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="sidebar-title">Do-able</span>
+      <button class="sidebar-close" onclick="navigateTo('home')" aria-label="Return to desktop" title="Return to desktop">&#x00D7;</button>
     </div>
     <nav class="sidebar-nav" id="sidebarNav">
       <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
@@ -558,27 +654,34 @@ textarea{resize:vertical;min-height:80px}
         <span class="nav-label">Settings</span>
       </div>
     </nav>
+    <div class="sidebar-tray" id="sidebarTray">
+      <div class="tray-item" onclick="cycleTheme()" title="Toggle theme">
+        <span id="trayThemeIcon" style="font-size:11px">&#x263D;</span>
+        <span id="trayThemeLabel" style="font-size:10px">Dark</span>
+      </div>
+    </div>
   </aside>
   <div class="main">
     <header class="topbar" role="banner">
+      <button class="topbar-home" onclick="navigateTo('home')" title="Return to desktop" aria-label="Return to desktop">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </button>
       <div class="topbar-search">
-        <input type="search" placeholder="Search tasks..." id="globalSearch" oninput="onGlobalSearch(this.value)">
+        <input type="search" placeholder="Search..." id="globalSearch" oninput="onGlobalSearch(this.value)">
       </div>
       <div id="topbarTitle" class="topbar-title"></div>
       <div class="topbar-actions">
-        <button class="palette-trigger" id="paletteTrigger" onclick="togglePalette()" title="Command palette" aria-label="Open command palette">⌘K</button>
-        <button class="icon-btn" onclick="showFocusMode()" title="Focus mode: narrow down what to work on" aria-label="Focus mode">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <button class="icon-btn" onclick="showFocusMode()" title="Focus mode" aria-label="Focus mode">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
         </button>
         <span id="offlineIndicator" class="offline-badge" style="display:none" title="Changes are saved locally but not synced to the backend">
           <span class="offline-dot"></span>Offline
         </span>
-        <button class="icon-btn" onclick="navigateTo('home')" title="Home" aria-label="Go to home page">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </button>
         <button class="icon-btn" onclick="cycleTheme()" title="Toggle theme" aria-label="Toggle theme">
-          <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="themeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
+        <button class="palette-trigger" id="paletteTrigger" onclick="togglePalette()" title="Command palette (Ctrl+K)" aria-label="Open command palette">⌘K</button>
       </div>
     </header>
     <main class="main-content" id="mainContent">
@@ -594,152 +697,185 @@ textarea{resize:vertical;min-height:80px}
         <div class="dash-bento" id="dashMain">
           <div class="dash-col dash-col-main">
             <div class="quick-add" style="margin-bottom:0">
-              <input type="text" id="dashQuickAdd" placeholder='Add a task... "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')dashQuickAddTask()">
-              <button class="btn btn-primary btn-sm" onclick="dashQuickAddTask()">Add</button>
+              <input type="text" class="win-input" id="dashQuickAdd" placeholder='Add a task... "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')dashQuickAddTask()">
+              <button class="btn-win" onclick="dashQuickAddTask()" style="min-width:44px;height:26px">Add</button>
               <span class="nl-info" title="Natural language tips: priority (high/medium/low), dates (today, tomorrow, next monday, MM-DD)&#10;Example: Buy milk tomorrow high">ⓘ</span>
             </div>
-            <div class="dash-card dash-hero" id="dashMyDayList">
-              <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">My Day</div>
+            <div class="win-window" style="display:flex;flex-direction:column;min-height:80px">
+              <div class="win-titlebar"><span class="win-title">My Day</span></div>
+              <div class="win-body" id="dashMyDayList" style="flex:1;overflow-y:auto"></div>
             </div>
-            <div class="dash-card" id="dashWeekProgress">
-              <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">This Week</div>
-              <div id="dashWeekContent"></div>
+            <div class="win-window" id="dashWeekProgress" style="display:flex;flex-direction:column">
+              <div class="win-titlebar"><span class="win-title">This Week</span></div>
+              <div class="win-body"><div id="dashWeekContent"></div></div>
             </div>
           </div>
           <div class="dash-col dash-col-side">
-            <div class="dash-card">
-              <h2 style="margin-bottom:8px">Focus Goals</h2>
-              <div id="dashFocusGoals"></div>
+            <div class="win-window" style="display:flex;flex-direction:column">
+              <div class="win-titlebar"><span class="win-title">Focus Goals</span></div>
+              <div class="win-body" id="dashFocusGoals"></div>
             </div>
-            <div class="dash-card">
-              <div style="display:flex;flex-direction:column;gap:8px">
-                <div class="text-dim" style="font-size:11px;margin-bottom:2px">Task Roulette</div>
+            <div class="win-window" style="display:flex;flex-direction:column">
+              <div class="win-titlebar"><span class="win-title">Roulette</span></div>
+              <div class="win-body">
                 <div class="roulette-wrap">
-                  <button class="roulette-btn" onclick="pickRandomTask()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8L8 16M8 8l8 8"/></svg>
-                    Pick a random task
+                  <button class="btn-win" onclick="pickRandomTask()" style="gap:4px;min-width:0;padding:0 10px">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8L8 16M8 8l8 8"/></svg>
+                    <span>Pick</span>
                   </button>
                   <span class="roulette-result" id="dashRouletteResult"></span>
                 </div>
               </div>
             </div>
-            <div class="dash-card">
-              <div class="text-dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Streak</div>
-              <div id="dashStreak"></div>
+            <div class="win-window" style="display:flex;flex-direction:column">
+              <div class="win-titlebar"><span class="win-title">Streak</span></div>
+              <div class="win-body"><div id="dashStreak"></div></div>
             </div>
           </div>
         </div>
         <div class="section full" id="dashScratchSection" style="margin-top:12px">
-          <div class="dash-card">
-            <div class="scratch-section" id="scratchSection">
-              <div class="scratch-input-area">
-                <textarea id="scratchInput" placeholder="Write a quick note..." rows="1"></textarea>
-                <button class="btn btn-primary btn-sm" onclick="addNote()" style="align-self:flex-end">Add Note</button>
+          <div class="win-window" style="display:flex;flex-direction:column">
+            <div class="win-titlebar"><span class="win-title">Scratch Pad</span></div>
+            <div class="win-body">
+              <div class="scratch-section" id="scratchSection">
+                <div class="scratch-input-area">
+                  <textarea class="win-input" id="scratchInput" placeholder="Write a quick note..." rows="1"></textarea>
+                  <button class="btn-win" onclick="addNote()" style="min-width:0;padding:0 14px">Add Note</button>
+                </div>
+                <div id="scratchList"></div>
               </div>
-              <div id="scratchList"></div>
             </div>
           </div>
         </div>
         <div class="section full" id="dashAnalytics">
-          <div class="dash-card" id="dashRecap"></div>
+          <div class="win-window" style="display:flex;flex-direction:column">
+            <div class="win-titlebar"><span class="win-title">Activity Map</span></div>
+            <div class="win-body"><div id="dashRecap"></div></div>
+          </div>
         </div>
       </div>
 
       <!-- Tasks -->
       <div class="page" id="page-tasks">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-          <div class="view-toggle">
-            <button class="icon-btn active" data-view="list" onclick="switchTaskView('list')" title="List view" aria-label="List view">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            </button>
-            <button class="icon-btn" data-view="kanban" onclick="switchTaskView('kanban')" title="Kanban" aria-label="Kanban view">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-            </button>
-            <button class="icon-btn" data-view="calendar" onclick="switchTaskView('calendar')" title="Calendar" aria-label="Calendar view">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </button>
-            <button class="icon-btn" data-view="eisenhower" onclick="switchTaskView('eisenhower')" title="Eisenhower Matrix" aria-label="Eisenhower Matrix view">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
-            </button>
+        <div class="win-window" style="display:flex;flex-direction:column;min-height:0">
+          <div class="win-titlebar">
+            <span class="win-title">Tasks</span>
+            <div class="view-toggle" style="display:flex;gap:2px;margin-left:auto">
+              <button class="view-toggle-btn active" data-view="list" onclick="switchTaskView('list')" title="List view" aria-label="List view">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </button>
+              <button class="view-toggle-btn" data-view="kanban" onclick="switchTaskView('kanban')" title="Kanban" aria-label="Kanban view">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+              </button>
+              <button class="view-toggle-btn" data-view="calendar" onclick="switchTaskView('calendar')" title="Calendar" aria-label="Calendar view">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </button>
+              <button class="view-toggle-btn" data-view="eisenhower" onclick="switchTaskView('eisenhower')" title="Eisenhower" aria-label="Eisenhower Matrix view">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+              </button>
+            </div>
           </div>
-        </div>
-        <div id="taskQuote" class="text-dim" style="font-size:12px;font-style:italic;margin-bottom:10px;font-family:var(--font-serif);line-height:1.5"></div>
-        <div id="eisenhowerHint" style="display:none"></div>
-        <div class="quick-add">
-          <input type="text" id="quickAddInput" placeholder='e.g. "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')quickAddTask()">
-          <button class="btn btn-primary btn-sm" onclick="quickAddTask()">Add</button>
-          <span class="nl-info" title='Natural language tips:
+          <div class="win-body" style="overflow-y:auto;flex:1;min-height:0">
+            <div id="taskQuote" class="text-dim" style="font-size:12px;font-style:italic;margin-bottom:10px;font-family:var(--font-serif);line-height:1.5"></div>
+            <div id="eisenhowerHint" style="display:none"></div>
+            <div class="quick-add">
+              <input type="text" id="quickAddInput" class="win-input" placeholder='e.g. "Buy milk tomorrow high"' onkeydown="if(event.key==='Enter')quickAddTask()" style="flex:1">
+              <button class="btn-win" onclick="quickAddTask()">Add</button>
+              <span class="nl-info" title='Natural language tips:
   "Buy milk tomorrow high" → due tomorrow, high priority
   "Meeting next monday medium" → due next Mon, medium priority
   "Read article" → no due, medium priority
   "Submit report today low" → due today, low priority
-  Keywords: high/medium/low, today/tomorrow/next week/next mon/tue/wed/thu/fri/sat/sun, MM/DD or MM-DD dates'>ⓘ</span>
-          <select id="templateSelect" onchange="if(this.value)applyTemplate(this.value);this.value=''" style="width:auto;font-size:12px;padding:4px 6px">
-            <option value="">Apply template...</option>
-          </select>
+  Keywords: high/medium/low, today/tomorrow/next week/next mon/tue/wed/thu/fri/sat/sun, MM/DD or MM-DD dates' style="cursor:help;font-size:15px;color:var(--win-fg);flex-shrink:0;line-height:1">ⓘ</span>
+              <select id="templateSelect" class="win-input" onchange="if(this.value)applyTemplate(this.value);this.value=''" style="width:auto;font-size:12px;padding:2px 4px;max-width:140px">
+                <option value="">Apply template...</option>
+              </select>
+            </div>
+            <div class="sort-bar" id="sortBar"></div>
+            <div id="taskListView"></div>
+            <div id="taskKanbanView" style="display:none"></div>
+            <div id="taskCalendarView" style="display:none"></div>
+            <div id="taskEisenhowerView" style="display:none"></div>
+            <div class="pagination" id="taskPagination"></div>
+          </div>
         </div>
-        <div class="sort-bar" id="sortBar"></div>
-        <div id="taskListView"></div>
-        <div id="taskKanbanView" style="display:none"></div>
-        <div id="taskCalendarView" style="display:none"></div>
-        <div id="taskEisenhowerView" style="display:none"></div>
-        <div class="pagination" id="taskPagination"></div>
       </div>
 
       <!-- Task Detail -->
       <div class="page" id="page-task-detail">
-        <div style="max-width:700px">
-          <button class="detail-back" onclick="navigateTo(previousPage)">← Back</button>
-          <div id="taskDetailContent"></div>
+        <div class="win-window" style="max-width:700px">
+          <div class="win-titlebar">
+            <span class="win-title">Task Detail</span>
+            <button class="win-close" onclick="navigateTo(previousPage)">&#x00D7;</button>
+          </div>
+          <div class="win-body">
+            <button class="detail-back" onclick="navigateTo(previousPage)">← Back</button>
+            <div id="taskDetailContent"></div>
+          </div>
         </div>
       </div>
 
       <!-- Bin -->
       <div class="page" id="page-bin">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-          <button class="btn btn-danger btn-sm" onclick="emptyBin()">Empty Bin</button>
-        </div>
-        <table class="bin-table" id="binTable">
-          <thead><tr><th>Title</th><th>Deleted</th><th>Original Status</th><th></th></tr></thead>
-          <tbody id="binBody"></tbody>
-        </table>
-        <div class="empty-state" id="binEmpty" style="display:none">
-          <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
-          <p>Nothing here yet.</p>
-          <p>Tasks you delete will land here in case you need them back.</p>
+        <div class="win-window">
+          <div class="win-titlebar">
+            <span class="win-title">Bin</span>
+            <button class="btn-win" onclick="emptyBin()" style="min-width:0;height:18px;padding:0 8px;font-size:10px">Empty</button>
+          </div>
+          <div class="win-body">
+            <table class="bin-table" id="binTable">
+              <thead><tr><th>Title</th><th>Deleted</th><th>Original Status</th><th></th></tr></thead>
+              <tbody id="binBody"></tbody>
+            </table>
+            <div class="empty-state" id="binEmpty" style="display:none">
+              <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+              <p>Nothing here yet.</p>
+              <p>Tasks you delete will land here in case you need them back.</p>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Activity Log -->
       <div class="page" id="page-log">
-        <div class="filter-bar">
-          <select id="logFilterAction" onchange="logPage=1;renderActivityLog()">
-            <option value="all">All actions</option>
-            <option value="created">Created</option>
-            <option value="completed">Completed</option>
-            <option value="deleted">Deleted</option>
-            <option value="restored">Restored</option>
-            <option value="updated">Updated</option>
-            <option value="dependency_removed">Dependency removed</option>
-            <option value="rescheduled">Rescheduled</option>
-            <option value="started">Started</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="recurred">Recurred</option>
-            <option value="series_stopped">Series stopped</option>
-          </select>
+        <div class="win-window">
+          <div class="win-titlebar">
+            <span class="win-title">Activity Log</span>
+          </div>
+          <div class="win-body">
+            <div style="margin-bottom:8px">
+              <select id="logFilterAction" class="win-input" onchange="logPage=1;renderActivityLog()" style="width:auto">
+                <option value="all">All actions</option>
+                <option value="created">Created</option>
+                <option value="completed">Completed</option>
+                <option value="deleted">Deleted</option>
+                <option value="restored">Restored</option>
+                <option value="updated">Updated</option>
+                <option value="dependency_removed">Dependency removed</option>
+                <option value="rescheduled">Rescheduled</option>
+                <option value="started">Started</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="recurred">Recurred</option>
+                <option value="series_stopped">Series stopped</option>
+              </select>
+            </div>
+            <div class="activity-log-list" id="logList"></div>
+            <div class="pagination" id="logPagination"></div>
+          </div>
         </div>
-        <div class="activity-log-list" id="logList"></div>
-        <div class="pagination" id="logPagination"></div>
       </div>
 
       <!-- Settings -->
       <div class="page" id="page-settings">
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Appearance</h2>
-          <div class="settings-body">
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Appearance</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
             <div class="settings-row">
               <div><div class="settings-label">Theme</div><div class="settings-desc">Choose dark, light, or system preference</div></div>
-              <select id="settingsTheme" onchange="setTheme(this.value)" style="width:auto">
+              <select id="settingsTheme" onchange="setTheme(this.value)" style="width:auto" class="win-input">
                 <option value="nord-dark">Nord Dark</option>
                 <option value="nord-light">Nord Light</option>
                 <option value="system">System</option>
@@ -749,16 +885,16 @@ textarea{resize:vertical;min-height:80px}
               <div><div class="settings-label">Frog companion</div><div class="settings-desc">A cute frog that plays on your screen</div></div>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
                 <input type="checkbox" id="settingsFrog" onchange="toggleFrog(this.checked)" style="width:16px;height:16px">
-                <span style="font-size:13px">Show frog</span>
+                <span style="font-size:12px">Show frog</span>
               </label>
             </div>
             <div class="settings-row">
               <div><div class="settings-label">Notifications</div><div class="settings-desc">Get notified about due and overdue tasks</div></div>
-              <button class="btn btn-sm btn-primary" onclick="requestNotifPermission();toast('Notification permission requested','info')">Enable Notifications</button>
+              <button class="btn-win" onclick="requestNotifPermission();toast('Notification permission requested','info')" style="height:22px;min-width:0;padding:0 10px;font-size:11px">Enable Notifications</button>
             </div>
-            <div style="background:var(--bg-raised);border-radius:8px;padding:12px 14px;margin-top:4px;margin-bottom:12px;font-size:12px;line-height:1.6;color:var(--text-dim)">
-              <strong style="color:var(--text)">Frog companion: what it does</strong>
-              <ul style="margin:6px 0 0 16px;padding:0">
+            <div style="background:var(--win-bg);border:2px solid;border-color:var(--win-border-light) var(--win-border-dark) var(--win-border-dark) var(--win-border-light);padding:8px 10px;margin-top:4px;margin-bottom:8px;font-size:11px;line-height:1.5;color:var(--win-fg)">
+              <strong>Frog companion: what it does</strong>
+              <ul style="margin:4px 0 0 16px;padding:0">
                 <li><strong>Sleep</strong>: dozes off with Zzz bubbles (most of the time)</li>
                 <li><strong>Idle</strong>: sits and breathes gently</li>
                 <li><strong>Stretch</strong>: lazy stretch once in a while</li>
@@ -768,87 +904,108 @@ textarea{resize:vertical;min-height:80px}
             </div>
           </div>
         </div>
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Display</h2>
-          <div class="settings-body">
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Display</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
             <div class="settings-row">
               <div><div class="settings-label">Date mode</div><div class="settings-desc">Show dates as ISO or relative ("in 3 days")</div></div>
-              <select id="settingsDateMode" onchange="updateConfig('date_mode',this.value)" style="width:auto">
+              <select id="settingsDateMode" onchange="updateConfig('date_mode',this.value)" style="width:auto" class="win-input">
                 <option value="smart">Smart (relative)</option>
                 <option value="iso">ISO (2026-06-25)</option>
               </select>
             </div>
             <div class="settings-row">
               <div><div class="settings-label">Tasks per page</div><div class="settings-desc">Number of tasks shown per page</div></div>
-              <input type="number" id="settingsPerPage" min="10" max="100" style="width:80px" onchange="updateConfig('per_page',parseInt(this.value))">
+              <input type="number" id="settingsPerPage" min="10" max="100" style="width:80px" class="win-input" onchange="updateConfig('per_page',parseInt(this.value))">
             </div>
           </div>
         </div>
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Backups</h2>
-          <div class="settings-body">
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Backups</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
             <div class="settings-row">
               <div><div class="settings-label">Create backup</div><div class="settings-desc">Save current data as a downloadable file</div></div>
-              <button class="btn btn-primary btn-sm" onclick="createBackup()">Download Backup</button>
+              <button class="btn-win" onclick="createBackup()" style="height:22px;min-width:0;padding:0 12px;font-size:11px">Download Backup</button>
             </div>
             <div class="settings-row">
               <div><div class="settings-label">Restore from backup</div><div class="settings-desc">Replace all data with a backup file</div></div>
-              <input type="file" id="backupFileInput" accept=".json" style="width:auto" onchange="restoreBackup(event)">
+              <input type="file" id="backupFileInput" accept=".json" style="width:auto" class="win-input" onchange="restoreBackup(event)">
             </div>
           </div>
         </div>
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Import / Export</h2>
-          <div class="settings-body">
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Import / Export</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
             <div class="settings-row">
               <div><div class="settings-label">Import tasks from CSV</div><div class="settings-desc">Add tasks from a CSV file (matching Do-able export format, or any CSV with a "title" column)</div></div>
-              <input type="file" id="csvFileInput" accept=".csv" style="width:auto" onchange="importCSV(event)">
+              <input type="file" id="csvFileInput" accept=".csv" style="width:auto" class="win-input" onchange="importCSV(event)">
             </div>
             <div class="settings-row">
               <div><div class="settings-label">Export tasks</div></div>
               <div style="display:flex;gap:8px">
-                <button class="btn btn-secondary btn-sm" onclick="exportData('json')">JSON</button>
-                <button class="btn btn-secondary btn-sm" onclick="exportData('csv')">CSV</button>
-                <button class="btn btn-secondary btn-sm" onclick="exportData('md')">Markdown</button>
+                <button class="btn-win" onclick="exportData('json')" style="height:22px;min-width:0;padding:0 10px;font-size:11px">JSON</button>
+                <button class="btn-win" onclick="exportData('csv')" style="height:22px;min-width:0;padding:0 10px;font-size:11px">CSV</button>
+                <button class="btn-win" onclick="exportData('md')" style="height:22px;min-width:0;padding:0 10px;font-size:11px">Markdown</button>
               </div>
             </div>
           </div>
         </div>
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Data</h2>
-          <div class="settings-body">
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Data</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
             <div class="settings-row">
               <div><div class="settings-label">Storage location</div><div class="settings-desc">All data is stored in browser localStorage</div></div>
-              <button class="btn btn-danger btn-sm" onclick="clearAllData()">Clear All Data</button>
+              <button class="btn-win" onclick="clearAllData()" style="height:22px;min-width:0;padding:0 10px;font-size:11px">Clear All Data</button>
             </div>
             <div class="settings-row">
               <div><div class="settings-label">Sample data</div><div class="settings-desc">Load or remove sample tasks to explore the app</div></div>
               <div style="display:flex;gap:8px">
-                <button class="btn btn-secondary btn-sm" onclick="loadSampleData()">Load Samples</button>
-                <button class="btn btn-ghost btn-sm" onclick="removeSampleTasks()">Remove Samples</button>
+                <button class="btn-win" onclick="loadSampleData()" style="height:22px;min-width:0;padding:0 10px;font-size:11px">Load Samples</button>
+                <button class="btn-win" onclick="removeSampleTasks()" style="height:22px;min-width:0;padding:0 10px;font-size:11px">Remove</button>
               </div>
             </div>
           </div>
         </div>
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Categories</h2>
-          <div class="settings-body">
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Categories</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
             <div class="settings-row">
               <div><div class="settings-label">Manage categories</div><div class="settings-desc">Delete unused categories. Tasks using a deleted category become uncategorized.</div></div>
             </div>
             <div id="settingsCategoriesList"></div>
           </div>
         </div>
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Templates</h2>
-          <div class="settings-body">
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Templates</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
             <div id="settingsTemplatesList"></div>
           </div>
         </div>
-        <div class="settings-section">
-          <h2 onclick="toggleAccordion(this)">Recurring Series</h2>
-          <div class="settings-body">
-            <div class="settings-desc" style="margin-bottom:8px">Created automatically when you set recurrence on a task. New instances carry the series' files, start date, and time.</div>
+        <div class="settings-section win-window">
+          <div class="win-titlebar" onclick="toggleAccordion(this)">
+            <span class="win-title">Recurring Series</span>
+            <button class="win-close" style="font-size:10px;width:16px;height:14px" tabindex="-1">^</button>
+          </div>
+          <div class="settings-body win-body">
+            <div style="margin-bottom:8px;font-size:11px;color:#555">Created automatically when you set recurrence on a task. New instances carry the series' files, start date, and time.</div>
             <div id="settingsSeriesList"></div>
           </div>
         </div>
@@ -976,6 +1133,11 @@ textarea{resize:vertical;min-height:80px}
       </div>
 
     </main>
+    <div class="app-statusbar" id="appStatusbar">
+      <div class="status-segment"><span class="status-text" id="statusLeft">Do-able</span></div>
+      <div class="status-segment"><span class="status-text" id="statusCenter"></span></div>
+      <div class="status-segment right"><span class="status-text" id="statusRight">Maple Leaf</span></div>
+    </div>
   </div>
 </div>
 
@@ -983,10 +1145,19 @@ textarea{resize:vertical;min-height:80px}
   <div class="modal" id="modalContent"></div>
 </div>
 <div class="palette-overlay" id="paletteOverlay" style="display:none" onclick="if(event.target===this)closePalette()" role="dialog" aria-modal="true" aria-label="Command palette">
-  <div class="palette">
-    <input type="text" id="paletteInput" class="palette-input" placeholder="Type a command..." autocomplete="off" role="combobox" aria-expanded="true" aria-controls="paletteList" aria-label="Command search">
-    <div class="palette-list" id="paletteList" role="listbox"></div>
-    <div class="palette-foot"><span>↑↓ navigate</span><span>↵ select</span><span>Esc close</span></div>
+  <div class="win-window" style="width:min(480px,90vw);min-width:300px">
+    <div class="win-titlebar">
+      <span class="win-title">Run Command</span>
+      <button class="win-close" onclick="closePalette()">&#x00D7;</button>
+    </div>
+    <div class="win-body" style="padding:8px 10px 10px">
+      <input type="text" id="paletteInput" class="win-input" placeholder="Type a command..." autocomplete="off" role="combobox" aria-expanded="true" aria-controls="paletteList" aria-label="Command search" style="margin-bottom:6px">
+      <div class="palette-list" id="paletteList" role="listbox"></div>
+      <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px">
+        <button class="btn-win btn-primary" onclick="_paletteSelect(_paletteIdx)" id="paletteOkBtn">OK</button>
+        <button class="btn-win" onclick="closePalette()">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
 <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>

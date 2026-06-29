@@ -75,7 +75,7 @@ Focus mode, My Day planner, heatmap grid, daily streak, weekly progress, task ro
 ARIA labels, keyboard navigation, modal focus trap, offline indicator, loading states.
 
 ### Extras
-Onboarding wizard, frog companion, confetti, Nord themes (dark/light/system), Tufte-inspired design (no shadows/gradients), PWA installable offline, export (JSON/CSV/MD), backup/restore, activity log (11 event types).
+Onboarding wizard, frog companion, confetti, Nord themes (dark/light/system), Win95-inspired design across all views, PWA installable offline, export (JSON/CSV/MD), backup/restore, activity log (11 event types).
 
 ## License
 

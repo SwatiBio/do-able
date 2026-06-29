@@ -1,0 +1,84 @@
+- generic [ref=e2]:
+  - button "Toggle navigation menu" [ref=e82] [cursor=pointer]:
+    - img [ref=e83]
+  - navigation "Main navigation" [ref=e84]:
+    - generic [ref=e85]:
+      - img [ref=e86]
+      - generic [ref=e89]: Do-able
+      - button "Return to desktop" [ref=e90] [cursor=pointer]: ×
+    - navigation [ref=e91]:
+      - generic [ref=e92] [cursor=pointer]:
+        - img [ref=e94]
+        - generic [ref=e99]: Dashboard
+      - generic [ref=e100] [cursor=pointer]:
+        - img [ref=e102]
+        - generic [ref=e103]: Tasks
+      - generic [ref=e104] [cursor=pointer]:
+        - img [ref=e106]
+        - generic [ref=e108]: Bin
+      - generic [ref=e109] [cursor=pointer]:
+        - img [ref=e111]
+        - generic [ref=e114]: Activity
+      - generic [ref=e115] [cursor=pointer]:
+        - img [ref=e117]
+        - generic [ref=e120]: Settings
+    - generic "Toggle theme" [ref=e122] [cursor=pointer]:
+      - generic [ref=e123]: ☽
+      - generic [ref=e124]: Dark
+  - generic [ref=e3]:
+    - banner [ref=e125]:
+      - button "Return to desktop" [ref=e126] [cursor=pointer]:
+        - img [ref=e127]
+        - generic [ref=e130]: Home
+      - searchbox "Search..." [ref=e132]
+      - generic: Dashboard
+      - generic [ref=e133]:
+        - button "Focus mode" [ref=e134] [cursor=pointer]:
+          - img [ref=e135]
+        - generic "Changes are saved locally but not synced to the backend" [ref=e139]: Offline
+        - button "Toggle theme" [ref=e141] [cursor=pointer]:
+          - img [ref=e142]
+        - button "Open command palette" [ref=e144] [cursor=pointer]: Ctrl+K
+    - main [ref=e4]:
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - textbox "Add a task... \"Buy milk tomorrow high\"" [ref=e149]
+              - button "Add" [ref=e150] [cursor=pointer]
+              - 'generic "Natural language tips: priority (high/medium/low), dates (today, tomorrow, next monday, MM-DD) Example: Buy milk tomorrow high" [ref=e151]': ⓘ
+            - generic [ref=e152]:
+              - generic [ref=e154]: My Day
+              - generic [ref=e156]: All clear for today! 🎯
+            - generic [ref=e157]:
+              - generic [ref=e159]: This Week
+              - generic [ref=e162]: Completed tasks this week will appear here.
+          - generic [ref=e163]:
+            - generic [ref=e164]:
+              - generic [ref=e166]: Focus Goals
+              - generic [ref=e167]:
+                - generic [ref=e168]:
+                  - combobox [ref=e169]
+                  - button "Add" [ref=e170] [cursor=pointer]
+                - generic [ref=e171]:
+                  - generic [ref=e172]: No focus goals for today
+                  - generic [ref=e173]: Pick up to 3 tasks above to prioritize what matters today.
+            - generic [ref=e174]:
+              - generic [ref=e176]: Roulette
+              - button "Pick" [ref=e179] [cursor=pointer]:
+                - img [ref=e180]
+                - generic [ref=e183]: Pick
+            - generic [ref=e186]: Streak
+        - generic [ref=e189]:
+          - generic [ref=e191]: Scratch Pad
+          - generic [ref=e194]:
+            - textbox "Write a quick note..." [ref=e195]
+            - button "Add Note" [ref=e196] [cursor=pointer]
+        - generic [ref=e198]:
+          - generic [ref=e200]: Activity Map
+          - generic [ref=e203]:
+            - generic [ref=e204]: Activity map
+            - generic [ref=e205]: Complete a task to light up your year.
+    - generic [ref=e212]:
+      - generic [ref=e214]: Dashboard
+      - generic [ref=e217]: Dark

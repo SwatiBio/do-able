@@ -9,6 +9,10 @@ function applyTheme(t){
   icon.innerHTML=resolved==='nord-dark'?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>':'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
   const st=document.getElementById('statusTheme');
   if(st)st.textContent='Theme: '+(resolved==='nord-light'?'Nord Light':'Nord Dark');
+  const tray=document.getElementById('trayThemeLabel');
+  if(tray)tray.textContent=resolved==='nord-light'?'Light':'Dark';
+  const sr=document.getElementById('statusRight');
+  if(sr)sr.textContent=resolved==='nord-light'?'Light':'Dark';
   const ts=document.getElementById('themeSwitch');
   if(ts)ts.innerHTML=resolved==='nord-dark'?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>':'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
 }
@@ -26,8 +30,12 @@ if(window.matchMedia)window.matchMedia('(prefers-color-scheme:dark)').addEventLi
 let currentPage='home';
 function navigateTo(page){
   if(currentPage==='task-detail'&&detailDirty&&page!=='task-detail'){
-    if(!confirm('You have unsaved changes. Leave without saving?'))return
+    showConfirmDialog("Unsaved Changes","You have unsaved changes. Leave without saving?",function(){doNavigateTo(page)});
+    return
   }
+  doNavigateTo(page)
+}
+function doNavigateTo(page){
   currentPage=page;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById('page-'+page);
@@ -45,6 +53,8 @@ function renderCurrentPage(){
   const titles={home:'Home',dashboard:'Dashboard',tasks:'Tasks','task-detail':'Task Detail',bin:'Bin',log:'Activity',settings:'Settings'};
   const titleEl=document.getElementById('topbarTitle');
   if(titleEl)titleEl.textContent=titles[currentPage]||'';
+  const sl=document.getElementById('statusLeft');
+  if(sl)sl.textContent=titles[currentPage]||'Do-able';
   switch(currentPage){
     case'home':renderHomePage();break;
     case'dashboard':renderDashboard();break;
@@ -146,7 +156,7 @@ function showFocusMode(){
     if(!focusGoals.length&&!overdue.length&&!dueToday.length){
       html+='<div class="empty-state" style="padding:20px 0"><p class="text-dim text-sm">Nothing overdue or due today.</p></div>'
     }
-    html+='<div style="text-align:center;padding-top:12px;border-top:1px solid var(--border)"><button class="roulette-btn" onclick="closeModal();pickRandomTask();navigateTo(\'dashboard\')" style="margin:0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8L8 16M8 8l8 8"/></svg>Just pick one for me</button></div>'
+    html+='<div style="text-align:center;padding-top:12px;border-top:1px solid var(--border)"><button class="btn-win" onclick="closeModal();pickRandomTask();navigateTo(\'dashboard\')" style="margin:0 auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8L8 16M8 8l8 8"/></svg>Just pick one for me</button></div>'
   }
   html+='</div>';
   showModal(html)
@@ -262,11 +272,11 @@ function renderDashFocusGoals(){
   const focus=getFocus();const today=todayStr();
   const ids=focus[today]||[];const goals=ids.map(id=>getTasks().find(t=>t.id===id)).filter(Boolean);
   const doneCount=goals.filter(t=>t.status==='done').length;
-  const selHtml=`<div class="goal-selector" style="margin-bottom:8px"><select id="dashFocusSelect" style="flex:1">${tasks.map(t=>`<option value="${t.id}">${escHtml(t.title)}</option>`).join('')}</select><button class="btn btn-primary btn-sm" onclick="addDashFocusGoal()">Add</button></div>`;
+  const selHtml=`<div class="goal-selector" style="margin-bottom:8px"><select id="dashFocusSelect" style="flex:1">${tasks.map(t=>`<option value="${t.id}">${escHtml(t.title)}</option>`).join('')}</select><button class="btn-win" onclick="addDashFocusGoal()" style="min-width:50px;height:22px;font-size:11px">Add</button></div>`;
   const allDone=goals.length>0&&doneCount===goals.length;
   const cntHtml=goals.length?allDone?`<div style="font-size:13px;color:var(--green);font-weight:600;margin-bottom:8px">All done!</div>`:`<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${doneCount} of ${goals.length} done</div>`:'';
   const cardsHtml=goals.length?goals.map(t=>{
-    if(t.status==='cancelled')return`<div class="focus-card" style="margin-bottom:4px;opacity:0.6"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" style="color:var(--red)">${escHtml(t.title)} <span class="text-sm" style="color:var(--red)">(cancelled)</span></div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div><button class="btn btn-secondary btn-sm" onclick="reopenFocusTask('${t.id}')">↻ Reopen</button></div>`;
+    if(t.status==='cancelled')return`<div class="focus-card" style="margin-bottom:4px;opacity:0.6"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" style="color:var(--red)">${escHtml(t.title)} <span class="text-sm" style="color:var(--red)">(cancelled)</span></div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div><button class="btn-win" onclick="reopenFocusTask('${t.id}')" style="min-width:50px;height:22px;font-size:11px">↻ Reopen</button></div>`;
     return`<div class="focus-card${t.status==='done'?' done':''}" style="margin-bottom:4px"><span class="priority-dot ${t.priority||'medium'}"></span><div class="focus-card-info"><div class="focus-card-title" onclick="cycleDashFocusStatus('${t.id}')" style="cursor:pointer${t.status==='done'?';text-decoration:line-through;color:var(--text-dim)':''}">${escHtml(t.title)}</div><div class="focus-card-meta">${fmtDate(t.due_date)}${(t.tags||[]).length?' · '+t.tags.join(', '):''}</div></div></div>`
   }).join(''):'<div style="padding:12px;background:var(--bg);border-radius:var(--radius);border:1px dashed var(--border)"><div style="font-size:13px;margin-bottom:4px">No focus goals for today</div><div class="text-dim text-sm">Pick up to 3 tasks above to prioritize what matters today.</div></div>';
   if(goals.length&&doneCount===goals.length)fireConfetti();
@@ -277,7 +287,7 @@ function renderDashFocusGoals(){
 let taskView='list',taskSorts=[],taskColumns=JSON.parse(localStorage.getItem('doable_taskColumns')||'["priority","status","due"]'),taskPage=1,taskSearch='';
 
 function switchTaskView(v){
-  taskView=v;document.querySelectorAll('.view-toggle .icon-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  taskView=v;document.querySelectorAll('.view-toggle .view-toggle-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
   ['taskListView','taskKanbanView','taskCalendarView','taskEisenhowerView'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('task'+v.charAt(0).toUpperCase()+v.slice(1)+'View').style.display='';
   taskPage=1;renderCurrentView()
@@ -342,7 +352,7 @@ function renderListView(){
       html=`<table class="task-table"><thead><tr>${cols}</tr></thead><tbody>${pageTasks.map(t=>renderTaskRow(t)).join('')}</tbody></table>`
     }
   document.getElementById('taskListView').innerHTML=html;
-  document.getElementById('taskPagination').innerHTML=totalPages>1?`<button class="btn btn-ghost btn-sm" onclick="taskPage=Math.max(1,taskPage-1);renderListView()" ${taskPage<=1?'disabled':''}>Prev</button><span>Page ${taskPage} of ${totalPages}</span><button class="btn btn-ghost btn-sm" onclick="taskPage=Math.min(${totalPages},taskPage+1);renderListView()" ${taskPage>=totalPages?'disabled':''}>Next</button>`:''
+  document.getElementById('taskPagination').innerHTML=totalPages>1?`<button class="btn-win" style="min-width:50px;height:22px;padding:0 10px;font-size:11px" onclick="taskPage=Math.max(1,taskPage-1);renderListView()" ${taskPage<=1?'disabled':''}>Prev</button><span>Page ${taskPage} of ${totalPages}</span><button class="btn-win" style="min-width:50px;height:22px;padding:0 10px;font-size:11px" onclick="taskPage=Math.min(${totalPages},taskPage+1);renderListView()" ${taskPage>=totalPages?'disabled':''}>Next</button>`:''
 }
 var foldedParents=new Set();
 function renderTaskRow(t){
@@ -358,7 +368,7 @@ function renderTaskRow(t){
   if(hasChildren)titleHtml+=`<span style="cursor:pointer;font-size:11px;margin-right:4px;user-select:none" onclick="event.stopPropagation();${isFolded?'foldedParents.delete':'foldedParents.add'}('${t.id}');renderCurrentView()">${isFolded?'▸':'▾'}</span>`;
   if(t.parent_id)titleHtml+='<span style="margin-right:4px;font-size:12px">↳</span>';
   titleHtml+=`<span class="task-title" onclick="showTaskDetail('${t.id}')">${escHtml(t.title)}</span>`;
-  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone(this,'${t.id}')" title="Mark done"></td><td>${titleHtml}</td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'&&t.status!=='cancelled'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
+  let cells=`<td><span class="priority-dot ${t.priority||'medium'}"></span></td><td style="text-align:center"><input type="checkbox" class="win-checkbox" ${t.status==='done'?'checked':''} onchange="toggleTaskDone(this,'${t.id}')" title="Mark done"></td><td>${titleHtml}</td><td class="text-dim text-sm">${t.priority||'medium'}</td><td>${statusBadge(t.status)}</td><td class="text-sm" style="color:${t.due_date&&t.due_date<todayStr()&&t.status!=='done'&&t.status!=='cancelled'?'var(--red)':t.due_date===todayStr()?'var(--orange)':'var(--text-dim)'}">${fmtDate(t.due_date)}</td>`;
   if(taskColumns.includes('time'))cells+=`<td class="text-sm text-dim">${t.time||'—'}</td>`;
   if(showTags)cells+=`<td>${(t.tags||[]).map(tag=>`<span class="tag-pill">${escHtml(tag)}</span>`).join('')}</td>`;
   if(showCat)cells+=`<td class="text-dim text-sm">${t.category?categoryDot(t.category)+escHtml(t.category):'—'}</td>`;
@@ -418,12 +428,21 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+// --- Win95 confirm dialog (Q8) ---
+function showConfirmDialog(title,msg,cbOk){
+  const html='<div class="win-titlebar"><span class="win-title">'+escHtml(title)+'</span><button class="win-close" onclick="closeModal()">&#x00D7;</button></div><div class="win-body"><p>'+escHtml(msg)+'</p><div class="dialog-actions"><button class="btn-win btn-primary" id="confirmOkBtn">OK</button><button class="btn-win" onclick="closeModal()">Cancel</button></div></div>';
+  showModal(html);
+  const okBtn=document.getElementById('confirmOkBtn');
+  if(okBtn){okBtn.focus();okBtn.onclick=function(){closeModal();if(cbOk)cbOk()}}
+}
+
 // --- Toast ---
 function toast(msg,type='info'){
   const c=document.getElementById('toastContainer');
-  const el=document.createElement('div');el.className='toast '+type;
-  el.innerHTML='<span class="toast-rider"><svg viewBox="0 0 64 56"><circle cx="32" cy="30" r="20" fill="#7bc67e"/><circle cx="20" cy="12" r="7.5" fill="#7bc67e"/><circle cx="44" cy="12" r="7.5" fill="#7bc67e"/><circle cx="20" cy="12" r="3.5" fill="#1a1a1a"/><circle cx="44" cy="12" r="3.5" fill="#1a1a1a"/><circle cx="18.5" cy="10.5" r="1.3" fill="white"/><circle cx="42.5" cy="10.5" r="1.3" fill="white"/><ellipse cx="32" cy="37" rx="10" ry="8" fill="#d4f5c4"/><path d="M26,33 Q29,36 32,33 Q35,36 38,33" fill="none" stroke="#3a7a3c" stroke-width="1.2" stroke-linecap="round"/></svg> '+escHtml(msg)+'</span>';
-  c.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300)},3000)
+  const el=document.createElement('div');el.className='toast';
+  el.textContent=msg;
+  c.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300)},3000)
 }
 
 // --- Confetti ---
@@ -798,9 +817,9 @@ function showOnboarding(){
     <p class="text-dim text-sm">A local-first task manager for people who want rich features without the cloud.</p>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
-    <button class="btn btn-primary" onclick="onboardingChoice('samples')">Try sample tasks</button>
-    <button class="btn btn-secondary" onclick="onboardingChoice('import')">Import from CSV</button>
-    <button class="btn btn-ghost" onclick="onboardingChoice('empty')">Start empty</button>
+    <button class="btn-win btn-primary" onclick="onboardingChoice('samples')">Try sample tasks</button>
+    <button class="btn-win" onclick="onboardingChoice('import')">Import from CSV</button>
+    <button class="btn-win" onclick="onboardingChoice('empty')">Start empty</button>
   </div>
   <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px">
     <div class="settings-label" style="margin-bottom:8px">Quick tour</div>
@@ -817,7 +836,7 @@ function showOnboarding(){
     <div class="text-sm">Personalize in <strong>Settings</strong>: categories, tags, theme, and more.</div>
   </div>
   <div style="text-align:center">
-    <button class="btn btn-primary" onclick="dismissOnboarding()">Get started</button>
+    <button class="btn-win btn-primary" onclick="dismissOnboarding()">Get started</button>
   </div>`;
   showModal(html)
 }
@@ -874,9 +893,9 @@ function showShortcutsHelp(){
   if(_paletteOpen)closePalette();
   const m=document.getElementById('modalOverlay');if(m&&m.style.display!=='none')return;
   const groups=[['Global',[['Open command palette',_m+'K'],['Show this help',_m+'/'],['Close overlay','Esc']]],['Navigation',[['Go to Dashboard',_m+_s+'1'],['Go to Tasks',_m+_s+'2'],['Go to Bin',_m+_s+'3'],['Go to Activity',_m+_s+'4'],['Go to Settings',_m+_s+'5']]],['Actions',[['New task',_m+_e],['Focus mode',_m+_s+'F'],['Toggle sidebar',_m+_s+'L'],['Toggle theme','via palette'],['Task roulette','via palette'],['Switch task view','via palette']]]];
-  let html='<div class="modal-title">Keyboard shortcuts</div>';
+  let html='<div class="win-body"><div class="modal-title">Keyboard shortcuts</div>';
   groups.forEach(([g,items])=>{html+=`<div class="shortcut-group">${escHtml(g)}</div>`;items.forEach(([l,k])=>{html+=`<div class="shortcut-row"><span>${escHtml(l)}</span><span class="shortcut-keys">${escHtml(k)}</span></div>`})});
-  html+='<div class="modal-actions"><button class="btn" onclick="closeModal()">Close</button></div>';
+  html+='<div class="modal-actions"><button class="btn-win btn-primary" onclick="closeModal()">Close</button></div></div>';
   showModal(html);
 }
 document.addEventListener('keydown',e=>{
