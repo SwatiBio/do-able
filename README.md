@@ -1,5 +1,8 @@
 # Do-able
 
+> **Live demo → [swatibio.github.io/do-able](https://swatibio.github.io/do-able/)**  
+> *Note: the demo is frontend-only — sync, dashboards, and other backend features won't work.*
+
 A task manager that runs in your browser with an optional Python backend for persistence.
 
 ## How it works
