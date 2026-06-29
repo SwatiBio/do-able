@@ -24,6 +24,8 @@ layers/
 .playwright-mcp/
 *-snapshot.yml
 activity-filled.yml
+dashboard-type-color.png
+home-page-first-load.png
 
 # OS / editor
 .DS_Store

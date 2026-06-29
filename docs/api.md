@@ -31,11 +31,13 @@ Array of task objects. Each task:
   "created_at": "2026-06-21T10:00:00.000Z",
   "updated_at": "2026-06-21T10:00:00.000Z",
   "deleted_at": null,
-  "_sample": true
+  "sample": true
 }
 ```
 
-Status values: `not_started`, `in_progress`, `done`, `cancelled`, `deleted`
+Status values: `not_started`, `in_progress`, `done`, `cancelled`
+
+Deletion is handled via the `deleted_at` timestamp — the `deleted` status does not exist in the app. The state machine (defined in `app.js`) validates transitions: `not_started ↔ in_progress`, `in_progress → done | cancelled`, `done ↔ in_progress`, `cancelled → not_started`. Invalid transitions log a warning to console but do not block the user.
 
 ### doable_activity
 
@@ -168,7 +170,7 @@ All defined globally in `src/app.js`, `src/ui.js`, `src/events.js`.
 | categoryDot(cat) | Returns HTML for a colored dot, or empty string |
 | logActivity(taskId, action, details) | Adds an activity entry |
 | parseQuickAdd(text) | Parses natural language from text, returns {title, priority, due_date}. Shared by dashboard and Tasks page quick-add |
-| buildTask(parsed) | Builds a full task object from a parsed quick-add result |
+| buildTask(props) | Builds a full task object from an overrides object. All ~10 constructor sites (quick-add, subtask, template, recurrence, CSV import) call this single factory. 18 fields, no `fields` or `depends_on_str`. Defined in `app.js` next to `_initApi` and `_taskPayload` |
 | quickAddTask() | Creates a task from the Tasks page quick-add input (uses parseQuickAdd + buildTask) |
 | dashQuickAddTask() | Creates a task from the dashboard inline quick-add input, re-renders dashboard, shows toast |
 | toggleTaskDone(id, checked) | Toggles completion, fires confetti, handles recurrence |
@@ -253,11 +255,11 @@ Base URL: http://localhost:8000
 | POST | /api/series/{id}/stop | Stop a series (set active=false) |
 | DELETE | /api/series/{id} | Delete a series |
 
-### Sync
+### Data Wipe
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | /api/sync/full | Initial data import only. Bulk replaces tasks, notes, config, templates, series. Body: {tasks, notes, config, templates, series}. Returns {id_map, series_id_map} for ID remapping. |
+| DELETE | /api/all | Clears all server data (tasks, series, templates, notes, config, activity log). Called from the "Clear all data" button in Settings. |
 
 ### Dashboard and Search
 
@@ -300,7 +302,7 @@ User action -> Event handler -> JS function -> localStorage (instant)
                                                 FastAPI -> SQLite
 ```
 
-All reads are synchronous localStorage operations. Every write updates localStorage immediately and then makes a targeted API call (create/update/delete) per mutated entity. Failed calls are queued in localStorage with sequence numbers and replayed when the connection returns.
+All reads are synchronous localStorage operations. Every write updates localStorage immediately and then makes a targeted API call (create/update/delete) per mutated entity. Failed calls set a `_pendingSync` flag in localStorage; on reconnection, all four collections (tasks, notes, templates, series) are re-sent in full. The diff inside each `save*` prevents unnecessary server writes.
 
 ## Features
 

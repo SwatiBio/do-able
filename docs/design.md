@@ -9,7 +9,7 @@ index.html + src/  <--->  FastAPI (Python)  <--->  SQLite
 
 The frontend caches everything in the browser's localStorage for instant reads. Every write goes to localStorage first (so the UI responds immediately) and then to the backend server in the background. The backend persists data to a SQLite database.
 
-If the server is offline, mutations are queued in localStorage with sequence numbers. When connectivity returns, the queue replays in order.
+If the server is offline, a `_pendingSync` flag is set in localStorage. When connectivity returns, all four collections (tasks, notes, templates, series) are re-sent in full. The diff inside each `save*` function prevents unnecessary server writes.
 
 ## Layout
 
@@ -189,7 +189,7 @@ annotations   array of {id, text, timestamp}
 created_at    ISO datetime
 updated_at    ISO datetime
 deleted_at    ISO datetime or null
-_sample       boolean (for sample data)
+sample       boolean (for sample data)
 ```
 
 ## Backend
@@ -204,7 +204,7 @@ FastAPI async server with SQLAlchemy 2.0 and SQLite (via aiosqlite).
 - Notes: CRUD for scratch notes
 - Templates: CRUD for task templates
 - Series: CRUD + stop for recurring task series
-- Sync: bulk import with ID remapping for dependencies and series
+- All: clear all server data (called from "Clear all data" in Settings)
 - Dashboard: analytics data
 - Search: full-text across tasks
 - Backups: list, create, restore

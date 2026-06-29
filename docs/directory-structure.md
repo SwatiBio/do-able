@@ -38,7 +38,7 @@ do-able/
         scratch.py         /api/notes CRUD
         templates.py        /api/templates CRUD
         task_series.py      /api/series CRUD + stop
-        sync.py            /api/sync/full initial data import with ID remapping (not used for routine sync)
+        sync.py            DELETE /api/all — clears all server data (called from "Clear all data" in Settings)
         dashboard.py       /api/dashboard analytics
         search.py          /api/search full-text search
         backups.py         /api/backups list/create/restore
@@ -53,7 +53,6 @@ do-able/
         scratch_service.py Scratch notes CRUD
         template_service.py Template CRUD
         task_series_service.py Recurring series CRUD + stop
-        sync_service.py    Initial data import with depends_on ID resolution
         dashboard_service.py Analytics queries
         search_service.py  Full-text search
         backup_service.py  Backup creation and restore

@@ -7,7 +7,7 @@
 | CSS (Nord theme, layout, responsive) | done |
 | HTML structure (orbital ring, sidebar, topbar, pages) | done |
 | JS data layer (localStorage read/write, ID generation) | done |
-| Offline write queue (dirty flag, replayed on reconnect) | done |
+| Offline write queue (binary pending flag, re-send all on reconnect, all 4 collections) | done |
 | File split: index.html / src/app.js / src/ui.js / src/events.js | done |
 | JS navigation (page switching, sidebar toggle, backdrop) | done |
 | Theme toggle (Nord Dark/Light/System) | done |
@@ -176,7 +176,7 @@
 | FastAPI async server with SQLAlchemy + SQLite | done |
 | Task CRUD endpoints | done |
 | Config, Focus, Notes endpoints | done |
-| Sync endpoint with ID remapping | done |
+| Data wipe endpoint (DELETE /api/all) | done |
 | Dashboard, Search, Backup, Bin, Activity, Export endpoints | done |
 | Frontend API client with background sync | done |
 | index.html served at GET / | done |
@@ -190,7 +190,7 @@
 | Smart reminders (browser notifications) | done |
 | start.bat / stop.bat scripts | done |
 | Updated README, design, api, directory-structure, TRACKER | done |
-| State machine formalized (not_started → in_progress → done/cancelled → deleted, reopen paths) | done |
+| State machine formalized (not_started → in_progress → done/cancelled ↔ reopen, warn-only, no `deleted` status) | done |
 | docs/conceptual-model.md | done |
 
 ## Phase 2 — Win95 Home Page
