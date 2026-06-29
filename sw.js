@@ -1,4 +1,4 @@
-const CACHE = 'doable-v2';
+const CACHE = 'doable-v3';
 const ASSETS = [
   '/',
   '/site.webmanifest',
