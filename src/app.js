@@ -16,7 +16,7 @@ const _api = {
       if (!r.ok) throw new Error(`API ${method} ${path}: ${r.status}`);
       return r.status === 204 ? null : r.json();
     } catch(e) {
-      _markPending();
+      if (method !== 'GET') _markPending();
       throw e;
     }
   },
@@ -58,7 +58,7 @@ async function _initApi() {
         parent_id: t.parent_id ? String(t.parent_id) : null,
         series_id: t.series_id ? String(t.series_id) : null,
         files: t.files || [],
-        _sample: t.sample || t._sample || undefined,
+        sample: t.sample || t._sample || undefined,
       }));
       lsSet('tasks', tasks);
     }
@@ -145,47 +145,68 @@ function _taskPayload(t){
     depends_on_str:(t.depends_on||[]).filter(d=>!_isNumericId(d)),
     annotations:t.annotations||[],files:t.files||[],
     parent_id:_isNumericId(t.parent_id)?Number(t.parent_id):null,
-    _sample:t._sample||undefined,
+    _sample:t.sample||undefined,
   }
 }
-function getTasks(){return lsGet('tasks',[])}
-async function saveTasks(t){
-  const prev=getTasks();
+function buildTask(overrides = {}) {
+  return {
+    id: overrides.id || uid(),
+    title: overrides.title || '',
+    description: overrides.description || '',
+    status: overrides.status || 'not_started',
+    priority: overrides.priority || 'medium',
+    due_date: overrides.due_date || '',
+    start_date: overrides.start_date || '',
+    time: overrides.time || '',
+    category: overrides.category || '',
+    tags: overrides.tags || [],
+    recur: overrides.recur || null,
+    series_id: overrides.series_id || null,
+    depends_on: overrides.depends_on || [],
+    annotations: overrides.annotations || [],
+    files: overrides.files || [],
+    parent_id: overrides.parent_id || null,
+    created_at: overrides.created_at || nowISO(),
+    updated_at: overrides.updated_at || nowISO(),
+    deleted_at: overrides.deleted_at || null,
+    sample: overrides.sample || undefined,
+  }
+}
+async function _syncCollection(key,route,items,toPayload,onCreated){
+  const prev=lsGet(key,[]);
   const prevIds=new Set(prev.map(x=>x.id));
-  const curIds=new Set(t.map(x=>x.id));
-  lsSet('tasks',t);
+  const curIds=new Set(items.map(x=>x.id));
+  lsSet(key,items);
   try{
     for(const p of prev){
       if(!curIds.has(p.id)&&_isNumericId(p.id))
-        await _api.del('/tasks/'+p.id).catch(()=>{})
+        await _api.del('/'+route+'/'+p.id).catch(()=>{})
     }
-    for(const task of t){
-      const pld=_taskPayload(task);
-      if(_isNumericId(task.id)){
-        await _api.put('/tasks/'+task.id,pld).catch(()=>{})
+    for(const item of items){
+      const pld=toPayload(item);
+      if(_isNumericId(item.id)){
+        await _api.put('/'+route+'/'+item.id,pld).catch(()=>{})
       }else{
-        const resp=await _api.post('/tasks',pld).catch(()=>null);
-        if(resp&&resp.id){
-          const oldId=task.id;task.id=String(resp.id);
-          const stored=getTasks();
-          for(const other of stored){
-            if(other.depends_on&&other.depends_on.includes(oldId))
-              other.depends_on=other.depends_on.map(d=>d===oldId?task.id:d)
-          }
-          lsSet('tasks',stored)
-  }
+        const resp=await _api.post('/'+route,pld).catch(()=>null);
+        if(resp&&resp.id){const oldId=item.id;item.id=String(resp.id);if(onCreated)onCreated(oldId,item.id)}
+      }
+    }
+  }catch(e){_markPending()}
 }
+function getTasks(){return lsGet('tasks',[])}
+function saveTasks(t){return _syncCollection('tasks','tasks',t,_taskPayload,(oid,nid)=>{const stored=getTasks();for(const o of stored){if(o.depends_on&&o.depends_on.includes(oid))o.depends_on=o.depends_on.map(d=>d===oid?nid:d)}lsSet('tasks',stored)})}
 
 // === State Machine ===
 const validTransitions = {
   not_started: ['in_progress'],
   in_progress: ['done', 'cancelled'],
-  done: ['in_progress', 'deleted'],
-  cancelled: ['not_started', 'deleted'],
-  deleted: ['not_started'],
+  done: ['in_progress'],
+  cancelled: ['not_started'],
 };
 function canTransition(from, to) {
-  return (validTransitions[from] || []).includes(to);
+  const allowed = (validTransitions[from] || []).includes(to);
+  if (!allowed) console.warn(`State transition "${from}" → "${to}" is not a documented transition`);
+  return true;
 }
 
 // === Offline Write Queue ===
@@ -194,21 +215,14 @@ function _clearPending(){lsSet('_pendingSync',false)}
 function _hasPending(){return !!lsGet('_pendingSync',false)}
 async function _flushQueue(){
   if(!_api.ready||!_hasPending())return;
-  const tasks=getTasks();
-  for(const t of tasks){
-    if(_isNumericId(t.id))
-      await _api.put('/tasks/'+t.id,_taskPayload(t)).catch(()=>{});
-    else{
-      const r=await _api.post('/tasks',_taskPayload(t)).catch(()=>null);
-      if(r&&r.id){t.id=String(r.id);const stored=getTasks();for(const o of stored)if(o.depends_on&&o.depends_on.includes(t.id))o.depends_on=o.depends_on.map(d=>d===t.id?r.id:d);lsSet('tasks',stored)}
-    }
-  }
-  _clearPending();const oi=document.getElementById('offlineIndicator');if(oi)oi.style.display='none'
+  _clearPending();
+  await saveTasks(getTasks());
+  await saveNotes(getNotes());
+  await saveTemplates(getTemplates());
+  await saveSeries(getSeries());
+  if(!_hasPending()){const oi=document.getElementById('offlineIndicator');if(oi)oi.style.display='none'}
 }
 window.addEventListener('online',_flushQueue);
-    }
-  }catch(e){_markPending()}
-}
 function getActivity(){return lsGet('activity',[])}
 function saveActivity(a){lsSet('activity',a)}
 function getConfig(){return lsGet('config',{theme:'nord-dark',date_mode:'smart',per_page:25})}
@@ -230,26 +244,7 @@ function categoryDot(cat){
   return c?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:4px;vertical-align:middle"></span>`:'';
 }
 function getNotes(){return lsGet('notes',[])}
-async function saveNotes(n){
-  const prev=getNotes();
-  const prevIds=new Set(prev.map(x=>x.id));
-  const curIds=new Set(n.map(x=>x.id));
-  lsSet('notes',n);
-  try{
-    for(const p of prev){
-      if(!curIds.has(p.id)&&_isNumericId(p.id))
-        await _api.del('/notes/'+p.id).catch(()=>{})
-    }
-    for(const note of n){
-      if(_isNumericId(note.id)){
-        await _api.put('/notes/'+note.id,{text:note.text,pinned:note.pinned}).catch(()=>{})
-      }else{
-        const resp=await _api.post('/notes',{text:note.text,pinned:!!note.pinned}).catch(()=>null);
-        if(resp&&resp.id)note.id=String(resp.id)
-      }
-    }
-  }catch(e){}
-}
+function saveNotes(n){return _syncCollection('notes','notes',n,x=>({text:x.text,pinned:!!x.pinned}))}
 function getFocus(){return lsGet('focus',{})}
 async function saveFocus(f){
   lsSet('focus',f);
@@ -267,47 +262,9 @@ function logActivity(taskId,action,details=''){
   if(a.length>500)a.length=500;saveActivity(a)
 }
 function getTemplates(){return lsGet('templates',[])}
-async function saveTemplates(t){
-  const prev=getTemplates();
-  const prevIds=new Set(prev.map(x=>x.id));
-  const curIds=new Set(t.map(x=>x.id));
-  lsSet('templates',t);
-  try{
-    for(const p of prev){
-      if(!curIds.has(p.id)&&_isNumericId(p.id))
-        await _api.del('/templates/'+p.id).catch(()=>{})
-    }
-    for(const tmpl of t){
-      if(_isNumericId(tmpl.id)){
-        await _api.put('/templates/'+tmpl.id,{name:tmpl.name,title:tmpl.title,description:tmpl.description||'',priority:tmpl.priority||'medium',category:tmpl.category||'',tags:tmpl.tags||[],recur:tmpl.recur||null}).catch(()=>{})
-      }else{
-        const resp=await _api.post('/templates',{name:tmpl.name,title:tmpl.title,description:tmpl.description||'',priority:tmpl.priority||'medium',category:tmpl.category||'',tags:tmpl.tags||[],recur:tmpl.recur||null}).catch(()=>null);
-        if(resp&&resp.id)tmpl.id=String(resp.id)
-      }
-    }
-  }catch(e){}
-}
+function saveTemplates(t){return _syncCollection('templates','templates',t,x=>({name:x.name,title:x.title,description:x.description||'',priority:x.priority||'medium',category:x.category||'',tags:x.tags||[],recur:x.recur||null}))}
 function getSeries(){return lsGet('series',[])}
-async function saveSeries(s){
-  const prev=getSeries();
-  const prevIds=new Set(prev.map(x=>x.id));
-  const curIds=new Set(s.map(x=>x.id));
-  lsSet('series',s);
-  try{
-    for(const p of prev){
-      if(!curIds.has(p.id)&&_isNumericId(p.id))
-        await _api.del('/series/'+p.id).catch(()=>{})
-    }
-    for(const series of s){
-      if(_isNumericId(series.id)){
-        await _api.put('/series/'+series.id,{title:series.title,description:series.description||'',priority:series.priority||'medium',category:series.category||'',tags:series.tags||[],recur:series.recur,start_date:series.start_date||null,time:series.time||null,files:series.files||[],active:series.active!==false}).catch(()=>{})
-      }else{
-        const resp=await _api.post('/series',{title:series.title,description:series.description||'',priority:series.priority||'medium',category:series.category||'',tags:series.tags||[],recur:series.recur,start_date:series.start_date||null,time:series.time||null,files:series.files||[],active:series.active!==false}).catch(()=>null);
-        if(resp&&resp.id)series.id=String(resp.id)
-      }
-    }
-  }catch(e){}
-}
+function saveSeries(s){return _syncCollection('series','series',s,x=>({title:x.title,description:x.description||'',priority:x.priority||'medium',category:x.category||'',tags:x.tags||[],recur:x.recur,start_date:x.start_date||null,time:x.time||null,files:x.files||[],active:x.active!==false}))}
 function ensureSeriesForTask(t){
   if(t.recur&&!t.series_id){
     const series=getSeries();

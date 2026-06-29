@@ -239,15 +239,14 @@ function getCalPreviews(tasks){
   tasks.filter(t=>t.recur&&t.due_date).forEach(t=>{
     const dueStr=t.due_date;
     if(dueStr>=startStr&&dueStr<=endStr)return;
-    let next=new Date(dueStr+'T00:00:00');
+    let next=t.due_date;
     let maxIter=1000;
     while(maxIter-->0){
-      if(t.recur==='daily')next.setDate(next.getDate()+1);
-      else if(t.recur==='weekly')next.setDate(next.getDate()+7);
-      else if(t.recur==='monthly')next.setMonth(next.getMonth()+1);
-      const ns=next.toISOString().slice(0,10);
+      const ns=_nextRecurDate(next,t.recur);
+      if(!ns||ns===next)break;
+      next=ns;
       if(ns>endStr)break;
-      if(ns>=startStr){result.push({...t,id:t.id+'_p',due_date:ns,_preview:true});break}
+      if(ns>=startStr){result.push({...t,due_date:ns,_preview:true});break}
     }
   });
   return result
@@ -273,14 +272,14 @@ function renderMonthView(tasks,previewTasks,m,y,today){
       const en=new Date(t.due_date+'T00:00:00');
       const td=Math.round((en-st)/86400000)+1;
       const od=Math.round((new Date(ds+'T00:00:00')-st)/86400000);
-      html+=`<div class="cal-multi-bar" style="background:var(--accent);left:${od/td*100}%;width:${100/td}%" title="${escHtml(t.title)}" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`
+      html+=`<div class="cal-multi-bar" style="background:var(--accent);left:${od/td*100}%;width:${100/td}%" title="${escHtml(t.title)}" onclick="event.stopPropagation();showTaskDetail('${t.id}')">${escHtml(t.title)}</div>`
     });
     const regTasks=dayTasks.filter(t=>!t.start_date||t.start_date===t.due_date||t.start_date>=ds);
     if(regTasks.length<=4){
-      regTasks.forEach(t=>{const cls=t._preview?'cal-preview-task':'calendar-day-task';html+=`<div class="${cls}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`})
+      regTasks.forEach(t=>{const cls=t._preview?'cal-preview-task':'calendar-day-task';html+=`<div class="${cls}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id}')">${escHtml(t.title)}</div>`})
     }else{
       html+=`<div class="calendar-day-dots">${['high','medium','low'].map(p=>regTasks.filter(t=>(t.priority||'medium')===p).length?`<span class="calendar-day-dot" style="background:${p==='high'?'var(--red)':p==='medium'?'var(--orange)':'var(--green)'}"></span>`:'').join('')}</div>`;
-      html+=`<div class="calendar-day-tasks">${regTasks.filter(t=>!t._preview).map(t=>`<div class="calendar-day-task" draggable="true" ondragstart="calDragStart(event,'${t.id}')" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`).join('')}${regTasks.filter(t=>t._preview).map(t=>`<div class="calendar-day-task cal-preview-task" onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`).join('')}</div>`
+      html+=`<div class="calendar-day-tasks">${regTasks.filter(t=>!t._preview).map(t=>`<div class="calendar-day-task" draggable="true" ondragstart="calDragStart(event,'${t.id}')" onclick="event.stopPropagation();showTaskDetail('${t.id}')">${escHtml(t.title)}</div>`).join('')}${regTasks.filter(t=>t._preview).map(t=>`<div class="calendar-day-task cal-preview-task" onclick="event.stopPropagation();showTaskDetail('${t.id}')">${escHtml(t.title)}</div>`).join('')}</div>`
     }
     html+=`</div>`
   }
@@ -308,8 +307,8 @@ function renderWeekView(tasks,previewTasks,today){
       const slotTasks=allTasks.filter(t=>t.due_date===ds&&t.time&&t.time.startsWith(String(h).padStart(2,'0')));
       const noTimeTasks=allTasks.filter(t=>t.due_date===ds&&(!t.time||!t.time.startsWith(String(h).padStart(2,'0')))&&h===12);
       html+=`<div class="calendar-hour-slot${isToday?' today-col':''}" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')" onclick="showTimeSlotPopover(${h},'${ds}',this)">
-        ${slotTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${t.time?`<span class="task-time">${t.time}</span>`:''}${escHtml(t.title)}</div>`).join('')}
-        ${h===12?noTimeTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id.replace(/_p$/,'')}')">${escHtml(t.title)}</div>`).join(''):''}
+        ${slotTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id}')">${t.time?`<span class="task-time">${t.time}</span>`:''}${escHtml(t.title)}</div>`).join('')}
+        ${h===12?noTimeTasks.map(t=>`<div class="calendar-day-task${t._preview?' cal-preview-task':''}"${t._preview?'':` draggable="true" ondragstart="calDragStart(event,'${t.id}')"`} onclick="event.stopPropagation();showTaskDetail('${t.id}')">${escHtml(t.title)}</div>`).join(''):''}
       </div>`
     })
   });
@@ -450,9 +449,6 @@ function parseQuickAdd(text){
   const filtered=keep.filter(w=>{const m=w.match(datePat);if(m){const d=new Date();d.setMonth(parseInt(m[1])-1);d.setDate(parseInt(m[2]));if(d.getFullYear()<2000)d.setFullYear(new Date().getFullYear());t.due_date=d.toISOString().slice(0,10);return false}return true});
   t.title=filtered.join(' ')||text;
   return t
-}
-function buildTask(p){
-  return {id:uid(),title:p.title,description:'',status:'not_started',priority:p.priority,due_date:p.due_date,start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null}
 }
 function quickAddTask(){
   const inp=document.getElementById('quickAddInput');if(!inp.value.trim())return;
@@ -639,7 +635,7 @@ function saveDetailTask(id){
   ensureSeriesForTask(t);
   t.updated_at=nowISO();
   saveTasks(tasks);
-  if(t.status!==oldStatus&&t.status==='done')handleRecurrence(t);
+  if(t.status!==oldStatus&&t.status==='done'){if(!_recurrenceFired.has(id)){handleRecurrence(t);_recurrenceFired.add(id)}}
   if(t.status!==oldStatus&&t.status==='in_progress')logActivity(id,'started',t.title);
   if(t.status!==oldStatus&&t.status==='cancelled')logActivity(id,'cancelled',t.title);
   if(newDue!==oldDue)logActivity(id,'rescheduled',(oldDue||'no date')+' → '+(newDue||'no date'));
@@ -648,18 +644,27 @@ function saveDetailTask(id){
   toast('Task saved','success');
   setTimeout(()=>navigateTo(previousPage),150)
 }
+function _nextRecurDate(dueDate,recur){
+  if(!dueDate||!recur)return dueDate;
+  const d=new Date(dueDate+'T00:00:00');
+  if(recur==='daily')d.setDate(d.getDate()+1);
+  else if(recur==='weekly')d.setDate(d.getDate()+7);
+  else if(recur==='monthly'){
+    const origDay=d.getDate();
+    d.setMonth(d.getMonth()+1);
+    const lastDay=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+    d.setDate(Math.min(origDay,lastDay))
+  }
+  return d.toISOString().slice(0,10)
+}
 function handleRecurrence(t){
   if(!t.recur)return;
   const tasks=getTasks();const due=t.due_date;
   if(!due)return;
-  const d=new Date(due+'T00:00:00');
-  if(t.recur==='daily')d.setDate(d.getDate()+1);
-  else if(t.recur==='weekly')d.setDate(d.getDate()+7);
-  else if(t.recur==='monthly')d.setMonth(d.getMonth()+1);
-  const nd=d.toISOString().slice(0,10);
+  const nd=_nextRecurDate(due,t.recur);
   const series=getSeries().find(s=>String(s.id)===String(t.series_id)&&s.active);
   const base=series||t;
-  const nt={id:uid(),title:base.title,description:base.description||'',status:'not_started',priority:base.priority||'medium',due_date:nd,start_date:series?(series.start_date||''):(t.start_date||''),time:series?(series.time||null):(t.time||null),category:base.category||'',tags:[...(base.tags||[])],recur:base.recur,depends_on:[],annotations:[],files:series?JSON.parse(JSON.stringify(series.files||[])):[],series_id:t.series_id||null,parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const nt=buildTask({title:base.title,description:base.description||'',status:'not_started',priority:base.priority||'medium',due_date:nd,start_date:series?(series.start_date||''):(t.start_date||''),time:series?(series.time||null):(t.time||null),category:base.category||'',tags:[...(base.tags||[])],recur:base.recur,series_id:t.series_id||null,files:series?JSON.parse(JSON.stringify(series.files||[])):[]});
   tasks.push(nt);saveTasks(tasks);logActivity(nt.id,'created',nt.title+' (recurring)');logActivity(t.id,'recurred',nt.title)
 }
 function addDetailTag(){
@@ -721,13 +726,13 @@ function removeDetailFile(idx){
 function addDetailSubtask(){
   const inp=document.getElementById('detailSubtaskInput');if(!inp||!inp.value.trim()||!detailTaskId)return;
   const tasks=getTasks();const parent=tasks.find(x=>x.id===detailTaskId);if(!parent)return;
-  const st={id:uid(),title:inp.value.trim(),description:'',status:'not_started',priority:'medium',due_date:'',start_date:'',time:'',category:'',tags:[],recur:null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:detailTaskId,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const st=buildTask({title:inp.value.trim(),parent_id:detailTaskId});
   tasks.push(st);saveTasks(tasks);logActivity(st.id,'created',st.title);inp.value='';renderTaskDetailPage()
 }
 function toggleSubtaskStatus(id,checked){
   const tasks=getTasks();const t=tasks.find(x=>x.id===id);
   if(!t)return;t.status=checked?'done':'not_started';t.updated_at=nowISO();
-  if(t.status==='done'){logActivity(id,'completed',t.title);handleRecurrence(t)}
+  if(t.status==='done'){logActivity(id,'completed',t.title);if(!_recurrenceFired.has(id)){handleRecurrence(t);_recurrenceFired.add(id)}}
   saveTasks(tasks);renderTaskDetailPage()
 }
 function saveTemplateFromDetail(){
@@ -741,7 +746,7 @@ function saveTemplateFromDetail(){
 function applyTemplate(name){
   const templates=getTemplates();const tmpl=templates.find(t=>t.name===name);
   if(!tmpl)return;
-  const tasks=getTasks();const t={id:uid(),title:tmpl.title,description:tmpl.description||'',status:'not_started',priority:tmpl.priority||'medium',due_date:'',start_date:'',time:'',category:tmpl.category||'',tags:[...(tmpl.tags||[])],recur:tmpl.recur||null,series_id:null,depends_on:[],annotations:[],files:[],parent_id:null,created_at:nowISO(),updated_at:nowISO(),deleted_at:null};
+  const tasks=getTasks();const t=buildTask({title:tmpl.title,description:tmpl.description||'',priority:tmpl.priority||'medium',category:tmpl.category||'',tags:[...(tmpl.tags||[])],recur:tmpl.recur||null});
   if(t.recur)ensureSeriesForTask(t);
   tasks.push(t);saveTasks(tasks);logActivity(t.id,'created',t.title);renderCurrentView()
 }
@@ -1012,8 +1017,8 @@ function importCSV(event){
         const annStr=getCol('annotations');
         const statusVal=getCol('status');
         const statusMap={'started':'in_progress','not_started':'not_started','in_progress':'in_progress','done':'done','cancelled':'cancelled'};
-        const t={
-          id:uid(),title,
+        const t=buildTask({
+          title,
           description:getCol('description'),
           status:statusMap[statusVal]||'not_started',
           priority:getCol('priority')||'medium',
@@ -1023,15 +1028,8 @@ function importCSV(event){
           category:getCol('category'),
           tags:tagsStr?tagsStr.split(';').map(s=>s.trim()).filter(Boolean):[],
           recur:getCol('recur')||null,
-          series_id:null,
-          depends_on:[],
           annotations:annStr?annStr.split(';').map(s=>({id:uid(),text:s.trim(),created_at:nowISO()})).filter(a=>a.text):[],
-          files:[],
-          parent_id:null,
-          created_at:nowISO(),
-          updated_at:nowISO(),
-          deleted_at:null
-        };
+        });
         tasks.push(t);
         logActivity(t.id,'created',t.title);
         imported++
@@ -1058,6 +1056,6 @@ function clearAllData(){
   if(!confirm('This will permanently delete ALL data. Are you sure?'))return;
   if(!confirm('Really? All tasks, notes, annotations, activity, everything?'))return;
   Object.keys(localStorage).filter(k=>k.startsWith(LS_PREFIX)).forEach(k=>localStorage.removeItem(k));
-  if(_api.ready){_api.post('/sync/full',{tasks:[],notes:[],config:{},templates:[],series:[]}).catch(()=>{})}
+  if(_api.ready){_api.del('/all').catch(()=>{})}
   toast('All data cleared','info');renderCurrentPage()
 }
