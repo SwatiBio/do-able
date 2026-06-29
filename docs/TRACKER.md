@@ -193,6 +193,23 @@
 | State machine formalized (not_started → in_progress → done/cancelled → deleted, reopen paths) | done |
 | docs/conceptual-model.md | done |
 
+## Phase 2 — Win95 Home Page
+
+| Feature | Status |
+|---------|--------|
+| Win95-inspired desktop landing page (`#page-home`) | done |
+| Dialog with Quick NLP input + Advanced panel toggle | done |
+| Theme-aware `--win-*` CSS vars (Nord Dark/Light) | done |
+| Chrome hiding (`.home-active` hides sidebar/topbar/ring) | done |
+| Clock widget (HH:MM, LCD style, updates every 10s) | done |
+| Desktop icons (My Computer, Recycle Bin) with selection | done |
+| Right-click desktop context menu | done |
+| Dialog drag by title bar | done |
+| Double-click title bar to minimize/restore | done |
+| Add button creates real tasks via shared data layer | done |
+| Cancel clears form, resets priority to Medium | done |
+| Home icon in topbar navigates back to home page | done |
+
 ## Type & Color Refinement
 
 | Feature | Status |

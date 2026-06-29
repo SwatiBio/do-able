@@ -62,6 +62,8 @@ The app is a PWA, so once added to your home screen it runs in its own window wi
 
 ## Features
 
+- **Home page** (Win95-inspired desktop) shown on first load: a retro dialog box with natural-language quick-add, advanced task form, priority buttons, clock widget, desktop icons, and context menu. Theme-aware. "Go to Main App" navigates to Dashboard.
+
 ### Views
 
 - **Dashboard** with scratch notes, daily focus goals, overdue and due-today lists, weekly completion summary with trend, daily streak, My Day section, heatmap grid, and task roulette

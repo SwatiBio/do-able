@@ -1,0 +1,648 @@
+/* ============================================================
+   Do-able · Home Page Concept (Windows 95/98-inspired)
+   Phase 1 — standalone prototype, not integrated
+   ============================================================ */
+
+/* ----- Reset & Base ----- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Pixelify Sans', 'Courier New', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  image-rendering: pixelated;
+}
+
+/* ----- Themes (only: background, title bar, accent, button highlights) ----- */
+:root, [data-theme="nord-dark"] {
+  --bg-top: #242933;
+  --bg-bottom: #1c212a;
+  --title-bar: #3b5998;
+  --title-bar-text: #eceff4;
+  --accent: #5e81ac;
+  --accent-hover: #7298c4;
+  --btn-primary-text: #eceff4;
+  --theme-label: "Nord Dark";
+}
+[data-theme="nord-light"] {
+  --bg-top: #d8dee9;
+  --bg-bottom: #c8ced9;
+  --title-bar: #5e81ac;
+  --title-bar-text: #ffffff;
+  --accent: #5e81ac;
+  --accent-hover: #4a72a0;
+  --btn-primary-text: #ffffff;
+  --theme-label: "Nord Light";
+}
+
+/* ----- Desktop (full-screen background) ----- */
+.desktop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(ellipse at 50% 48%, transparent 50%, rgba(0,0,0,0.18) 100%),
+    linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+  position: relative;
+  transition: background 0.4s ease;
+}
+
+/* Scanline overlay — subtle retro CRT texture */
+.desktop::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.025) 2px,
+    rgba(0,0,0,0.025) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ----- Clock Widget (digital gadget) ----- */
+.clock-widget {
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  background: #0a0a0a;
+  border: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+  z-index: 5;
+  user-select: none;
+  border-radius: 2px;
+}
+
+.clock-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 14px;
+  background: #111;
+  border: 1px solid #333;
+}
+
+.clock-time {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #88c0d0;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+/* ----- Status Bar ----- */
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: #c0c0c0;
+  border-top: 2px solid #fff;
+  box-shadow: inset 0 1px 0 #808080;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 11px;
+  z-index: 10;
+}
+
+.status-text {
+  color: #000;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+}
+
+/* ----- Dialog Box (Win95/98 style) ----- */
+.dialog {
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  box-shadow:
+    6px 6px 0 -2px rgba(0,0,0,0.12),
+    10px 10px 24px -6px rgba(0,0,0,0.35);
+  min-width: 380px;
+  max-width: 520px;
+  width: 90vw;
+  position: relative;
+  user-select: none;
+}
+
+/* Inner sunken border for the whole dialog face */
+.dialog::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid #808080;
+  border-color: #808080 #ffffff #ffffff #808080;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ----- Title Bar ----- */
+.dialog-titlebar {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 3px 0 4px;
+  background: linear-gradient(90deg, var(--title-bar), color-mix(in srgb, var(--title-bar) 80%, #000));
+  position: relative;
+  z-index: 1;
+  transition: background 0.4s ease;
+  cursor: default;
+}
+
+.titlebar-icon {
+  flex-shrink: 0;
+  margin-right: 5px;
+  color: var(--title-bar-text);
+  opacity: 0.9;
+  transition: color 0.4s ease;
+}
+
+.dialog-title {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--title-bar-text);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.4s ease;
+}
+
+.dialog-close {
+  width: 18px;
+  height: 16px;
+  padding: 0;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  flex-shrink: 0;
+  margin-left: 4px;
+  transition: none;
+}
+
+.dialog-close:active {
+  border-style: inset;
+}
+
+.dialog-close:hover {
+  background: #d0d0d0;
+}
+
+.dialog-close:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -3px;
+}
+
+/* ----- Dialog Body ----- */
+.dialog-body {
+  padding: 16px 14px 14px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ----- Quick Input Area ----- */
+.quick-area {
+  margin-bottom: 10px;
+}
+
+.quick-input {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.btn-advanced {
+  font-size: 11px;
+  min-width: 0;
+  height: 22px;
+  padding: 0 10px;
+  background: transparent;
+  border: 1px solid #808080;
+  border-color: #808080 #fff #fff #808080;
+  color: #000;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  font-weight: 600;
+  transition: none;
+}
+
+.btn-advanced:active {
+  border-color: #fff #808080 #808080 #fff;
+}
+
+.btn-advanced:hover {
+  background: #d5d5d5;
+}
+
+.quick-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-launch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  min-width: 0;
+  height: 22px;
+  padding: 0 10px;
+  text-decoration: none;
+  color: #000;
+  background: #c0c0c0;
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px outset #c0c0c0;
+  transition: none;
+}
+
+.btn-launch:active {
+  border-style: inset;
+}
+
+.btn-launch:hover {
+  background: #d0d0d0;
+  text-decoration: none;
+  color: #000;
+}
+
+.btn-advanced .arrow {
+  font-size: 9px;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.btn-advanced.open .arrow {
+  transform: rotate(90deg);
+}
+
+/* ----- Advanced Panel ----- */
+.advanced-panel {
+  margin-top: 4px;
+  margin-bottom: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #808080;
+  border-top-color: #808080 #fff transparent transparent;
+}
+
+.advanced-panel.closed {
+  display: none;
+}
+
+.field-row {
+  margin-bottom: 8px;
+}
+
+.row-duo {
+  display: flex;
+  gap: 10px;
+}
+
+.field-half {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 2px;
+  letter-spacing: 0.02em;
+}
+
+/* ----- Win95-style Inputs (sunken) ----- */
+.win-input {
+  width: 100%;
+  border: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  font-size: 12px;
+  padding: 3px 5px;
+  outline: none;
+  transition: none;
+}
+
+.win-input:focus {
+  border-color: #000080 #c0c0c0 #c0c0c0 #000080;
+}
+
+.win-input::placeholder {
+  color: #999;
+  font-size: 11px;
+}
+
+textarea.win-input {
+  resize: vertical;
+  min-height: 48px;
+  line-height: 1.4;
+}
+
+/* Win95-style select */
+select.win-input {
+  appearance: auto;
+  padding: 2px 4px;
+  background: #ffffff;
+}
+
+/* ----- Priority Button Group ----- */
+.prio-group {
+  display: flex;
+  gap: 6px;
+}
+
+.prio-btn {
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  background: #c0c0c0;
+  color: #000;
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 14px;
+  cursor: pointer;
+  transition: none;
+  letter-spacing: 0.02em;
+}
+
+.prio-btn:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+
+.prio-btn.active {
+  border-color: #808080 #ffffff #ffffff #808080;
+  background: #a0a0a0;
+  color: #fff;
+  font-weight: 700;
+}
+
+.prio-btn:hover {
+  background: #d0d0d0;
+}
+
+.prio-btn.active:hover {
+  background: #909090;
+}
+
+.prio-btn[data-prio="high"].active { background: #bf616a; color: #fff; border-color: #8a3a3a #e8a0a0 #e8a0a0 #8a3a3a; }
+.prio-btn[data-prio="medium"].active { background: #d08770; color: #fff; border-color: #a06040 #e8c0a0 #e8c0a0 #a06040; }
+.prio-btn[data-prio="low"].active { background: #a3be8c; color: #fff; border-color: #6a8a50 #c8e0b0 #c8e0b0 #6a8a50; }
+
+.prio-btn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -3px;
+}
+
+/* ----- 3D Buttons (raised bevel) ----- */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.btn-win {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 26px;
+  padding: 0 16px;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  color: #000;
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: none;
+  letter-spacing: 0.02em;
+}
+
+.btn-win:active {
+  border-style: inset;
+}
+
+.btn-win:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -3px;
+}
+
+.btn-win:hover {
+  background: #d0d0d0;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent-hover) #000 var(--accent-hover);
+  color: var(--btn-primary-text);
+  font-weight: 700;
+  transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
+.btn-primary:active {
+  border-style: inset;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* ----- Theme Icon Button ----- */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 0;
+  padding: 0;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  cursor: pointer;
+  transition: none;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.btn-icon:active {
+  border-style: inset;
+}
+
+.btn-icon:hover {
+  background: #d0d0d0;
+}
+
+.btn-icon svg {
+  display: block;
+}
+
+/* ----- Responsive ----- */
+/* ----- Desktop Icons ----- */
+.desktop-icons {
+  position: fixed;
+  left: 16px;
+  top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.desk-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 72px;
+  cursor: pointer;
+  pointer-events: auto;
+  padding: 4px;
+  border-radius: 2px;
+}
+
+.desk-icon:hover {
+  background: rgba(255,255,255,0.1);
+  outline: 1px dotted rgba(255,255,255,0.25);
+}
+
+.desk-icon.selected {
+  background: rgba(0,0,128,0.25);
+  outline: 1px dotted rgba(255,255,255,0.4);
+}
+
+.desk-icon-img {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.desk-icon-label {
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  line-height: 1.2;
+  max-width: 68px;
+  word-wrap: break-word;
+}
+
+/* ----- Desktop Context Menu ----- */
+.ctx-menu {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+  padding: 2px;
+  min-width: 180px;
+  font-family: 'Pixelify Sans', 'Courier New', monospace;
+}
+
+.ctx-menu.open {
+  display: block;
+}
+
+.ctx-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 20px 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #000;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ctx-item:hover {
+  background: #000080;
+  color: #fff;
+}
+
+.ctx-item:active {
+  background: #000060;
+}
+
+.ctx-arrow {
+  font-size: 8px;
+  margin-left: 24px;
+  color: inherit;
+}
+
+.ctx-separator {
+  height: 1px;
+  margin: 2px 4px;
+  background: #808080;
+  border-bottom: 1px solid #fff;
+}
+
+@media (max-width: 640px) {
+  .dialog {
+    min-width: 0;
+    width: 92vw;
+  }
+
+  .dialog-body {
+    padding: 12px 10px 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .dialog {
+    width: 96vw;
+  }
+
+  .dialog-title {
+    font-size: 11px;
+  }
+
+  .btn-win {
+    min-width: 60px;
+    height: 24px;
+    font-size: 11px;
+    padding: 0 12px;
+  }
+}

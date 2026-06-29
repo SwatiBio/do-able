@@ -25,9 +25,20 @@ If the server is offline, mutations are queued in localStorage with sequence num
 
 The sidebar uses an "orbital ring" design: a 44px circular button fixed at the bottom-left corner of the screen. Clicking it slides open a 200px navigation panel from the left with a backdrop overlay. On first load the ring pulses with an accent glow animation three times to draw attention, until the user opens the sidebar once (state persisted in config). On mobile the ring is 44px (WCAG touch target minimum) and the sidebar takes the full width.
 
-The topbar is 52px tall. Left to right: global search input, centered page title (`#topbarTitle`), command palette trigger (⌘K / Ctrl+K), focus-mode button, theme-cycle button, offline badge.
+The topbar is 52px tall. Left to right: global search input, centered page title (`#topbarTitle`), command palette trigger (⌘K / Ctrl+K), focus-mode button, home icon, theme-cycle button, offline badge.
 
 ## Pages
+
+### Home Page
+
+A Windows 95/98-inspired desktop landing page shown on first load. Uses `#page-home` with a `.home-active` CSS class to hide sidebar, topbar, sidebar-ring, and backdrop, making the desktop fill the full viewport.
+
+- Dialog has two modes: Quick (always-visible NLP input for "Buy milk tomorrow high" style entry) and Advanced (toggle via ▶ Advanced button with Title, Description, Priority High/Medium/Low, Due Date, Start Date, Time, Category select, Tags)
+- NLP parsing reuses the app's shared `parseQuickAdd()` function
+- Desktop decorations: LCD clock widget (top-right, HH:MM), My Computer + Recycle Bin desktop icons (clickable), right-click context menu, scanline CRT overlay, status bar with build info and theme name
+- Theme toggle calls the app's existing `cycleTheme()`, updating `--win-*` CSS vars (background gradient, title bar color, accent, clock color)
+- "Go to Main App" button navigates to Dashboard; home icon in the topbar navigates back to home
+- Add button creates real tasks via `buildTask()` + `saveTasks()` + `logActivity()` + toast
 
 ### Dashboard
 
