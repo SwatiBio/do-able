@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas import AnnotationCreate, TaskCreate, TaskOut, TaskUpdate
+from app.schemas import AnnotationCreate, TaskCreate, TaskUpdate
 from app.services import task_service
 from app.services.backup_service import auto_backup
 

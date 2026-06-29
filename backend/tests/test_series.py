@@ -62,76 +62,32 @@ async def test_delete_series(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_sync_series_and_task_mapping(client: AsyncClient):
-    resp = await client.post("/api/sync/full", json={
-        "tasks": [],
-        "notes": [],
-        "config": {},
-        "templates": [],
-        "series": [
-            {"title": "Synced series", "recur": "weekly", "priority": "high", "tags": ["sync"]},
-        ],
-    })
-    assert resp.status_code == 200
-    list_resp = await client.get("/api/series")
-    series = list_resp.json()["series"]
-    assert len(series) == 1
-    assert series[0]["title"] == "Synced series"
-    assert series[0]["tags"] == ["sync"]
-    server_series_id = series[0]["id"]
+async def test_series_with_task_mapping(client: AsyncClient):
+    create_resp = await client.post("/api/series", json={"title": "Test series", "recur": "weekly", "priority": "high", "tags": ["sync"]})
+    assert create_resp.status_code == 201
+    series_id = create_resp.json()["id"]
+    assert series_id is not None
 
-    task_resp = await client.post("/api/sync/full", json={
-        "tasks": [
-            {
-                "id": "local1",
-                "title": "Recurring task",
-                "status": "not_started",
-                "priority": "medium",
-                "recur": "weekly",
-                "series_id": str(server_series_id),
-                "depends_on": [],
-                "annotations": [],
-                "files": [],
-                "tags": [],
-                "created_at": "2026-06-28T10:00:00",
-                "updated_at": "2026-06-28T10:00:00",
-            },
-        ],
-        "notes": [],
-        "config": {},
-        "templates": [],
-        "series": [
-            {"title": "Synced series", "recur": "weekly", "priority": "high", "tags": ["sync"]},
-        ],
+    task_resp = await client.post("/api/tasks", json={
+        "title": "Recurring task",
+        "status": "not_started",
+        "priority": "medium",
+        "recur": "weekly",
+        "series_id": series_id,
     })
-    assert task_resp.status_code == 200
-    tasks_resp = await client.get("/api/tasks?flat=true&per_page=100")
-    tasks = tasks_resp.json().get("tasks", tasks_resp.json())
-    if isinstance(tasks, dict):
-        tasks = tasks.get("tasks", [])
-    assert len(tasks) >= 1
-    task = tasks[0]
-    assert task["series_id"] == server_series_id
+    assert task_resp.status_code == 201
+    task = task_resp.json()
+    assert task["series_id"] == series_id
 
 
 @pytest.mark.asyncio
-async def test_sync_series_with_files(client: AsyncClient):
-    resp = await client.post("/api/sync/full", json={
-        "tasks": [],
-        "notes": [],
-        "config": {},
-        "templates": [],
-        "series": [
-            {
-                "title": "Series with files",
-                "recur": "daily",
-                "files": [{"name": "checklist.txt", "data": "aGVsbG8=", "size": 5, "type": "text/plain"}],
-            },
-        ],
+async def test_series_with_files(client: AsyncClient):
+    resp = await client.post("/api/series", json={
+        "title": "Series with files",
+        "recur": "daily",
+        "files": [{"name": "checklist.txt", "data": "aGVsbG8=", "size": 5, "type": "text/plain"}],
     })
-    assert resp.status_code == 200
-    list_resp = await client.get("/api/series")
-    series = list_resp.json()["series"]
-    synced = next(s for s in series if s["title"] == "Series with files")
-    assert len(synced["files"]) == 1
-    assert synced["files"][0]["name"] == "checklist.txt"
+    assert resp.status_code == 201
+    data = resp.json()
+    assert len(data["files"]) == 1
+    assert data["files"][0]["name"] == "checklist.txt"

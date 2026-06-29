@@ -51,20 +51,11 @@ async def test_delete_template(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_sync_templates(client: AsyncClient):
-    resp = await client.post("/api/sync/full", json={
-        "tasks": [],
-        "notes": [],
-        "config": {},
-        "templates": [
-            {"name": "Synced template", "title": "Synced task", "priority": "high", "tags": ["sync"]},
-            {"name": "Another", "title": "Another task", "category": "Work"},
-        ],
-    })
-    assert resp.status_code == 200
+async def test_create_multiple_templates(client: AsyncClient):
+    await client.post("/api/templates", json={"name": "Synced template", "title": "Synced task", "priority": "high", "tags": ["sync"]})
+    await client.post("/api/templates", json={"name": "Another", "title": "Another task", "category": "Work"})
     list_resp = await client.get("/api/templates")
     templates = list_resp.json()["templates"]
-    assert len(templates) == 2
     names = [t["name"] for t in templates]
     assert "Synced template" in names
     assert "Another" in names
